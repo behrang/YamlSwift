@@ -1,4 +1,5 @@
 module-name = Yaml
+sdk = $$(xcrun --show-sdk-path --sdk macosx)
 
 build/libyaml.a: build/yaml.o build/yaml.swiftmodule
 	@xcrun swiftc \
@@ -11,6 +12,7 @@ build/yaml.swiftmodule: yaml.swift | build
 	@xcrun swiftc \
 		-emit-module \
 		-module-name $(module-name) \
+		-sdk $(sdk) \
 		-o $@ \
 		$^
 
@@ -19,12 +21,14 @@ build/yaml.o: yaml.swift | build
 		-emit-library \
 		-emit-object \
 		-module-name $(module-name) \
+		-sdk $(sdk) \
 		-o $@ \
 		$^
 
 build/test: test.swift build/libyaml.a | build
 	@xcrun swiftc \
 		-emit-executable \
+		-sdk $(sdk) \
 		-I build \
 		-L build \
 		-lyaml \
