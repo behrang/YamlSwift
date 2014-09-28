@@ -42,13 +42,28 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
 }
 
 class Parser {
-  var tokens: [TokenMatch]
+  let tokens: [TokenMatch]
+  var index: Int = 0
 
   init(_ tokens: [TokenMatch]) {
     self.tokens = tokens
   }
 
+  func peekType() -> TokenType {
+    return tokens[index].type
+  }
+
   func parse() -> Yaml {
+    while index < tokens.endIndex {
+      if peekType() == .Comment {
+        index += 1
+        continue
+      }
+      if peekType() == .Null {
+        index += 1
+        return .Null
+      }
+    }
     return .Null
   }
 }
