@@ -41,6 +41,18 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
   return (nil, matches)
 }
 
+class Parser {
+  var tokens: [TokenMatch]
+
+  init(_ tokens: [TokenMatch]) {
+    self.tokens = tokens
+  }
+
+  func parse() -> Yaml {
+    return .Null
+  }
+}
+
 public enum Yaml {
 
   case Null
@@ -51,7 +63,7 @@ public enum Yaml {
     if let error = result.error {
       return .Invalid(error)
     }
-    return .Null
+    return Parser(result.tokens!).parse()
   }
 }
 
