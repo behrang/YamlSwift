@@ -3,6 +3,8 @@ import Foundation
 enum TokenType: String, Printable {
   case Comment = "comment"
   case Null = "null"
+  case True = "true"
+  case False = "false"
 
   var description: String {
     return self.toRaw()
@@ -14,7 +16,9 @@ typealias TokenMatch = (type: TokenType, match: String)
 
 let tokenPatterns: [TokenPattern] = [
   (.Comment, "^#[^\\n]*"),
-  (.Null, "^(null|Null|NULL|~|$)")
+  (.Null, "^(null|Null|NULL|~|$)"),
+  (.True, "^(true|True|TRUE)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
+  (.False, "^(false|False|FALSE)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
 ]
 
 func context (var text: String) -> String {
@@ -55,30 +59,59 @@ class Parser {
 
   func parse() -> Yaml {
     while index < tokens.endIndex {
-      if peekType() == .Comment {
+      let nextType = peekType()
+
+      if nextType == .Comment {
         index += 1
         continue
       }
-      if peekType() == .Null {
+
+      if nextType == .Null {
         index += 1
         return .Null
       }
+
+      if nextType == .True {
+        return .Bool(true)
+      }
+
+      if nextType == .False {
+        return .Bool(false)
+      }
+
     }
     return .Null
   }
 }
 
-public enum Yaml {
+public enum Yaml: Printable {
 
   case Null
+  case Bool(Swift.Bool)
   case Invalid(String)
+
+  public var description: String {
+    switch self {
+    case .Null:
+      return "Null"
+    case .Bool(let b):
+      return "Bool: \(b)"
+    case .Invalid(let e):
+      return "Invalid: \(e)"
+    default:
+      return "*Unknown*"
+    }
+  }
 
   public static func load (text: String) -> Yaml {
     let result = tokenize(text)
     if let error = result.error {
+      println(error)
       return .Invalid(error)
     }
-    return Parser(result.tokens!).parse()
+    let ret = Parser(result.tokens!).parse()
+    println(ret)
+    return ret
   }
 }
 
@@ -93,10 +126,18 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
       return false
     }
 
-  case .Invalid(let ls):
+  case .Bool(let lv):
     switch rhs {
-    case .Invalid(let rs):
-      return ls == rs
+    case .Bool(let rv):
+      return lv == rv
+    default:
+      return false
+    }
+
+  case .Invalid(let lv):
+    switch rhs {
+    case .Invalid(let rv):
+      return lv == rv
     default:
       return false
     }
