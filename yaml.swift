@@ -2,6 +2,7 @@ import Foundation
 
 enum TokenType: String, Printable {
   case Comment = "comment"
+  case Space = "space"
   case Null = "null"
   case True = "true"
   case False = "false"
@@ -17,14 +18,16 @@ enum TokenType: String, Printable {
 typealias TokenPattern = (type: TokenType, pattern: String)
 typealias TokenMatch = (type: TokenType, match: String)
 
+let finish = "(?=\\s*(\\s#[^\\n]*)?(\\n|$))"
 let tokenPatterns: [TokenPattern] = [
   (.Comment, "^#[^\\n]*"),
-  (.Null, "^(null|Null|NULL|~|$)"),
-  (.True, "^(true|True|TRUE)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
-  (.False, "^(false|False|FALSE)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
-  (.PositiveInfinity, "^\\+?\\.(inf|Inf|INF)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
-  (.NegativeInfinity, "^-\\.(inf|Inf|INF)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
-  (.NaN, "^\\.(nan|NaN|NAN)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
+  (.Space, "^ +"),
+  (.Null, "^(null|Null|NULL|~)\(finish)"),
+  (.True, "^(true|True|TRUE)\(finish)"),
+  (.False, "^(false|False|FALSE)\(finish)"),
+  (.PositiveInfinity, "^\\+?\\.(inf|Inf|INF)\(finish)"),
+  (.NegativeInfinity, "^-\\.(inf|Inf|INF)\(finish)"),
+  (.NaN, "^\\.(nan|NaN|NAN)\(finish)"),
 ]
 
 func context (var text: String) -> String {
@@ -69,7 +72,7 @@ class Parser {
 
       switch nextType {
 
-      case .Comment:
+      case .Comment, .Space:
         index += 1
         continue
 
