@@ -5,6 +5,8 @@ enum TokenType: String, Printable {
   case Null = "null"
   case True = "true"
   case False = "false"
+  case PositiveInfinity = "+infinity"
+  case NegativeInfinity = "-infinity"
 
   var description: String {
     return self.toRaw()
@@ -19,6 +21,8 @@ let tokenPatterns: [TokenPattern] = [
   (.Null, "^(null|Null|NULL|~|$)"),
   (.True, "^(true|True|TRUE)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
   (.False, "^(false|False|FALSE)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
+  (.PositiveInfinity, "^\\+?(\\.inf|\\.Inf|\\.INF)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
+  (.NegativeInfinity, "^-(\\.inf|\\.Inf|\\.INF)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
 ]
 
 func context (var text: String) -> String {
@@ -61,24 +65,27 @@ class Parser {
     while index < tokens.endIndex {
       let nextType = peekType()
 
-      if nextType == .Comment {
+      switch nextType {
+
+      case .Comment:
         index += 1
         continue
-      }
 
-      if nextType == .Null {
-        index += 1
+      case .Null:
         return .Null
-      }
 
-      if nextType == .True {
+      case .True:
         return .Bool(true)
-      }
 
-      if nextType == .False {
+      case .False:
         return .Bool(false)
-      }
 
+      case .PositiveInfinity:
+        return .Float(Float.infinity) //(tokens[index].match as NSString).floatValue
+
+      case .NegativeInfinity:
+        return .Float(-Float.infinity)
+      }
     }
     return .Null
   }
@@ -88,6 +95,7 @@ public enum Yaml: Printable {
 
   case Null
   case Bool(Swift.Bool)
+  case Float(Swift.Float)
   case Invalid(String)
 
   public var description: String {
@@ -96,6 +104,8 @@ public enum Yaml: Printable {
       return "Null"
     case .Bool(let b):
       return "Bool: \(b)"
+    case .Float(let f):
+      return "Float: \(f)"
     case .Invalid(let e):
       return "Invalid: \(e)"
     default:
@@ -129,6 +139,14 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
   case .Bool(let lv):
     switch rhs {
     case .Bool(let rv):
+      return lv == rv
+    default:
+      return false
+    }
+
+  case .Float(let lv):
+    switch rhs {
+    case .Float(let rv):
       return lv == rv
     default:
       return false
