@@ -10,6 +10,9 @@ enum TokenType: String, Printable {
   case NegativeInfinity = "-infinity"
   case NaN = "nan"
   case Float = "float"
+  case Int = "int"
+  case IntOct = "int-oct"
+  case IntHex = "int-hex"
 
   var description: String {
     return self.toRaw()
@@ -29,6 +32,9 @@ let tokenPatterns: [TokenPattern] = [
   (.PositiveInfinity, "^\\+?\\.(inf|Inf|INF)\(finish)"),
   (.NegativeInfinity, "^-\\.(inf|Inf|INF)\(finish)"),
   (.NaN, "^\\.(nan|NaN|NAN)\(finish)"),
+  (.Int, "^[-+]?[0-9]+\(finish)"),
+  (.IntOct, "^0o[0-7]+\(finish)"),
+  (.IntHex, "^0x[0-9a-fA-F]+\(finish)"),
   (.Float, "^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)"),
 ]
 
@@ -71,6 +77,7 @@ class Parser {
   func parse() -> Yaml {
     while index < tokens.endIndex {
       let nextType = peekType()
+      let match = tokens[index].match
 
       switch nextType {
 
@@ -87,6 +94,15 @@ class Parser {
       case .False:
         return .Bool(false)
 
+      case .Int:
+        return .Int((match as NSString).integerValue)
+
+      case .IntOct:
+        return .Int(parseInt(match.substringFromIndex(advance(match.startIndex, 2)), radix: 8))
+
+      case .IntHex:
+        return .Int(parseInt(match.substringFromIndex(advance(match.startIndex, 2)), radix: 16))
+
       case .PositiveInfinity:
         return .Float(Float.infinity)
 
@@ -97,7 +113,7 @@ class Parser {
         return .Float(Float.NaN)
 
       case .Float:
-        return .Float((tokens[index].match as NSString).floatValue)
+        return .Float((match as NSString).floatValue)
       }
     }
     return .Null
@@ -108,6 +124,7 @@ public enum Yaml: Printable {
 
   case Null
   case Bool(Swift.Bool)
+  case Int(Swift.Int)
   case Float(Swift.Float)
   case Invalid(String)
 
@@ -117,6 +134,8 @@ public enum Yaml: Printable {
       return "Null"
     case .Bool(let b):
       return "Bool: \(b)"
+    case .Int(let i):
+      return "Int: \(i)"
     case .Float(let f):
       return "Float: \(f)"
     case .Invalid(let e):
@@ -157,6 +176,14 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
       return false
     }
 
+  case .Int(let lv):
+    switch rhs {
+    case .Int(let rv):
+      return lv == rv
+    default:
+      return false
+    }
+
   case .Float(let lv):
     switch rhs {
     case .Float(let rv):
@@ -180,4 +207,20 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
 
 public func != (lhs: Yaml, rhs: Yaml) -> Bool {
   return !(lhs == rhs)
+}
+
+func parseInt(s: String, #radix: Int) -> Int {
+  return reduce(lazy(s.unicodeScalars).map({
+    c in
+    switch c {
+    case "0"..."9":
+      return c.value - "0".value
+    case "a"..."z":
+      return c.value - "a".value + 10
+    case "A"..."Z":
+      return c.value - "A".value + 10
+    default:
+      fatalError("invalid digit")
+    }
+  }), 0, {$0 * radix + $1})
 }
