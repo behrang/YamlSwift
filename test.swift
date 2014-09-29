@@ -52,4 +52,13 @@ assert(Yaml.load("-.inf# comment") != .Float(-Float.infinity), "`-.inf# comment`
 assert(Yaml.load("-.inf # comment") == .Float(-Float.infinity), "`-.inf # comment` should be -infinity")
 assert(Yaml.load("-.inf -.inf") != .Float(-Float.infinity), "`-.inf .inf` should NOT be -infinity")
 
-println("Done.")
+assert(Yaml.load(".nan") == .Float(Float.NaN), ".nan should be NaN")
+assert(Yaml.load(".NaN") == .Float(Float.NaN), ".NaN should be NaN")
+assert(Yaml.load(".NAN") == .Float(Float.NaN), ".NAN should be NaN")
+assert(Yaml.load(".Nan") != .Float(Float.NaN), ".Nan should NOT be NaN")
+assert(Yaml.load(".nan#") != .Float(Float.NaN), ".nan# should NOT be NaN")
+assert(Yaml.load(".nan# comment") != .Float(Float.NaN), "`.nan# comment` should NOT be NaN")
+assert(Yaml.load(".nan # comment") == .Float(Float.NaN), "`.nan # comment` should be NaN")
+assert(Yaml.load(".nan .nan") != .Float(Float.NaN), "`.nan .nan` should NOT be NaN")
+
+println("\n\nDone.")

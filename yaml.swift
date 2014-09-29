@@ -7,6 +7,7 @@ enum TokenType: String, Printable {
   case False = "false"
   case PositiveInfinity = "+infinity"
   case NegativeInfinity = "-infinity"
+  case NaN = "nan"
 
   var description: String {
     return self.toRaw()
@@ -21,8 +22,9 @@ let tokenPatterns: [TokenPattern] = [
   (.Null, "^(null|Null|NULL|~|$)"),
   (.True, "^(true|True|TRUE)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
   (.False, "^(false|False|FALSE)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
-  (.PositiveInfinity, "^\\+?(\\.inf|\\.Inf|\\.INF)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
-  (.NegativeInfinity, "^-(\\.inf|\\.Inf|\\.INF)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
+  (.PositiveInfinity, "^\\+?\\.(inf|Inf|INF)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
+  (.NegativeInfinity, "^-\\.(inf|Inf|INF)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
+  (.NaN, "^\\.(nan|NaN|NAN)\\s*(\\s#[^\\n]*)?(?=\\n|$)"),
 ]
 
 func context (var text: String) -> String {
@@ -85,6 +87,9 @@ class Parser {
 
       case .NegativeInfinity:
         return .Float(-Float.infinity)
+
+      case .NaN:
+        return .Float(Float.NaN)
       }
     }
     return .Null
@@ -116,7 +121,7 @@ public enum Yaml: Printable {
   public static func load (text: String) -> Yaml {
     let result = tokenize(text)
     if let error = result.error {
-      println(error)
+      println("Error: \(error)")
       return .Invalid(error)
     }
     let ret = Parser(result.tokens!).parse()
@@ -147,7 +152,7 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
   case .Float(let lv):
     switch rhs {
     case .Float(let rv):
-      return lv == rv
+      return lv == rv || lv.isNaN && rv.isNaN
     default:
       return false
     }
