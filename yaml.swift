@@ -9,6 +9,7 @@ enum TokenType: String, Printable {
   case PositiveInfinity = "+infinity"
   case NegativeInfinity = "-infinity"
   case NaN = "nan"
+  case Float = "float"
 
   var description: String {
     return self.toRaw()
@@ -28,6 +29,7 @@ let tokenPatterns: [TokenPattern] = [
   (.PositiveInfinity, "^\\+?\\.(inf|Inf|INF)\(finish)"),
   (.NegativeInfinity, "^-\\.(inf|Inf|INF)\(finish)"),
   (.NaN, "^\\.(nan|NaN|NAN)\(finish)"),
+  (.Float, "^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)"),
 ]
 
 func context (var text: String) -> String {
@@ -86,13 +88,16 @@ class Parser {
         return .Bool(false)
 
       case .PositiveInfinity:
-        return .Float(Float.infinity) //(tokens[index].match as NSString).floatValue
+        return .Float(Float.infinity)
 
       case .NegativeInfinity:
         return .Float(-Float.infinity)
 
       case .NaN:
         return .Float(Float.NaN)
+
+      case .Float:
+        return .Float((tokens[index].match as NSString).floatValue)
       }
     }
     return .Null
