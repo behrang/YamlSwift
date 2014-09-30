@@ -6,13 +6,14 @@ enum TokenType: String, Printable {
   case Null = "null"
   case True = "true"
   case False = "false"
-  case PositiveInfinity = "+infinity"
-  case NegativeInfinity = "-infinity"
+  case InfinityP = "+infinity"
+  case InfinityN = "-infinity"
   case NaN = "nan"
   case Float = "float"
   case Int = "int"
   case IntOct = "int-oct"
   case IntHex = "int-hex"
+  case End = "end"
 
   var description: String {
     return self.toRaw()
@@ -29,8 +30,8 @@ let tokenPatterns: [TokenPattern] = [
   (.Null, "^(null|Null|NULL|~)\(finish)"),
   (.True, "^(true|True|TRUE)\(finish)"),
   (.False, "^(false|False|FALSE)\(finish)"),
-  (.PositiveInfinity, "^\\+?\\.(inf|Inf|INF)\(finish)"),
-  (.NegativeInfinity, "^-\\.(inf|Inf|INF)\(finish)"),
+  (.InfinityP, "^\\+?\\.(inf|Inf|INF)\(finish)"),
+  (.InfinityN, "^-\\.(inf|Inf|INF)\(finish)"),
   (.NaN, "^\\.(nan|NaN|NAN)\(finish)"),
   (.Int, "^[-+]?[0-9]+\(finish)"),
   (.IntOct, "^0o[0-7]+\(finish)"),
@@ -59,6 +60,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
     }
     return (context(text), nil)
   }
+  matches.append((.End, ""))
   return (nil, matches)
 }
 
@@ -70,53 +72,67 @@ class Parser {
     self.tokens = tokens
   }
 
-  func peekType() -> TokenType {
-    return tokens[index].type
+  func peek() -> TokenMatch {
+    return tokens[index]
+  }
+
+  func advance() -> TokenMatch {
+    let r = tokens[index]
+    index += 1
+    return r
   }
 
   func parse() -> Yaml {
-    while index < tokens.endIndex {
-      let nextType = peekType()
-      let match = tokens[index].match
+    switch peek().type {
 
-      switch nextType {
+    case .Comment, .Space:
+      advance()
+      return parse()
 
-      case .Comment, .Space:
-        index += 1
-        continue
+    case .Null:
+      advance()
+      return .Null
 
-      case .Null:
-        return .Null
+    case .True:
+      advance()
+      return .Bool(true)
 
-      case .True:
-        return .Bool(true)
+    case .False:
+      advance()
+      return .Bool(false)
 
-      case .False:
-        return .Bool(false)
+    case .Int:
+      let m = advance().match as NSString
+      return .Int(m.integerValue) // what about overflow?
 
-      case .Int:
-        return .Int((match as NSString).integerValue)
+    case .IntOct:
+      let m = advance().match.stringByReplacingOccurrencesOfString("0o", withString: "")
+      return .Int(parseInt(m, radix: 8))
 
-      case .IntOct:
-        return .Int(parseInt(match.substringFromIndex(advance(match.startIndex, 2)), radix: 8))
+    case .IntHex:
+      let m = advance().match.stringByReplacingOccurrencesOfString("0x", withString: "")
+      return .Int(parseInt(m, radix: 16))
 
-      case .IntHex:
-        return .Int(parseInt(match.substringFromIndex(advance(match.startIndex, 2)), radix: 16))
+    case .InfinityP:
+      advance()
+      return .Float(Float.infinity)
 
-      case .PositiveInfinity:
-        return .Float(Float.infinity)
+    case .InfinityN:
+      advance()
+      return .Float(-Float.infinity)
 
-      case .NegativeInfinity:
-        return .Float(-Float.infinity)
+    case .NaN:
+      advance()
+      return .Float(Float.NaN)
 
-      case .NaN:
-        return .Float(Float.NaN)
+    case .Float:
+      let m = advance().match as NSString
+      return .Float(m.floatValue)
 
-      case .Float:
-        return .Float((match as NSString).floatValue)
-      }
+    case .End:
+      return .Null
+
     }
-    return .Null
   }
 }
 
