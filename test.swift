@@ -107,4 +107,13 @@ assert(Yaml.load("-1230.15") == .Float(-1230.15))
 assert(Yaml.load("-01230.15") == .Float(-1230.15))
 assert(Yaml.load("-12.3015e02") == .Float(-12.3015e+02))
 
-println("\n\nDone.")
+assert(Yaml.load("[]") == .Seq([]))
+assert(Yaml.load("[ true]") == .Seq([.Bool(true)]))
+assert(Yaml.load("[true, true  ,false,  false  ,  false]") ==
+    .Seq([.Bool(true), .Bool(true), .Bool(false), .Bool(false), .Bool(false)]))
+assert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, .NaN, 0, 123, -456, 0o74, 0xFf, 1.23, -4.56]") ==
+    .Seq([.Null, .Null, .Bool(true), .Bool(false), .Float(Float.infinity), .Float(-Float.infinity),
+        .Float(Float.NaN), .Int(0), .Int(123), .Int(-456), .Int(60), .Int(255), .Float(1.23),
+        .Float(-4.56)]))
+
+println("Done.")

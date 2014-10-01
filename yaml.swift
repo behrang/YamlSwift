@@ -13,6 +13,9 @@ enum TokenType: String, Printable {
   case Int = "int"
   case IntOct = "int-oct"
   case IntHex = "int-hex"
+  case Comma = ","
+  case OpenSB = "["
+  case CloseSB = "]"
   case End = "end"
 
   var description: String {
@@ -23,7 +26,7 @@ enum TokenType: String, Printable {
 typealias TokenPattern = (type: TokenType, pattern: String)
 typealias TokenMatch = (type: TokenType, match: String)
 
-let finish = "(?=\\s*(\\s#[^\\n]*)?(\\n|$))"
+let finish = "(?= *,| *]| *( #[^\\n]*)?(\\n|$))"
 let tokenPatterns: [TokenPattern] = [
   (.Comment, "^#[^\\n]*"),
   (.Space, "^ +"),
@@ -37,6 +40,9 @@ let tokenPatterns: [TokenPattern] = [
   (.IntOct, "^0o[0-7]+\(finish)"),
   (.IntHex, "^0x[0-9a-fA-F]+\(finish)"),
   (.Float, "^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)"),
+  (.Comma, "^,"),
+  (.OpenSB, "^\\["),
+  (.CloseSB, "^\\]"),
 ]
 
 func context (var text: String) -> String {
@@ -80,6 +86,28 @@ class Parser {
     let r = tokens[index]
     index += 1
     return r
+  }
+
+  func accept(type: TokenType) -> Bool {
+    if peek().type == type {
+      advance()
+      return true
+    }
+    return false
+  }
+
+  func expect(type: TokenType, message: String) -> String? {
+    if peek().type == type {
+      advance()
+      return nil
+    }
+    return "\(message), \(context(peek().match))"
+  }
+
+  func ignoreSpace() {
+    while peek().type == .Space {
+      advance()
+    }
   }
 
   func parse() -> Yaml {
@@ -129,10 +157,39 @@ class Parser {
       let m = advance().match as NSString
       return .Float(m.floatValue)
 
+    case .OpenSB:
+      return parseFlowSeq()
+
     case .End:
       return .Null
 
+    default:
+      return .Invalid(context(peek().match))
+
     }
+  }
+
+  func parseFlowSeq () -> Yaml {
+    var seq: [Yaml] = []
+    accept(.OpenSB)
+    while !accept(.CloseSB) {
+      ignoreSpace()
+      if seq.count > 0 {
+        if let error = expect(.Comma, message: "expected comma") {
+          return .Invalid(error)
+        }
+      }
+      ignoreSpace()
+      let r = parse()
+      switch r {
+      case .Invalid:
+        return r
+      default:
+        seq.append(r)
+      }
+      ignoreSpace()
+    }
+    return .Seq(seq)
   }
 }
 
@@ -142,6 +199,7 @@ public enum Yaml: Printable {
   case Bool(Swift.Bool)
   case Int(Swift.Int)
   case Float(Swift.Float)
+  case Seq([Yaml])
   case Invalid(String)
 
   public var description: String {
@@ -154,21 +212,21 @@ public enum Yaml: Printable {
       return "Int: \(i)"
     case .Float(let f):
       return "Float: \(f)"
+    case .Seq(let s):
+      return "Seq: \(s)"
     case .Invalid(let e):
       return "Invalid: \(e)"
-    default:
-      return "*Unknown*"
     }
   }
 
   public static func load (text: String) -> Yaml {
     let result = tokenize(text)
     if let error = result.error {
-      println("Error: \(error)")
+      // println("Error: \(error)")
       return .Invalid(error)
     }
     let ret = Parser(result.tokens!).parse()
-    println(ret)
+    // println(ret)
     return ret
   }
 }
@@ -208,6 +266,19 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
       return false
     }
 
+  case .Seq(let lv):
+    switch rhs {
+    case .Seq(let rv) where lv.count == rv.count:
+      for i in 0..<lv.count {
+        if lv[i] != rv[i] {
+          return false
+        }
+      }
+      return true
+    default:
+      return false
+    }
+
   case .Invalid(let lv):
     switch rhs {
     case .Invalid(let rv):
@@ -216,8 +287,6 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
       return false
     }
 
-  default:
-    return false
   }
 }
 
