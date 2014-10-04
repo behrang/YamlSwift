@@ -16,6 +16,12 @@ enum TokenType: String, Printable {
   case Comma = ","
   case OpenSB = "["
   case CloseSB = "]"
+  case OpenCB = "{"
+  case CloseCB = "}"
+  case Key = "key"
+  case KeyDQ = "key-dq"
+  case KeySQ = "key-sq"
+  case Colon = ":"
   case End = "end"
 
   var description: String {
@@ -26,7 +32,7 @@ enum TokenType: String, Printable {
 typealias TokenPattern = (type: TokenType, pattern: String)
 typealias TokenMatch = (type: TokenType, match: String)
 
-let finish = "(?= *,| *]| *( #[^\\n]*)?(\\n|$))"
+let finish = "(?= *(,|\\]|\\}|( #[^\\n]*)?(\\n|$)))"
 let tokenPatterns: [TokenPattern] = [
   (.Comment, "^#[^\\n]*"),
   (.Space, "^ +"),
@@ -43,6 +49,12 @@ let tokenPatterns: [TokenPattern] = [
   (.Comma, "^,"),
   (.OpenSB, "^\\["),
   (.CloseSB, "^\\]"),
+  (.OpenCB, "^\\{"),
+  (.CloseCB, "^\\}"),
+  (.Key, "^\\w[\\w -]*(?= *: )"),
+  (.KeyDQ, "^\".*?\"(?= *:)"),
+  (.KeySQ, "^'.*?'(?= *:)"),
+  (.Colon, "^:"),
 ]
 
 func context (var text: String) -> String {
@@ -160,6 +172,9 @@ class Parser {
     case .OpenSB:
       return parseFlowSeq()
 
+    case .OpenCB:
+      return parseFlowMap()
+
     case .End:
       return .Null
 
@@ -180,16 +195,53 @@ class Parser {
         }
       }
       ignoreSpace()
-      let r = parse()
-      switch r {
+      let v = parse() // what about two consecutive commas?
+      switch v {
       case .Invalid:
-        return r
+        return v
       default:
-        seq.append(r)
+        seq.append(v)
       }
       ignoreSpace()
     }
     return .Seq(seq)
+  }
+
+  func parseFlowMap () -> Yaml {
+    var map: [String: Yaml] = [:]
+    accept(.OpenCB)
+    while !accept(.CloseCB) {
+      ignoreSpace()
+      if map.count > 0 {
+        if let error = expect(.Comma, message: "expected comma") {
+          return .Invalid(error)
+        }
+      }
+      ignoreSpace()
+      var k: String = ""
+      switch peek().type {
+      case .Key:
+        k = advance().match
+      case .KeyDQ, .KeySQ:
+        let m = advance().match
+        let r = Range(start: Swift.advance(m.startIndex, 1), end: Swift.advance(m.endIndex, -1))
+        k = m.substringWithRange(r)
+      default:
+        break // what if not?
+      }
+      if let error = expect(.Colon, message: "expected colon") {
+        return .Invalid(error)
+      }
+      let v = parse()
+      switch v {
+      case .Invalid:
+        return v
+      default:
+        map.updateValue(v, forKey: k)
+      }
+      ignoreSpace()
+    }
+    return .Map(map)
   }
 }
 
@@ -200,6 +252,7 @@ public enum Yaml: Printable {
   case Int(Swift.Int)
   case Float(Swift.Float)
   case Seq([Yaml])
+  case Map([String: Yaml]) // todo: change key type to Yaml
   case Invalid(String)
 
   public var description: String {
@@ -207,15 +260,17 @@ public enum Yaml: Printable {
     case .Null:
       return "Null"
     case .Bool(let b):
-      return "Bool: \(b)"
+      return "Bool(\(b))"
     case .Int(let i):
-      return "Int: \(i)"
+      return "Int(\(i))"
     case .Float(let f):
-      return "Float: \(f)"
+      return "Float(\(f))"
     case .Seq(let s):
-      return "Seq: \(s)"
+      return "Seq(\(s))"
+    case .Map(let m):
+      return "Map(\(m))"
     case .Invalid(let e):
-      return "Invalid: \(e)"
+      return "Invalid(\(e))"
     }
   }
 
@@ -271,6 +326,19 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
     case .Seq(let rv) where lv.count == rv.count:
       for i in 0..<lv.count {
         if lv[i] != rv[i] {
+          return false
+        }
+      }
+      return true
+    default:
+      return false
+    }
+
+  case .Map(let lv):
+    switch rhs {
+    case .Map(let rv) where lv.count == rv.count:
+      for (k, v) in lv {
+        if rv[k] == nil || rv[k]! != v {
           return false
         }
       }
