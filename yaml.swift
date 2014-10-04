@@ -1,6 +1,6 @@
 import Foundation
 
-enum TokenType: String, Printable {
+enum TokenType: Swift.String, Printable {
   case Comment = "comment"
   case Space = "space"
   case Null = "null"
@@ -22,9 +22,12 @@ enum TokenType: String, Printable {
   case KeyDQ = "key-dq"
   case KeySQ = "key-sq"
   case Colon = ":"
+  case StringDQ = "string-dq"
+  case StringSQ = "string-sq"
+  case String = "string"
   case End = "end"
 
-  var description: String {
+  var description: Swift.String {
     return self.toRaw()
   }
 }
@@ -55,6 +58,9 @@ let tokenPatterns: [TokenPattern] = [
   (.KeyDQ, "^\".*?\"(?= *:)"),
   (.KeySQ, "^'.*?'(?= *:)"),
   (.Colon, "^:"),
+  (.StringDQ, "^\".*?\""),
+  (.StringSQ, "^'.*?'"),
+  (.String, "^.*?\(finish)"),
 ]
 
 func context (var text: String) -> String {
@@ -175,6 +181,14 @@ class Parser {
     case .OpenCB:
       return parseFlowMap()
 
+    case .StringDQ, .StringSQ:
+      let m = advance().match
+      let r = Range(start: Swift.advance(m.startIndex, 1), end: Swift.advance(m.endIndex, -1))
+      return .String(m.substringWithRange(r))
+
+    case .String:
+      return .String(advance().match)
+
     case .End:
       return .Null
 
@@ -251,11 +265,12 @@ public enum Yaml: Printable {
   case Bool(Swift.Bool)
   case Int(Swift.Int)
   case Float(Swift.Float)
+  case String(Swift.String)
   case Seq([Yaml])
-  case Map([String: Yaml]) // todo: change key type to Yaml
-  case Invalid(String)
+  case Map([Swift.String: Yaml]) // todo: change key type to Yaml
+  case Invalid(Swift.String)
 
-  public var description: String {
+  public var description: Swift.String {
     switch self {
     case .Null:
       return "Null"
@@ -265,6 +280,8 @@ public enum Yaml: Printable {
       return "Int(\(i))"
     case .Float(let f):
       return "Float(\(f))"
+    case .String(let s):
+      return "String(\(s))"
     case .Seq(let s):
       return "Seq(\(s))"
     case .Map(let m):
@@ -274,7 +291,7 @@ public enum Yaml: Printable {
     }
   }
 
-  public static func load (text: String) -> Yaml {
+  public static func load (text: Swift.String) -> Yaml {
     let result = tokenize(text)
     if let error = result.error {
       // println("Error: \(error)")
@@ -317,6 +334,14 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
     switch rhs {
     case .Float(let rv):
       return lv == rv || lv.isNaN && rv.isNaN
+    default:
+      return false
+    }
+
+  case .String(let lv):
+    switch rhs {
+    case .String(let rv):
+      return lv == rv
     default:
       return false
     }

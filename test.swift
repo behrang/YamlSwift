@@ -122,5 +122,9 @@ assert(Yaml.load("{x:1}") != .Map(["x": .Int(1)]))
 assert(Yaml.load("{\"x\":1}") == .Map(["x": .Int(1)]))
 assert(Yaml.load("{\"x\":1, 'y': true}") == .Map(["x": .Int(1), "y": .Bool(true)]))
 assert(Yaml.load("{\"x\":1, 'y': true, z: null}") == .Map(["x": .Int(1), "y": .Bool(true), "z": .Null]))
+assert(Yaml.load("{first name: \"Behrang\", last name: 'Noruzi Niya'}") ==
+    .Map(["first name": .String("Behrang"), "last name": .String("Noruzi Niya")]))
+assert(Yaml.load("{fn: Behrang, ln: Noruzi Niya}") ==
+    .Map(["fn": .String("Behrang"), "ln": .String("Noruzi Niya")]))
 
 println("Done.")
