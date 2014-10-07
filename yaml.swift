@@ -117,6 +117,10 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
     }
     return (context(text), nil)
   }
+  while indents.count > 1 {
+    indents.removeLast()
+    matches.append((.Dedent, ""))
+  }
   matches.append((.End, ""))
   return (nil, matches)
 }
@@ -152,7 +156,18 @@ class Parser {
       advance()
       return nil
     }
-    return "\(message), \(context(peek().match))"
+    return "\(message), \(context(buildContext()))"
+  }
+
+  func buildContext (count: Int = 25) -> String {
+    var text = ""
+    while peek().type != .End {
+      text += advance().match
+      if countElements(text) >= count {
+        break
+      }
+    }
+    return text
   }
 
   func ignoreSpace () {
@@ -229,7 +244,9 @@ class Parser {
     case .Indent:
       accept(.Indent)
       let result = parse()
-      expect(.Dedent, message: "expected dedent")
+      if let error = expect(.Dedent, message: "expected dedent") {
+        return .Invalid(error)
+      }
       return result
 
     case .StringDQ, .StringSQ:
@@ -244,7 +261,7 @@ class Parser {
       return .Null
 
     default:
-      return .Invalid(context(peek().match))
+      return .Invalid(context(buildContext()))
 
     }
   }
@@ -256,10 +273,8 @@ class Parser {
       ignoreSpace()
       let v = parse()
       ignoreSpace()
-      if peek().type != .End {
-        if let error = expect(.Dedent, message: "expected dedent after dash indent") {
-          return .Invalid(error)
-        }
+      if let error = expect(.Dedent, message: "expected dedent after dash indent") {
+        return .Invalid(error)
       }
       switch v {
       case .Invalid:
@@ -340,7 +355,7 @@ class Parser {
       case .KeyDQ, .KeySQ:
         k = unwrapQuotedString(advance().match)
       default:
-        return .Invalid("unexpected token \(peek().type)")
+        return .Invalid(expect(.Key, message: "expected key")!)
       }
       if let error = expect(.Colon, message: "expected colon") {
         return .Invalid(error)
@@ -349,7 +364,9 @@ class Parser {
       var v: Yaml
       if accept(.Indent) {
         v = parse()
-        expect(.Dedent, message: "expected dedent")
+        if let error = expect(.Dedent, message: "expected dedent") {
+          return .Invalid(error)
+        }
       } else {
         v = parse()
       }
@@ -407,8 +424,8 @@ public enum Yaml: Printable {
     let parser = Parser(result.tokens!)
     let value = parser.parse()
     parser.ignoreSpace()
-    if parser.peek().type != .End {
-      return .Invalid("expected end of input")
+    if let error = parser.expect(.End, message: "expected end") {
+      return .Invalid(error)
     }
     // println(value)
     return value
