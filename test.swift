@@ -42,6 +42,28 @@ func bool () {
   assert(Yaml.load("false \n").bool == false)
 }
 
+func int () {
+  assert(Yaml.load("0") == .Int(0))
+  assert(Yaml.load("+0").int == 0)
+  assert(Yaml.load("-0").int == 0)
+  assert(Yaml.load("2").int == 2)
+  assert(Yaml.load("+2").int == 2)
+  assert(Yaml.load("-2").int == -2)
+  assert(Yaml.load("00123").int == 123)
+  assert(Yaml.load("+00123").int == 123)
+  assert(Yaml.load("-00123").int == -123)
+  assert(Yaml.load("0o10").int == 8)
+  assert(Yaml.load("0o010").int == 8)
+  assert(Yaml.load("0o0010").int == 8)
+  assert(Yaml.load("0x10").int == 16)
+  assert(Yaml.load("0x1a").int == 26)
+  assert(Yaml.load("0x01a").int == 26)
+  assert(Yaml.load("0x001a").int == 26)
+
+  assert(Yaml.load("2.0").int == 2)
+  assert(Yaml.load("2.5").int == nil)
+}
+
 func float () {
   assert(Yaml.load(".inf") == .Float(Float.infinity))
   assert(Yaml.load(".Inf") == .Float(Float.infinity))
@@ -96,25 +118,6 @@ func float () {
   assert(Yaml.load("-1230.15") == .Float(-1230.15))
   assert(Yaml.load("-01230.15") == .Float(-1230.15))
   assert(Yaml.load("-12.3015e02") == .Float(-12.3015e+02))
-}
-
-func int () {
-  assert(Yaml.load("0") == .Int(0))
-  assert(Yaml.load("+0") == .Int(0))
-  assert(Yaml.load("-0") == .Int(0))
-  assert(Yaml.load("2") == .Int(2))
-  assert(Yaml.load("+2") == .Int(2))
-  assert(Yaml.load("-2") == .Int(-2))
-  assert(Yaml.load("00123") == .Int(123))
-  assert(Yaml.load("+00123") == .Int(123))
-  assert(Yaml.load("-00123") == .Int(-123))
-  assert(Yaml.load("0o10") == .Int(8))
-  assert(Yaml.load("0o010") == .Int(8))
-  assert(Yaml.load("0o0010") == .Int(8))
-  assert(Yaml.load("0x10") == .Int(16))
-  assert(Yaml.load("0x1a") == .Int(26))
-  assert(Yaml.load("0x01a") == .Int(26))
-  assert(Yaml.load("0x001a") == .Int(26))
 }
 
 func flowSeq () {

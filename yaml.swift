@@ -419,6 +419,21 @@ public enum Yaml: Printable {
     }
   }
 
+  public var int: Swift.Int? {
+    switch self {
+    case .Int(let i):
+      return i
+    case .Float(let f):
+      if Swift.Float(Swift.Int(f)) == f {
+        return Swift.Int(f)
+      } else {
+        return nil
+      }
+    default:
+      return nil
+    }
+  }
+
   public var description: Swift.String {
     switch self {
     case .Null:
