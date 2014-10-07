@@ -247,7 +247,7 @@ class Parser {
         }
       }
       ignoreSpace()
-      let v = parse() // what about two consecutive commas?
+      let v = parse()
       switch v {
       case .Invalid:
         return v
@@ -277,7 +277,7 @@ class Parser {
       case .KeyDQ, .KeySQ:
         k = unwrapQuotedString(advance().match)
       default:
-        break // what if not?
+        return .Invalid(expect(.Key, message: "expected key")!)
       }
       if let error = expect(.Colon, message: "expected colon") {
         return .Invalid(error)
