@@ -1,10 +1,7 @@
 import Yaml
 
-func comment () {
-  assert(Yaml.load("# comment line") == .Null)
-}
-
 func null () {
+  assert(Yaml.load("# comment line") == .Null)
   assert(Yaml.load("") == .Null)
   assert(Yaml.load("null") == .Null)
   assert(Yaml.load("Null") == .Null)
@@ -120,6 +117,11 @@ func float () {
   assert(Yaml.load("-12.3015e02").float == -12.3015e+02)
 }
 
+func string () {
+  assert(Yaml.load("Behrang") == .String("Behrang"))
+  assert(Yaml.load("Behrang Noruzi Niya").string == "Behrang Noruzi Niya")
+}
+
 func flowSeq () {
   assert(Yaml.load("[]") == .Seq([]))
   assert(Yaml.load("[ true]") == .Seq([.Bool(true)]))
@@ -165,11 +167,11 @@ func blockMap () {
 }
 
 func test () {
-  comment()
   null()
   bool()
-  float()
   int()
+  float()
+  string()
 
   flowSeq()
   blockSeq()

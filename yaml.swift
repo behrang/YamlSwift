@@ -445,6 +445,15 @@ public enum Yaml: Printable {
     }
   }
 
+  public var string: Swift.String? {
+    switch self {
+    case .String(let s):
+      return s
+    default:
+      return nil
+    }
+  }
+
   public var description: Swift.String {
     switch self {
     case .Null:
