@@ -116,6 +116,12 @@ assert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, .NaN, 0, 123, -456, 0o74, 
         .Float(Float.NaN), .Int(0), .Int(123), .Int(-456), .Int(60), .Int(255), .Float(1.23),
         .Float(-4.56)]))
 
+assert(Yaml.load("- 1\n- 2") == .Seq([.Int(1), .Int(2)]))
+assert(Yaml.load("- x: 1") == .Seq([.Map(["x": .Int(1)])]))
+assert(Yaml.load("- x: 1\n  y: 2") == .Seq([.Map(["x": .Int(1), "y": .Int(2)])]))
+assert(Yaml.load("- 1\n    \n- x: 1\n  y: 2") ==
+    .Seq([.Int(1), .Map(["x": .Int(1), "y": .Int(2)])]))
+
 assert(Yaml.load("{}") == .Map([:]))
 assert(Yaml.load("{x: 1}") == .Map(["x": .Int(1)]))
 assert(Yaml.load("{x:1}") != .Map(["x": .Int(1)]))

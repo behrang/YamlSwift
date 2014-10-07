@@ -20,6 +20,7 @@ enum TokenType: Swift.String, Printable {
   case Comma = ","
   case OpenSB = "["
   case CloseSB = "]"
+  case Dash = "-"
   case OpenCB = "{"
   case CloseCB = "}"
   case Key = "key"
@@ -45,6 +46,7 @@ let tokenPatterns: [TokenPattern] = [
   (.Space, "^ +"),
   (.BlankLine, "^\\n *(#[^\\n]*)?(?=\\n|$)"),
   (.NewLine, "^\\n *"),
+  (.Dash, "^-( +|(?=\\n))"),
   (.Null, "^(null|Null|NULL|~)\(finish)"),
   (.True, "^(true|True|TRUE)\(finish)"),
   (.False, "^(false|False|FALSE)\(finish)"),
@@ -84,9 +86,8 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
   while countElements(text) > 0 {
     for tokenPattern in tokenPatterns {
       if let range = text.rangeOfString(tokenPattern.pattern, options: .RegularExpressionSearch) {
-        if tokenPattern.type != .NewLine {
-          matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
-        } else {
+        switch tokenPattern.type {
+        case .NewLine:
           let match = text.substringWithRange(range)
           let spaces = countElements(match.substringFromIndex(advance(match.startIndex, 1)))
           if spaces > indents.last! {
@@ -100,6 +101,15 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
               matches.append(TokenMatch(.Dedent, ""))
             }
           }
+        case .Dash:
+          let match = text.substringWithRange(range)
+          let dashIndex = advance(match.startIndex, 1)
+          let indent = countElements(match)
+          indents.append(indent)
+          matches.append(TokenMatch(.Dash, match.substringToIndex(dashIndex)))
+          matches.append(TokenMatch(.Indent, match.substringFromIndex(dashIndex)))
+        default:
+          matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
         }
         text = text.substringFromIndex(range.endIndex)
         continue next
@@ -204,6 +214,9 @@ class Parser {
       let m = advance().match as NSString
       return .Float(m.floatValue)
 
+    case .Dash:
+      return parseBlockSeq()
+
     case .OpenSB:
       return parseFlowSeq()
 
@@ -234,6 +247,29 @@ class Parser {
       return .Invalid(context(peek().match))
 
     }
+  }
+
+  func parseBlockSeq () -> Yaml {
+    var seq: [Yaml] = []
+    while accept(.Dash) {
+      accept(.Indent)
+      ignoreSpace()
+      let v = parse()
+      ignoreSpace()
+      if peek().type != .End {
+        if let error = expect(.Dedent, message: "expected dedent after dash indent") {
+          return .Invalid(error)
+        }
+      }
+      switch v {
+      case .Invalid:
+        return v
+      default:
+        seq.append(v)
+      }
+      ignoreSpace()
+    }
+    return .Seq(seq)
   }
 
   func parseFlowSeq () -> Yaml {
@@ -368,9 +404,14 @@ public enum Yaml: Printable {
       return .Invalid(error)
     }
     // println(result.tokens!)
-    let ret = Parser(result.tokens!).parse()
-    // println(ret)
-    return ret
+    let parser = Parser(result.tokens!)
+    let value = parser.parse()
+    parser.ignoreSpace()
+    if parser.peek().type != .End {
+      return .Invalid("expected end of input")
+    }
+    // println(value)
+    return value
   }
 }
 
