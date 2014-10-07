@@ -454,6 +454,15 @@ public enum Yaml: Printable {
     }
   }
 
+  public var seq: [Yaml]? {
+    switch self {
+    case .Seq(let seq):
+      return seq
+    default:
+      return nil
+    }
+  }
+
   public var description: Swift.String {
     switch self {
     case .Null:

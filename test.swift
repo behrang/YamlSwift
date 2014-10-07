@@ -124,7 +124,9 @@ func string () {
 
 func flowSeq () {
   assert(Yaml.load("[]") == .Seq([]))
+  assert(Yaml.load("[]").seq!.count == 0)
   assert(Yaml.load("[ true]") == .Seq([.Bool(true)]))
+  assert(Yaml.load("[ true]").seq![0].bool == true)
   assert(Yaml.load("[true, true  ,false,  false  ,  false]") ==
       .Seq([.Bool(true), .Bool(true), .Bool(false), .Bool(false), .Bool(false)]))
   assert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, .NaN, 0, 123, -456, 0o74, 0xFf, 1.23, -4.5]") ==
@@ -135,8 +137,9 @@ func flowSeq () {
 
 func blockSeq () {
   assert(Yaml.load("- 1\n- 2") == .Seq([.Int(1), .Int(2)]))
+  assert(Yaml.load("- 1\n- 2").seq![1].int == 2)
   assert(Yaml.load("- x: 1") == .Seq([.Map(["x": .Int(1)])]))
-  assert(Yaml.load("- x: 1\n  y: 2") == .Seq([.Map(["x": .Int(1), "y": .Int(2)])]))
+  assert(Yaml.load("- x: 1\n  y: 2").seq![0] == .Map(["x": .Int(1), "y": .Int(2)]))
   assert(Yaml.load("- 1\n    \n- x: 1\n  y: 2") ==
       .Seq([.Int(1), .Map(["x": .Int(1), "y": .Int(2)])]))
 }
