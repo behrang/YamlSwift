@@ -178,15 +178,15 @@ class Parser {
 
     case .Int:
       let m = advance().match as NSString
-      return .Int(m.integerValue) // what about overflow?
+      return .Int(m.integerValue) // will be between Int.min and Int.max
 
     case .IntOct:
       let m = advance().match.stringByReplacingOccurrencesOfString("0o", withString: "")
-      return .Int(parseInt(m, radix: 8))
+      return .Int(parseInt(m, radix: 8)) // will throw runtime error if overflows
 
     case .IntHex:
       let m = advance().match.stringByReplacingOccurrencesOfString("0x", withString: "")
-      return .Int(parseInt(m, radix: 16))
+      return .Int(parseInt(m, radix: 16)) // will throw runtime error if overflows
 
     case .InfinityP:
       advance()
