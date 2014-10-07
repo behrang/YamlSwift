@@ -147,24 +147,21 @@ func blockSeq () {
 func flowMap () {
   assert(Yaml.load("{}") == .Map([:]))
   assert(Yaml.load("{x: 1}") == .Map(["x": .Int(1)]))
-  assert(Yaml.load("{x:1}") != .Map(["x": .Int(1)]))
-  assert(Yaml.load("{\"x\":1}") == .Map(["x": .Int(1)]))
-  assert(Yaml.load("{\"x\":1, 'y': true}") == .Map(["x": .Int(1), "y": .Bool(true)]))
-  assert(Yaml.load("{\"x\":1, 'y': true, z: null}") == .Map(["x": .Int(1), "y": .Bool(true), "z": .Null]))
+  assert(Yaml.load("{x: 1}").map!["x"]!.int == 1)
+  assert(Yaml.load("{x:1}").map == nil)
+  assert(Yaml.load("{\"x\":1}").map!["x"]!.int == 1)
+  assert(Yaml.load("{\"x\":1, 'y': true}").map!["y"]!.bool == true)
+  assert(Yaml.load("{\"x\":1, 'y': true, z: null}").map!["z"]! == .Null)
   assert(Yaml.load("{first name: \"Behrang\", last name: 'Noruzi Niya'}") ==
       .Map(["first name": .String("Behrang"), "last name": .String("Noruzi Niya")]))
-  assert(Yaml.load("{fn: Behrang, ln: Noruzi Niya}") ==
-      .Map(["fn": .String("Behrang"), "ln": .String("Noruzi Niya")]))
-  assert(Yaml.load("{fn: Behrang\n ,\nln: Noruzi Niya}") ==
-      .Map(["fn": .String("Behrang"), "ln": .String("Noruzi Niya")]))
+  assert(Yaml.load("{fn: Behrang, ln: Noruzi Niya}").map!["ln"]!.string == "Noruzi Niya")
+  assert(Yaml.load("{fn: Behrang\n ,\nln: Noruzi Niya}").map!["ln"]!.string == "Noruzi Niya")
 }
 
 func blockMap () {
   assert(Yaml.load("x: 1\ny: 2") == .Map(["x": .Int(1), "y": .Int(2)]))
-  assert(Yaml.load(" \n  \n \n  \n\nx: 1  \n   \ny: 2\n   \n  \n ") ==
-      .Map(["x": .Int(1), "y": .Int(2)]))
-  assert(Yaml.load("x:\n a: 1 # comment \n b: 2\ny: \n  c: 3\n  ") ==
-      .Map(["x": .Map(["a": .Int(1), "b": .Int(2)]), "y": .Map(["c": .Int(3)])]))
+  assert(Yaml.load(" \n  \n \n  \n\nx: 1  \n   \ny: 2\n   \n  \n ").map!["y"]!.int == 2)
+  assert(Yaml.load("x:\n a: 1 # comment \n b: 2\ny: \n  c: 3\n  ").map!["y"]!.map!["c"]!.int == 3)
   assert(Yaml.load("# comment \n\n  # x\n  # y \n  \n  x: 1  \n  y: 2") ==
       .Map(["x": .Int(1), "y": .Int(2)]))
 }

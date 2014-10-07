@@ -463,6 +463,15 @@ public enum Yaml: Printable {
     }
   }
 
+  public var map: [Swift.String: Yaml]? {
+    switch self {
+    case .Map(let map):
+      return map
+    default:
+      return nil
+    }
+  }
+
   public var description: Swift.String {
     switch self {
     case .Null:
