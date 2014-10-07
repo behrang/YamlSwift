@@ -434,6 +434,17 @@ public enum Yaml: Printable {
     }
   }
 
+  public var float: Swift.Float? {
+    switch self {
+    case .Float(let f):
+      return f
+    case .Int(let i):
+      return Swift.Float(i)
+    default:
+      return nil
+    }
+  }
+
   public var description: Swift.String {
     switch self {
     case .Null:
