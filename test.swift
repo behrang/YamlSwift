@@ -21,8 +21,8 @@ assert(Yaml.load("true#string") != .Bool(true))
 assert(Yaml.load("true #comment") == .Bool(true))
 assert(Yaml.load("true  #") == .Bool(true))
 assert(Yaml.load("true  ") == .Bool(true))
-// assert(Yaml.load("true\n") == .Bool(true))
-// assert(Yaml.load("true \n") == .Bool(true))
+assert(Yaml.load("true\n") == .Bool(true))
+assert(Yaml.load("true \n") == .Bool(true))
 
 assert(Yaml.load("false") == .Bool(false))
 assert(Yaml.load("False") == .Bool(false))
@@ -33,8 +33,8 @@ assert(Yaml.load("false#string") != .Bool(false))
 assert(Yaml.load("false #comment") == .Bool(false))
 assert(Yaml.load("false  #") == .Bool(false))
 assert(Yaml.load("false  ") == .Bool(false))
-// assert(Yaml.load("false\n") == .Bool(false))
-// assert(Yaml.load("false \n") == .Bool(false))
+assert(Yaml.load("false\n") == .Bool(false))
+assert(Yaml.load("false \n") == .Bool(false))
 
 assert(Yaml.load(".inf") == .Float(Float.infinity))
 assert(Yaml.load(".Inf") == .Float(Float.infinity))
@@ -126,5 +126,15 @@ assert(Yaml.load("{first name: \"Behrang\", last name: 'Noruzi Niya'}") ==
     .Map(["first name": .String("Behrang"), "last name": .String("Noruzi Niya")]))
 assert(Yaml.load("{fn: Behrang, ln: Noruzi Niya}") ==
     .Map(["fn": .String("Behrang"), "ln": .String("Noruzi Niya")]))
+assert(Yaml.load("{fn: Behrang\n ,\nln: Noruzi Niya}") ==
+    .Map(["fn": .String("Behrang"), "ln": .String("Noruzi Niya")]))
+
+assert(Yaml.load("x: 1\ny: 2") == .Map(["x": .Int(1), "y": .Int(2)]))
+assert(Yaml.load(" \n  \n \n  \n\nx: 1  \n   \ny: 2\n   \n  \n ") ==
+    .Map(["x": .Int(1), "y": .Int(2)]))
+assert(Yaml.load("x:\n a: 1 # comment \n b: 2\ny: \n  c: 3\n  ") ==
+    .Map(["x": .Map(["a": .Int(1), "b": .Int(2)]), "y": .Map(["c": .Int(3)])]))
+assert(Yaml.load("# comment \n\n  # x\n  # y \n  \n  x: 1  \n  y: 2") ==
+    .Map(["x": .Int(1), "y": .Int(2)]))
 
 println("Done.")

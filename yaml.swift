@@ -3,6 +3,10 @@ import Foundation
 enum TokenType: Swift.String, Printable {
   case Comment = "comment"
   case Space = "space"
+  case BlankLine = "blankline"
+  case NewLine = "newline"
+  case Indent = "indent"
+  case Dedent = "dedent"
   case Null = "null"
   case True = "true"
   case False = "false"
@@ -39,6 +43,8 @@ let finish = "(?= *(,|\\]|\\}|( #[^\\n]*)?(\\n|$)))"
 let tokenPatterns: [TokenPattern] = [
   (.Comment, "^#[^\\n]*"),
   (.Space, "^ +"),
+  (.BlankLine, "^\\n *(#[^\\n]*)?(?=\\n|$)"),
+  (.NewLine, "^\\n *"),
   (.Null, "^(null|Null|NULL|~)\(finish)"),
   (.True, "^(true|True|TRUE)\(finish)"),
   (.False, "^(false|False|FALSE)\(finish)"),
@@ -54,7 +60,7 @@ let tokenPatterns: [TokenPattern] = [
   (.CloseSB, "^\\]"),
   (.OpenCB, "^\\{"),
   (.CloseCB, "^\\}"),
-  (.Key, "^\\w[\\w -]*(?= *: )"),
+  (.Key, "^\\w[\\w -]*(?= *:( |\\n))"),
   (.KeyDQ, "^\".*?\"(?= *:)"),
   (.KeySQ, "^'.*?'(?= *:)"),
   (.Colon, "^:"),
@@ -73,11 +79,28 @@ func context (var text: String) -> String {
 
 func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
   var matches: [TokenMatch] = []
+  var indents = [0]
   next:
   while countElements(text) > 0 {
     for tokenPattern in tokenPatterns {
       if let range = text.rangeOfString(tokenPattern.pattern, options: .RegularExpressionSearch) {
-        matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
+        if tokenPattern.type != .NewLine {
+          matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
+        } else {
+          let match = text.substringWithRange(range)
+          let spaces = countElements(match.substringFromIndex(advance(match.startIndex, 1)))
+          if spaces > indents.last! {
+            indents.append(spaces)
+            matches.append(TokenMatch(.Indent, match))
+          } else if spaces == indents.last! {
+            matches.append(TokenMatch(.NewLine, match))
+          } else {
+            while spaces < indents.last! {
+              indents.removeLast()
+              matches.append(TokenMatch(.Dedent, ""))
+            }
+          }
+        }
         text = text.substringFromIndex(range.endIndex)
         continue next
       }
@@ -96,17 +119,17 @@ class Parser {
     self.tokens = tokens
   }
 
-  func peek() -> TokenMatch {
+  func peek () -> TokenMatch {
     return tokens[index]
   }
 
-  func advance() -> TokenMatch {
+  func advance () -> TokenMatch {
     let r = tokens[index]
     index += 1
     return r
   }
 
-  func accept(type: TokenType) -> Bool {
+  func accept (type: TokenType) -> Bool {
     if peek().type == type {
       advance()
       return true
@@ -114,7 +137,7 @@ class Parser {
     return false
   }
 
-  func expect(type: TokenType, message: String) -> String? {
+  func expect (type: TokenType, message: String) -> String? {
     if peek().type == type {
       advance()
       return nil
@@ -122,16 +145,22 @@ class Parser {
     return "\(message), \(context(peek().match))"
   }
 
-  func ignoreSpace() {
-    while peek().type == .Space {
+  func ignoreSpace () {
+    while contains([.Comment, .Space, .BlankLine, .NewLine], peek().type) {
       advance()
     }
   }
 
-  func parse() -> Yaml {
+  func ignoreWhiteSpace () {
+    while contains([.Comment, .Space, .BlankLine, .NewLine, .Indent, .Dedent], peek().type) {
+      advance()
+    }
+  }
+
+  func parse () -> Yaml {
     switch peek().type {
 
-    case .Comment, .Space:
+    case .Comment, .Space, .BlankLine, .NewLine:
       advance()
       return parse()
 
@@ -181,6 +210,15 @@ class Parser {
     case .OpenCB:
       return parseFlowMap()
 
+    case .KeyDQ, .KeySQ, .Key:
+      return parseBlockMap()
+
+    case .Indent:
+      accept(.Indent)
+      let result = parse()
+      expect(.Dedent, message: "expected dedent")
+      return result
+
     case .StringDQ, .StringSQ:
       let m = advance().match
       let r = Range(start: Swift.advance(m.startIndex, 1), end: Swift.advance(m.endIndex, -1))
@@ -225,21 +263,19 @@ class Parser {
     var map: [String: Yaml] = [:]
     accept(.OpenCB)
     while !accept(.CloseCB) {
-      ignoreSpace()
+      ignoreWhiteSpace()
       if map.count > 0 {
         if let error = expect(.Comma, message: "expected comma") {
           return .Invalid(error)
         }
       }
-      ignoreSpace()
-      var k: String = ""
+      ignoreWhiteSpace()
+      var k = ""
       switch peek().type {
       case .Key:
         k = advance().match
       case .KeyDQ, .KeySQ:
-        let m = advance().match
-        let r = Range(start: Swift.advance(m.startIndex, 1), end: Swift.advance(m.endIndex, -1))
-        k = m.substringWithRange(r)
+        k = unwrapQuotedString(advance().match)
       default:
         break // what if not?
       }
@@ -247,6 +283,40 @@ class Parser {
         return .Invalid(error)
       }
       let v = parse()
+      switch v {
+      case .Invalid:
+        return v
+      default:
+        map.updateValue(v, forKey: k)
+      }
+      ignoreWhiteSpace()
+    }
+    return .Map(map)
+  }
+
+  func parseBlockMap () -> Yaml {
+    var map: [String: Yaml] = [:]
+    while contains([.Key, .KeyDQ, .KeySQ], peek().type) {
+      var k = ""
+      switch peek().type {
+      case .Key:
+        k = advance().match
+      case .KeyDQ, .KeySQ:
+        k = unwrapQuotedString(advance().match)
+      default:
+        return .Invalid("unexpected token \(peek().type)")
+      }
+      if let error = expect(.Colon, message: "expected colon") {
+        return .Invalid(error)
+      }
+      ignoreSpace()
+      var v: Yaml
+      if accept(.Indent) {
+        v = parse()
+        expect(.Dedent, message: "expected dedent")
+      } else {
+        v = parse()
+      }
       switch v {
       case .Invalid:
         return v
@@ -297,6 +367,7 @@ public enum Yaml: Printable {
       // println("Error: \(error)")
       return .Invalid(error)
     }
+    // println(result.tokens!)
     let ret = Parser(result.tokens!).parse()
     // println(ret)
     return ret
@@ -387,7 +458,7 @@ public func != (lhs: Yaml, rhs: Yaml) -> Bool {
   return !(lhs == rhs)
 }
 
-func parseInt(s: String, #radix: Int) -> Int {
+func parseInt (s: String, #radix: Int) -> Int {
   return reduce(lazy(s.unicodeScalars).map({
     c in
     switch c {
@@ -401,4 +472,8 @@ func parseInt(s: String, #radix: Int) -> Int {
       fatalError("invalid digit")
     }
   }), 0, {$0 * radix + $1})
+}
+
+func unwrapQuotedString (s: String) -> String {
+  return s.substringWithRange(Range(start: advance(s.startIndex, 1), end: advance(s.endIndex, -1)))
 }
