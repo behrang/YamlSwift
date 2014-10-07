@@ -393,6 +393,32 @@ public enum Yaml: Printable {
   case Map([Swift.String: Yaml]) // todo: change key type to Yaml
   case Invalid(Swift.String)
 
+  public static func load (text: Swift.String) -> Yaml {
+    let result = tokenize(text)
+    if let error = result.error {
+      // println("Error: \(error)")
+      return .Invalid(error)
+    }
+    // println(result.tokens!)
+    let parser = Parser(result.tokens!)
+    let value = parser.parse()
+    parser.ignoreSpace()
+    if let error = parser.expect(.End, message: "expected end") {
+      return .Invalid(error)
+    }
+    // println(value)
+    return value
+  }
+
+  public var bool: Swift.Bool? {
+    switch self {
+    case .Bool(let b):
+      return b
+    default:
+      return nil
+    }
+  }
+
   public var description: Swift.String {
     switch self {
     case .Null:
@@ -412,23 +438,6 @@ public enum Yaml: Printable {
     case .Invalid(let e):
       return "Invalid(\(e))"
     }
-  }
-
-  public static func load (text: Swift.String) -> Yaml {
-    let result = tokenize(text)
-    if let error = result.error {
-      // println("Error: \(error)")
-      return .Invalid(error)
-    }
-    // println(result.tokens!)
-    let parser = Parser(result.tokens!)
-    let value = parser.parse()
-    parser.ignoreSpace()
-    if let error = parser.expect(.End, message: "expected end") {
-      return .Invalid(error)
-    }
-    // println(value)
-    return value
   }
 }
 
