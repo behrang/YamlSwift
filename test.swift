@@ -166,7 +166,7 @@ func blockMap () {
       .Map(["x": .Int(1), "y": .Int(2)]))
 }
 
-func example1 () {
+func example0 () {
   let value = Yaml.load(
     "- just: write some\n" +
     "- yaml: \n" +
@@ -179,8 +179,47 @@ func example1 () {
   assert(value.seq![1].map!["yaml"]!.seq![1].map!["in"]!.string! == "real-time")
 }
 
+func example1 () {
+  let value = Yaml.load(
+    "- Mark McGwire\n" +
+    "- Sammy Sosa\n" +
+    "- Ken Griffey\n"
+  )
+  assert(value.seq!.count == 3)
+  assert(value.seq![1].string! == "Sammy Sosa")
+}
+
+func example2 () {
+  let value = Yaml.load(
+    "hr:  65    # Home runs\n" +
+    "avg: 0.278 # Batting average\n" +
+    "rbi: 147   # Runs Batted In\n"
+  )
+  assert(value.map!.count == 3)
+  assert(value.map!["avg"]!.float! == 0.278)
+}
+
+func example3 () {
+  let value = Yaml.load(
+    "american:\n" +
+    "  - Boston Red Sox\n" +
+    "  - Detroit Tigers\n" +
+    "  - New York Yankees\n" +
+    "national:\n" +
+    "  - New York Mets\n" +
+    "  - Chicago Cubs\n" +
+    "  - Atlanta Braves\n"
+  )
+  assert(value.map!.count == 2)
+  assert(value.map!["national"]!.seq!.count == 3)
+  assert(value.map!["national"]!.seq![2].string! == "Atlanta Braves")
+}
+
 func examples () {
+  example0()
   example1()
+  example2()
+  example3()
 }
 
 func test () {
