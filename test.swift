@@ -215,11 +215,52 @@ func example3 () {
   assert(value.map!["national"]!.seq![2].string! == "Atlanta Braves")
 }
 
+func example4 () {
+  let value = Yaml.load(
+    "-\n" +
+    "  name: Mark McGwire\n" +
+    "  hr:   65\n" +
+    "  avg:  0.278\n" +
+    "-\n" +
+    "  name: Sammy Sosa\n" +
+    "  hr:   63\n" +
+    "  avg:  0.288\n"
+  )
+  assert(value.seq!.count == 2)
+  assert(value.seq![1].map!["avg"]!.float! == 0.288)
+}
+
+func example5 () {
+  let value = Yaml.load(
+    "- [name        , hr, avg  ]\n" +
+    "- [Mark McGwire, 65, 0.278]\n" +
+    "- [Sammy Sosa  , 63, 0.288]\n"
+  )
+  assert(value.seq!.count == 3)
+  assert(value.seq![2].seq!.count == 3)
+  assert(value.seq![2].seq![2].float! == 0.288)
+}
+
+func example6 () {
+  let value = Yaml.load(
+    "Mark McGwire: {hr: 65, avg: 0.278}\n" +
+    "Sammy Sosa: {\n" +
+    "    hr: 63,\n" +
+    "    avg: 0.288\n" +
+    "  }\n"
+  )
+  assert(value.map!["Mark McGwire"]!.map!["hr"]!.int! == 65)
+  assert(value.map!["Sammy Sosa"]!.map!["hr"]!.int! == 63)
+}
+
 func examples () {
   example0()
   example1()
   example2()
   example3()
+  example4()
+  example5()
+  example6()
 }
 
 func test () {
