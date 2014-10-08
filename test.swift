@@ -166,6 +166,23 @@ func blockMap () {
       .Map(["x": .Int(1), "y": .Int(2)]))
 }
 
+func example1 () {
+  let value = Yaml.load(
+    "- just: write some\n" +
+    "- yaml: \n" +
+    "  - [here, and]\n" +
+    "  - {it: updates, in: real-time}\n"
+  )
+  assert(value.seq!.count == 2)
+  assert(value.seq![0].map!["just"]!.string! == "write some")
+  assert(value.seq![1].map!["yaml"]!.seq![0].seq![1].string! == "and")
+  assert(value.seq![1].map!["yaml"]!.seq![1].map!["in"]!.string! == "real-time")
+}
+
+func examples () {
+  example1()
+}
+
 func test () {
   null()
   bool()
@@ -178,6 +195,8 @@ func test () {
 
   flowMap()
   blockMap()
+
+  examples()
 
   println("Done.")
 }

@@ -105,7 +105,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           let match = text.substringWithRange(range)
           let dashIndex = advance(match.startIndex, 1)
           let indent = countElements(match)
-          indents.append(indent)
+          indents.append(indents.last! + indent)
           matches.append(TokenMatch(.Dash, match.substringToIndex(dashIndex)))
           matches.append(TokenMatch(.Indent, match.substringFromIndex(dashIndex)))
         default:
