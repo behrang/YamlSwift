@@ -140,32 +140,37 @@ func flowSeq () {
 func blockSeq () {
   assert(Yaml.load("- 1\n- 2") == .Seq([.Int(1), .Int(2)]))
   assert(Yaml.load("- 1\n- 2").seq![1].int == 2)
-  assert(Yaml.load("- x: 1") == .Seq([.Map(["x": .Int(1)])]))
-  assert(Yaml.load("- x: 1\n  y: 2").seq![0] == .Map(["x": .Int(1), "y": .Int(2)]))
+  assert(Yaml.load("- x: 1") == .Seq([.Map([.String("x"): .Int(1)])]))
+  assert(Yaml.load("- x: 1\n  y: 2").seq![0] == .Map([.String("x"): .Int(1), .String("y"): .Int(2)]))
   assert(Yaml.load("- 1\n    \n- x: 1\n  y: 2") ==
-      .Seq([.Int(1), .Map(["x": .Int(1), "y": .Int(2)])]))
+      .Seq([.Int(1), .Map([.String("x"): .Int(1), .String("y"): .Int(2)])]))
 }
 
 func flowMap () {
   assert(Yaml.load("{}") == .Map([:]))
-  assert(Yaml.load("{x: 1}") == .Map(["x": .Int(1)]))
-  assert(Yaml.load("{x: 1}").map!["x"]!.int == 1)
+  assert(Yaml.load("{x: 1}") == .Map([.String("x"): .Int(1)]))
+  assert(Yaml.load("{x: 1}").map![.String("x")]!.int == 1)
   assert(Yaml.load("{x:1}").map == nil)
-  assert(Yaml.load("{\"x\":1}").map!["x"]!.int == 1)
-  assert(Yaml.load("{\"x\":1, 'y': true}").map!["y"]!.bool == true)
-  assert(Yaml.load("{\"x\":1, 'y': true, z: null}").map!["z"]! == .Null)
+  assert(Yaml.load("{\"x\":1}").map![.String("x")]!.int == 1)
+  assert(Yaml.load("{\"x\":1, 'y': true}").map![.String("y")]!.bool == true)
+  assert(Yaml.load("{\"x\":1, 'y': true, z: null}").map![.String("z")]! == .Null)
   assert(Yaml.load("{first name: \"Behrang\", last name: 'Noruzi Niya'}") ==
-      .Map(["first name": .String("Behrang"), "last name": .String("Noruzi Niya")]))
-  assert(Yaml.load("{fn: Behrang, ln: Noruzi Niya}").map!["ln"]!.string == "Noruzi Niya")
-  assert(Yaml.load("{fn: Behrang\n ,\nln: Noruzi Niya}").map!["ln"]!.string == "Noruzi Niya")
+      .Map([.String("first name"): .String("Behrang"), .String("last name"): .String("Noruzi Niya")]))
+  assert(Yaml.load("{fn: Behrang, ln: Noruzi Niya}").map![.String("ln")]!.string == "Noruzi Niya")
+  assert(Yaml.load("{fn: Behrang\n ,\nln: Noruzi Niya}").map![.String("ln")]!.string == "Noruzi Niya")
 }
 
 func blockMap () {
-  assert(Yaml.load("x: 1\ny: 2") == .Map(["x": .Int(1), "y": .Int(2)]))
-  assert(Yaml.load(" \n  \n \n  \n\nx: 1  \n   \ny: 2\n   \n  \n ").map!["y"]!.int == 2)
-  assert(Yaml.load("x:\n a: 1 # comment \n b: 2\ny: \n  c: 3\n  ").map!["y"]!.map!["c"]!.int == 3)
+  assert(Yaml.load("x: 1\ny: 2") == .Map([.String("x"): .Int(1), .String("y"): .Int(2)]))
+  assert(Yaml.load("x: 1\n? y\n: 2") == .Map([.String("x"): .Int(1), .String("y"): .Int(2)]))
+  assert(Yaml.load("x: 1\n?  y\n:\n2") == .Map([.String("x"): .Int(1), .String("y"): .Int(2)]))
+  assert(Yaml.load("x: 1\n?  y") == .Map([.String("x"): .Int(1), .String("y"): .Null]))
+  assert(Yaml.load("?  y") == .Map([.String("y"): .Null]))
+  assert(Yaml.load(" \n  \n \n  \n\nx: 1  \n   \ny: 2\n   \n  \n ").map![.String("y")]!.int == 2)
+  assert(Yaml.load("x:\n a: 1 # comment \n b: 2\ny: \n  c: 3\n  "
+    ).map![.String("y")]!.map![.String("c")]!.int == 3)
   assert(Yaml.load("# comment \n\n  # x\n  # y \n  \n  x: 1  \n  y: 2") ==
-      .Map(["x": .Int(1), "y": .Int(2)]))
+      .Map([.String("x"): .Int(1), .String("y"): .Int(2)]))
 }
 
 func example0 () {
@@ -176,9 +181,9 @@ func example0 () {
     "  - {it: updates, in: real-time}\n"
   )
   assert(value.seq!.count == 2)
-  assert(value.seq![0].map!["just"]!.string! == "write some")
-  assert(value.seq![1].map!["yaml"]!.seq![0].seq![1].string! == "and")
-  assert(value.seq![1].map!["yaml"]!.seq![1].map!["in"]!.string! == "real-time")
+  assert(value.seq![0].map![.String("just")]!.string! == "write some")
+  assert(value.seq![1].map![.String("yaml")]!.seq![0].seq![1].string! == "and")
+  assert(value.seq![1].map![.String("yaml")]!.seq![1].map![.String("in")]!.string! == "real-time")
 }
 
 func example1 () {
@@ -198,7 +203,7 @@ func example2 () {
     "rbi: 147   # Runs Batted In\n"
   )
   assert(value.map!.count == 3)
-  assert(value.map!["avg"]!.float! == 0.278)
+  assert(value.map![.String("avg")]!.float! == 0.278)
 }
 
 func example3 () {
@@ -213,8 +218,8 @@ func example3 () {
     "  - Atlanta Braves\n"
   )
   assert(value.map!.count == 2)
-  assert(value.map!["national"]!.seq!.count == 3)
-  assert(value.map!["national"]!.seq![2].string! == "Atlanta Braves")
+  assert(value.map![.String("national")]!.seq!.count == 3)
+  assert(value.map![.String("national")]!.seq![2].string! == "Atlanta Braves")
 }
 
 func example4 () {
@@ -229,7 +234,7 @@ func example4 () {
     "  avg:  0.288\n"
   )
   assert(value.seq!.count == 2)
-  assert(value.seq![1].map!["avg"]!.float! == 0.288)
+  assert(value.seq![1].map![.String("avg")]!.float! == 0.288)
 }
 
 func example5 () {
@@ -251,8 +256,8 @@ func example6 () {
     "    avg: 0.288\n" +
     "  }\n"
   )
-  assert(value.map!["Mark McGwire"]!.map!["hr"]!.int! == 65)
-  assert(value.map!["Sammy Sosa"]!.map!["hr"]!.int! == 63)
+  assert(value.map![.String("Mark McGwire")]!.map![.String("hr")]!.int! == 65)
+  assert(value.map![.String("Sammy Sosa")]!.map![.String("hr")]!.int! == 63)
 }
 
 func example7 () {
@@ -289,10 +294,10 @@ func example8 () {
     "...\n"
   )
   assert(value.seq!.count == 2)
-  assert(value.seq![0].map!["player"]!.string! == "Sammy Sosa")
-  assert(value.seq![0].map!["time"]!.int! == 72200)
-  assert(value.seq![1].map!["player"]!.string! == "Sammy Sosa")
-  assert(value.seq![1].map!["time"]!.int! == 72227)
+  assert(value.seq![0].map![.String("player")]!.string! == "Sammy Sosa")
+  assert(value.seq![0].map![.String("time")]!.int! == 72200)
+  assert(value.seq![1].map![.String("player")]!.string! == "Sammy Sosa")
+  assert(value.seq![1].map![.String("time")]!.int! == 72227)
 }
 
 func example9 () {
@@ -306,8 +311,8 @@ func example9 () {
     "  - Sammy Sosa\n" +
     "  - Ken Griffey\n"
   )
-  assert(value.map!["hr"]!.seq![1].string! == "Sammy Sosa")
-  assert(value.map!["rbi"]!.seq![1].string! == "Ken Griffey")
+  assert(value.map![.String("hr")]!.seq![1].string! == "Sammy Sosa")
+  assert(value.map![.String("rbi")]!.seq![1].string! == "Ken Griffey")
 }
 
 func example10 () {
@@ -321,10 +326,28 @@ func example10 () {
     "  - *SS # Subsequent occurrence\n" +
     "  - Ken Griffey\n"
   )
-  assert(value.map!["hr"]!.seq!.count == 2)
-  assert(value.map!["hr"]!.seq![1].string! == "Sammy Sosa")
-  assert(value.map!["rbi"]!.seq!.count == 2)
-  assert(value.map!["rbi"]!.seq![0].string! == "Sammy Sosa")
+  assert(value.map![.String("hr")]!.seq!.count == 2)
+  assert(value.map![.String("hr")]!.seq![1].string! == "Sammy Sosa")
+  assert(value.map![.String("rbi")]!.seq!.count == 2)
+  assert(value.map![.String("rbi")]!.seq![0].string! == "Sammy Sosa")
+}
+
+func example11 () {
+  let value = Yaml.load(
+    "? - Detroit Tigers\n" +
+    "  - Chicago cubs\n" +
+    ":\n" +
+    "  - 2001-07-23\n" +
+    "\n" +
+    "? [ New York Yankees,\n" +
+    "    Atlanta Braves ]\n" +
+    ": [ 2001-07-02, 2001-08-12,\n" +
+    "    2001-08-14 ]\n"
+  )
+  assert(value.map!.count == 2)
+  assert(value.map!.keys.first!.seq!.count == 2)
+  assert(value.map!.keys.last!.seq!.count == 2)
+  assert(value.map!.keys.last! != value.map!.keys.first!)
 }
 
 func examples () {
@@ -339,6 +362,7 @@ func examples () {
   example8()
   example9()
   example10()
+  example11()
 }
 
 func test () {

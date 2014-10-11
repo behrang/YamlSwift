@@ -31,6 +31,7 @@ enum TokenType: Swift.String, Printable {
   case Key = "key"
   case KeyDQ = "key-dq"
   case KeySQ = "key-sq"
+  case QuestionMark = "?"
   case Colon = ":"
   case StringDQ = "string-dq"
   case StringSQ = "string-sq"
@@ -75,6 +76,7 @@ let tokenPatterns: [TokenPattern] = [
   (.Key, "^\\w[\\w -]*(?= *:( |\\n))"),
   (.KeyDQ, "^\".*?\"(?= *:)"),
   (.KeySQ, "^'.*?'(?= *:)"),
+  (.QuestionMark, "^\\?( +|(?=\\n))"),
   (.Colon, "^:"),
   (.StringDQ, "^\".*?\""),
   (.StringSQ, "^'.*?'"),
@@ -92,6 +94,7 @@ func context (var text: String) -> String {
 func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
   var matches: [TokenMatch] = []
   var indents = [0]
+  var insideFlow = 0
   next:
   while countElements(text) > 0 {
     for tokenPattern in tokenPatterns {
@@ -100,24 +103,30 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
         case .NewLine:
           let match = text.substringWithRange(range)
           let spaces = countElements(match.substringFromIndex(advance(match.startIndex, 1)))
-          if spaces > indents.last! {
+          if insideFlow > 0 || spaces == indents.last! {
+            matches.append(TokenMatch(.NewLine, match))
+          } else if spaces > indents.last! {
             indents.append(spaces)
             matches.append(TokenMatch(.Indent, match))
-          } else if spaces == indents.last! {
-            matches.append(TokenMatch(.NewLine, match))
           } else {
             while spaces < indents.last! {
               indents.removeLast()
               matches.append(TokenMatch(.Dedent, ""))
             }
           }
-        case .Dash:
+        case .Dash, .QuestionMark:
           let match = text.substringWithRange(range)
-          let dashIndex = advance(match.startIndex, 1)
+          let index = advance(match.startIndex, 1)
           let indent = countElements(match)
           indents.append(indents.last! + indent)
-          matches.append(TokenMatch(.Dash, match.substringToIndex(dashIndex)))
-          matches.append(TokenMatch(.Indent, match.substringFromIndex(dashIndex)))
+          matches.append(TokenMatch(tokenPattern.type, match.substringToIndex(index)))
+          matches.append(TokenMatch(.Indent, match.substringFromIndex(index)))
+        case .OpenSB, .OpenCB:
+          insideFlow += 1
+          matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
+        case .CloseSB, .CloseCB:
+          insideFlow -= 1
+          matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
         default:
           matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
         }
@@ -259,7 +268,7 @@ class Parser {
     case .OpenCB:
       return parseFlowMap()
 
-    case .KeyDQ, .KeySQ, .Key:
+    case .KeyDQ, .KeySQ, .Key, .QuestionMark:
       return parseBlockMap()
 
     case .Indent:
@@ -344,7 +353,7 @@ class Parser {
   }
 
   func parseFlowMap () -> Yaml {
-    var map: [String: Yaml] = [:]
+    var map: [Yaml: Yaml] = [:]
     accept(.OpenCB)
     while !accept(.CloseCB) {
       ignoreWhiteSpace()
@@ -354,12 +363,12 @@ class Parser {
         }
       }
       ignoreWhiteSpace()
-      var k = ""
+      var k: Yaml
       switch peek().type {
       case .Key:
-        k = advance().match
+        k = .String(advance().match)
       case .KeyDQ, .KeySQ:
-        k = unwrapQuotedString(advance().match)
+        k = .String(unwrapQuotedString(advance().match))
       default:
         return .Invalid(expect(.Key, message: "expected key")!)
       }
@@ -379,14 +388,28 @@ class Parser {
   }
 
   func parseBlockMap () -> Yaml {
-    var map: [String: Yaml] = [:]
-    while contains([.Key, .KeyDQ, .KeySQ], peek().type) {
-      var k = ""
+    var map: [Yaml: Yaml] = [:]
+    while contains([.Key, .KeyDQ, .KeySQ, .QuestionMark], peek().type) {
+      var k: Yaml
       switch peek().type {
+      case .QuestionMark:
+        advance()
+        k = parse()
+        switch k {
+        case .Invalid:
+          return k
+        default:
+          break
+        }
+        ignoreSpace()
+        if peek().type != .Colon {
+          map.updateValue(.Null, forKey: k)
+          continue
+        }
       case .Key:
-        k = advance().match
+        k = .String(advance().match)
       case .KeyDQ, .KeySQ:
-        k = unwrapQuotedString(advance().match)
+        k = .String(unwrapQuotedString(advance().match))
       default:
         return .Invalid(expect(.Key, message: "expected key")!)
       }
@@ -415,7 +438,7 @@ class Parser {
   }
 }
 
-public enum Yaml: Printable {
+public enum Yaml: Hashable, Printable {
 
   case Null
   case Bool(Swift.Bool)
@@ -423,7 +446,7 @@ public enum Yaml: Printable {
   case Float(Swift.Float)
   case String(Swift.String)
   case Seq([Yaml])
-  case Map([Swift.String: Yaml]) // todo: change key type to Yaml
+  case Map([Yaml: Yaml])
   case Invalid(Swift.String)
 
   public static func load (text: Swift.String) -> Yaml {
@@ -524,7 +547,7 @@ public enum Yaml: Printable {
     }
   }
 
-  public var map: [Swift.String: Yaml]? {
+  public var map: [Yaml: Yaml]? {
     switch self {
     case .Map(let map):
       return map
@@ -552,6 +575,10 @@ public enum Yaml: Printable {
     case .Invalid(let e):
       return "Invalid(\(e))"
     }
+  }
+
+  public var hashValue: Swift.Int {
+    return description.hashValue
   }
 }
 
