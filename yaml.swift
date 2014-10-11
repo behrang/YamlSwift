@@ -1,6 +1,8 @@
 import Foundation
 
 enum TokenType: Swift.String, Printable {
+  case Start = "doc-start"
+  case End = "doc-end"
   case Comment = "comment"
   case Space = "space"
   case BlankLine = "blankline"
@@ -30,7 +32,6 @@ enum TokenType: Swift.String, Printable {
   case StringDQ = "string-dq"
   case StringSQ = "string-sq"
   case String = "string"
-  case End = "end"
 
   var description: Swift.String {
     return self.rawValue
@@ -42,6 +43,8 @@ typealias TokenMatch = (type: TokenType, match: String)
 
 let finish = "(?= *(,|\\]|\\}|( #[^\\n]*)?(\\n|$)))"
 let tokenPatterns: [TokenPattern] = [
+  (.Start, "^---"),
+  (.End, "^\\.\\.\\."),
   (.Comment, "^#[^\\n]*"),
   (.Space, "^ +"),
   (.BlankLine, "^\\n *(#[^\\n]*)?(?=\\n|$)"),
@@ -401,6 +404,8 @@ public enum Yaml: Printable {
     }
     // println(result.tokens!)
     let parser = Parser(result.tokens!)
+    parser.ignoreSpace()
+    parser.accept(.Start)
     let value = parser.parse()
     parser.ignoreSpace()
     if let error = parser.expect(.End, message: "expected end") {
@@ -408,6 +413,35 @@ public enum Yaml: Printable {
     }
     // println(value)
     return value
+  }
+
+  public static func loadMultiple (text: Swift.String) -> Yaml {
+    let result = tokenize(text)
+    if let error = result.error {
+      // println("Error: \(error)")
+      return .Invalid(error)
+    }
+    // println(result.tokens!)
+    let parser = Parser(result.tokens!)
+    parser.ignoreSpace()
+    var docs: [Yaml] = []
+    while parser.peek().type != .End {
+      parser.accept(.Start)
+      let value = parser.parse()
+      switch value {
+      case .Invalid:
+        return value
+      default:
+        break
+      }
+      docs.append(value)
+      parser.ignoreSpace()
+    }
+    if let error = parser.expect(.End, message: "expected end") {
+      return .Invalid(error)
+    }
+    // println(docs)
+    return .Seq(docs)
   }
 
   public var bool: Swift.Bool? {

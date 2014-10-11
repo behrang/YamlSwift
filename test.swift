@@ -253,6 +253,26 @@ func example6 () {
   assert(value.map!["Sammy Sosa"]!.map!["hr"]!.int! == 63)
 }
 
+func example7 () {
+  let value = Yaml.loadMultiple(
+    "# Ranking of 1998 home runs\n" +
+    "---\n" +
+    "- Mark McGwire\n" +
+    "- Sammy Sosa\n" +
+    "- Ken Griffey\n" +
+    "\n" +
+    "# Team ranking\n" +
+    "---\n" +
+    "- Chicago Cubs\n" +
+    "- St Louis Cardinals\n"
+  )
+  assert(value.seq!.count == 2)
+  assert(value.seq![0].seq!.count == 3)
+  assert(value.seq![0].seq![1].string! == "Sammy Sosa")
+  assert(value.seq![1].seq!.count == 2)
+  assert(value.seq![1].seq![1].string! == "St Louis Cardinals")
+}
+
 func examples () {
   example0()
   example1()
@@ -261,6 +281,7 @@ func examples () {
   example4()
   example5()
   example6()
+  example7()
 }
 
 func test () {
