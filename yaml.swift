@@ -1,8 +1,8 @@
 import Foundation
 
 enum TokenType: Swift.String, Printable {
-  case Start = "doc-start"
-  case End = "doc-end"
+  case DocStart = "doc-start"
+  case DocEnd = "doc-end"
   case Comment = "comment"
   case Space = "space"
   case BlankLine = "blankline"
@@ -19,6 +19,7 @@ enum TokenType: Swift.String, Printable {
   case Int = "int"
   case IntOct = "int-oct"
   case IntHex = "int-hex"
+  case IntSex = "int-sex"
   case Comma = ","
   case OpenSB = "["
   case CloseSB = "]"
@@ -32,6 +33,7 @@ enum TokenType: Swift.String, Printable {
   case StringDQ = "string-dq"
   case StringSQ = "string-sq"
   case String = "string"
+  case End = "end"
 
   var description: Swift.String {
     return self.rawValue
@@ -43,8 +45,8 @@ typealias TokenMatch = (type: TokenType, match: String)
 
 let finish = "(?= *(,|\\]|\\}|( #[^\\n]*)?(\\n|$)))"
 let tokenPatterns: [TokenPattern] = [
-  (.Start, "^---"),
-  (.End, "^\\.\\.\\."),
+  (.DocStart, "^---"),
+  (.DocEnd, "^\\.\\.\\."),
   (.Comment, "^#[^\\n]*"),
   (.Space, "^ +"),
   (.BlankLine, "^\\n *(#[^\\n]*)?(?=\\n|$)"),
@@ -59,6 +61,7 @@ let tokenPatterns: [TokenPattern] = [
   (.Int, "^[-+]?[0-9]+\(finish)"),
   (.IntOct, "^0o[0-7]+\(finish)"),
   (.IntHex, "^0x[0-9a-fA-F]+\(finish)"),
+  (.IntSex, "^[0-9]{2}(:[0-9]{2})+\(finish)"),
   (.Float, "^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)"),
   (.Comma, "^,"),
   (.OpenSB, "^\\["),
@@ -185,6 +188,12 @@ class Parser {
     }
   }
 
+  func ignoreDocEnd () {
+    while contains([.Comment, .Space, .BlankLine, .NewLine, .DocEnd], peek().type) {
+      advance()
+    }
+  }
+
   func parse () -> Yaml {
     switch peek().type {
 
@@ -215,6 +224,10 @@ class Parser {
     case .IntHex:
       let m = advance().match.stringByReplacingOccurrencesOfString("0x", withString: "")
       return .Int(parseInt(m, radix: 16)) // will throw runtime error if overflows
+
+    case .IntSex:
+      let m = advance().match
+      return .Int(parseInt(m, radix: 60))
 
     case .InfinityP:
       advance()
@@ -405,9 +418,9 @@ public enum Yaml: Printable {
     // println(result.tokens!)
     let parser = Parser(result.tokens!)
     parser.ignoreSpace()
-    parser.accept(.Start)
+    parser.accept(.DocStart)
     let value = parser.parse()
-    parser.ignoreSpace()
+    parser.ignoreDocEnd()
     if let error = parser.expect(.End, message: "expected end") {
       return .Invalid(error)
     }
@@ -426,7 +439,7 @@ public enum Yaml: Printable {
     parser.ignoreSpace()
     var docs: [Yaml] = []
     while parser.peek().type != .End {
-      parser.accept(.Start)
+      parser.accept(.DocStart)
       let value = parser.parse()
       switch value {
       case .Invalid:
@@ -435,10 +448,7 @@ public enum Yaml: Printable {
         break
       }
       docs.append(value)
-      parser.ignoreSpace()
-    }
-    if let error = parser.expect(.End, message: "expected end") {
-      return .Invalid(error)
+      parser.ignoreDocEnd()
     }
     // println(docs)
     return .Seq(docs)
@@ -613,19 +623,25 @@ public func != (lhs: Yaml, rhs: Yaml) -> Bool {
 }
 
 func parseInt (s: String, #radix: Int) -> Int {
-  return reduce(lazy(s.unicodeScalars).map {
-    c in
-    switch c {
-    case "0"..."9":
-      return c.value - UnicodeScalar("0").value
-    case "a"..."z":
-      return c.value - UnicodeScalar("a").value + 10
-    case "A"..."Z":
-      return c.value - UnicodeScalar("A").value + 10
-    default:
-      fatalError("invalid digit")
-    }
-  }, 0, {$0 * radix + $1})
+  if radix == 60 {
+    return reduce(s.componentsSeparatedByString(":").map {
+      $0.toInt()!
+    }, 0, {$0 * radix + $1})
+  } else {
+    return reduce(lazy(s.unicodeScalars).map {
+      c in
+      switch c {
+      case "0"..."9":
+        return c.value - UnicodeScalar("0").value
+      case "a"..."z":
+        return c.value - UnicodeScalar("a").value + 10
+      case "A"..."Z":
+        return c.value - UnicodeScalar("A").value + 10
+      default:
+        fatalError("invalid digit")
+      }
+    }, 0, {$0 * radix + $1})
+  }
 }
 
 func unwrapQuotedString (s: String) -> String {

@@ -56,6 +56,8 @@ func int () {
   assert(Yaml.load("0x1a").int == 26)
   assert(Yaml.load("0x01a").int == 26)
   assert(Yaml.load("0x001a").int == 26)
+  assert(Yaml.load("10:10").int == 610)
+  assert(Yaml.load("10:10:10").int == 36610)
 
   assert(Yaml.load("2.0").int == 2)
   assert(Yaml.load("2.5").int == nil)
@@ -273,6 +275,26 @@ func example7 () {
   assert(value.seq![1].seq![1].string! == "St Louis Cardinals")
 }
 
+func example8 () {
+  let value = Yaml.loadMultiple(
+    "---\n" +
+    "time: 20:03:20\n" +
+    "player: Sammy Sosa\n" +
+    "action: strike (miss)\n" +
+    "...\n" +
+    "---\n" +
+    "time: 20:03:47\n" +
+    "player: Sammy Sosa\n" +
+    "action: grand slam\n" +
+    "...\n"
+  )
+  assert(value.seq!.count == 2)
+  assert(value.seq![0].map!["player"]!.string! == "Sammy Sosa")
+  assert(value.seq![0].map!["time"]!.int! == 72200)
+  assert(value.seq![1].map!["player"]!.string! == "Sammy Sosa")
+  assert(value.seq![1].map!["time"]!.int! == 72227)
+}
+
 func examples () {
   example0()
   example1()
@@ -282,6 +304,7 @@ func examples () {
   example5()
   example6()
   example7()
+  example8()
 }
 
 func test () {
