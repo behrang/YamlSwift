@@ -295,6 +295,38 @@ func example8 () {
   assert(value.seq![1].map!["time"]!.int! == 72227)
 }
 
+func example9 () {
+  let value = Yaml.load(
+    "---\n" +
+    "hr: # 1998 hr ranking\n" +
+    "  - Mark McGwire\n" +
+    "  - Sammy Sosa\n" +
+    "rbi:\n" +
+    "  # 1998 rbi ranking\n" +
+    "  - Sammy Sosa\n" +
+    "  - Ken Griffey\n"
+  )
+  assert(value.map!["hr"]!.seq![1].string! == "Sammy Sosa")
+  assert(value.map!["rbi"]!.seq![1].string! == "Ken Griffey")
+}
+
+func example10 () {
+  let value = Yaml.load(
+    "---\n" +
+    "hr:\n" +
+    "  - Mark McGwire\n" +
+    "  # Following node labeled SS\n" +
+    "  - &SS Sammy Sosa\n" +
+    "rbi:\n" +
+    "  - *SS # Subsequent occurrence\n" +
+    "  - Ken Griffey\n"
+  )
+  assert(value.map!["hr"]!.seq!.count == 2)
+  assert(value.map!["hr"]!.seq![1].string! == "Sammy Sosa")
+  assert(value.map!["rbi"]!.seq!.count == 2)
+  assert(value.map!["rbi"]!.seq![0].string! == "Sammy Sosa")
+}
+
 func examples () {
   example0()
   example1()
@@ -305,6 +337,8 @@ func examples () {
   example6()
   example7()
   example8()
+  example9()
+  example10()
 }
 
 func test () {

@@ -20,6 +20,8 @@ enum TokenType: Swift.String, Printable {
   case IntOct = "int-oct"
   case IntHex = "int-hex"
   case IntSex = "int-sex"
+  case Anchor = "&"
+  case Alias = "*"
   case Comma = ","
   case OpenSB = "["
   case CloseSB = "]"
@@ -63,6 +65,8 @@ let tokenPatterns: [TokenPattern] = [
   (.IntHex, "^0x[0-9a-fA-F]+\(finish)"),
   (.IntSex, "^[0-9]{2}(:[0-9]{2})+\(finish)"),
   (.Float, "^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)"),
+  (.Anchor, "^&\\w+"),
+  (.Alias, "^\\*\\w+"),
   (.Comma, "^,"),
   (.OpenSB, "^\\["),
   (.CloseSB, "^\\]"),
@@ -134,6 +138,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
 class Parser {
   let tokens: [TokenMatch]
   var index: Int = 0
+  var aliases: [String: Yaml] = [:]
 
   init(_ tokens: [TokenMatch]) {
     self.tokens = tokens
@@ -272,6 +277,18 @@ class Parser {
 
     case .String:
       return .String(advance().match)
+
+    case .Anchor:
+      let m = advance().match
+      let name = m.substringFromIndex(Swift.advance(m.startIndex, 1))
+      let value = parse()
+      aliases[name] = value
+      return value
+
+    case .Alias:
+      let m = advance().match
+      let name = m.substringFromIndex(Swift.advance(m.startIndex, 1))
+      return aliases[name] ?? .Null
 
     case .End:
       return .Null
