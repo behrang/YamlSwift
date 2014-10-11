@@ -33,7 +33,7 @@ enum TokenType: Swift.String, Printable {
   case End = "end"
 
   var description: Swift.String {
-    return self.toRaw()
+    return self.rawValue
   }
 }
 
@@ -579,19 +579,19 @@ public func != (lhs: Yaml, rhs: Yaml) -> Bool {
 }
 
 func parseInt (s: String, #radix: Int) -> Int {
-  return reduce(lazy(s.unicodeScalars).map({
+  return reduce(lazy(s.unicodeScalars).map {
     c in
     switch c {
     case "0"..."9":
-      return c.value - "0".value
+      return c.value - UnicodeScalar("0").value
     case "a"..."z":
-      return c.value - "a".value + 10
+      return c.value - UnicodeScalar("a").value + 10
     case "A"..."Z":
-      return c.value - "A".value + 10
+      return c.value - UnicodeScalar("A").value + 10
     default:
       fatalError("invalid digit")
     }
-  }), 0, {$0 * radix + $1})
+  }, 0, {$0 * radix + $1})
 }
 
 func unwrapQuotedString (s: String) -> String {
