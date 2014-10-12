@@ -308,3 +308,27 @@ public func == (lhs: Int, rhs: Yaml) -> Bool {
 public func != (lhs: Int, rhs: Yaml) -> Bool {
   return !(rhs == lhs)
 }
+
+// Float comparison operators
+public func == (lhs:Yaml, rhs: Float) -> Bool {
+  switch lhs {
+  case .Float(let lv):
+    return lv == rhs
+  case .Int(let lv):
+    return Float(lv) == rhs
+  default:
+    return false
+  }
+}
+
+public func != (lhs: Yaml, rhs: Float) -> Bool {
+  return !(lhs == rhs)
+}
+
+public func == (lhs: Float, rhs: Yaml) -> Bool {
+  return rhs == lhs
+}
+
+public func != (lhs: Float, rhs: Yaml) -> Bool {
+  return !(rhs == lhs)
+}

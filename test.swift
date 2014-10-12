@@ -69,22 +69,22 @@ func int () {
 func float () {
   assert(Yaml.load(".inf") == .Float(Float.infinity))
   assert(Yaml.load(".Inf").float == Float.infinity)
-  assert(Yaml.load(".INF").float == Float.infinity)
-  assert(Yaml.load(".iNf").float != Float.infinity)
-  assert(Yaml.load(".inf#").float != Float.infinity)
-  assert(Yaml.load(".inf# string").float != Float.infinity)
-  assert(Yaml.load(".inf # comment").float == Float.infinity)
-  assert(Yaml.load(".inf .inf").float != Float.infinity)
-  assert(Yaml.load("+.inf # comment").float == Float.infinity)
+  assert(Yaml.load(".INF") == Float.infinity)
+  assert(Yaml.load(".iNf") != Float.infinity)
+  assert(Yaml.load(".inf#") != Float.infinity)
+  assert(Yaml.load(".inf# string") != Float.infinity)
+  assert(Yaml.load(".inf # comment") == Float.infinity)
+  assert(Yaml.load(".inf .inf") != Float.infinity)
+  assert(Yaml.load("+.inf # comment") == Float.infinity)
 
   assert(Yaml.load("-.inf") == .Float(-Float.infinity))
   assert(Yaml.load("-.Inf").float == -Float.infinity)
-  assert(Yaml.load("-.INF").float == -Float.infinity)
-  assert(Yaml.load("-.iNf").float != -Float.infinity)
-  assert(Yaml.load("-.inf#").float != -Float.infinity)
-  assert(Yaml.load("-.inf# string").float != -Float.infinity)
-  assert(Yaml.load("-.inf # comment").float == -Float.infinity)
-  assert(Yaml.load("-.inf -.inf").float != -Float.infinity)
+  assert(Yaml.load("-.INF") == -Float.infinity)
+  assert(Yaml.load("-.iNf") != -Float.infinity)
+  assert(Yaml.load("-.inf#") != -Float.infinity)
+  assert(Yaml.load("-.inf# string") != -Float.infinity)
+  assert(Yaml.load("-.inf # comment") == -Float.infinity)
+  assert(Yaml.load("-.inf -.inf") != -Float.infinity)
 
   assert(Yaml.load(".nan") == .Float(Float.NaN))
   assert(Yaml.load(".NaN") == .Float(Float.NaN))
@@ -97,29 +97,29 @@ func float () {
 
   assert(Yaml.load("0.") == .Float(0))
   assert(Yaml.load(".0").float == 0)
-  assert(Yaml.load("+0.").float == 0)
-  assert(Yaml.load("+.0").float == 0)
-  assert(Yaml.load("+.").float != 0)
-  assert(Yaml.load("-0.").float == 0)
-  assert(Yaml.load("-.0").float == 0)
-  assert(Yaml.load("-.").float != 0)
-  assert(Yaml.load("2.").float == 2)
-  assert(Yaml.load(".2").float == 0.2)
-  assert(Yaml.load("+2.").float == 2)
-  assert(Yaml.load("+.2").float == 0.2)
-  assert(Yaml.load("-2.").float == -2)
-  assert(Yaml.load("-.2").float == -0.2)
-  assert(Yaml.load("1.23015e+3").float == 1.23015e+3)
-  assert(Yaml.load("12.3015e+02").float == 12.3015e+02)
-  assert(Yaml.load("1230.15").float == 1230.15)
-  assert(Yaml.load("+1.23015e+3").float == 1.23015e+3)
-  assert(Yaml.load("+12.3015e+02").float == 12.3015e+02)
-  assert(Yaml.load("+1230.15").float == 1230.15)
-  assert(Yaml.load("-1.23015e+3").float == -1.23015e+3)
-  assert(Yaml.load("-12.3015e+02").float == -12.3015e+02)
-  assert(Yaml.load("-1230.15").float == -1230.15)
-  assert(Yaml.load("-01230.15").float == -1230.15)
-  assert(Yaml.load("-12.3015e02").float == -12.3015e+02)
+  assert(Yaml.load("+0.") == 0)
+  assert(Yaml.load("+.0") == 0)
+  assert(Yaml.load("+.") != 0)
+  assert(Yaml.load("-0.") == 0)
+  assert(Yaml.load("-.0") == 0)
+  assert(Yaml.load("-.") != 0)
+  assert(Yaml.load("2.") == 2)
+  assert(Yaml.load(".2") == 0.2)
+  assert(Yaml.load("+2.") == 2)
+  assert(Yaml.load("+.2") == 0.2)
+  assert(Yaml.load("-2.") == -2)
+  assert(Yaml.load("-.2") == -0.2)
+  assert(Yaml.load("1.23015e+3") == 1.23015e+3)
+  assert(Yaml.load("12.3015e+02") == 12.3015e+02)
+  assert(Yaml.load("1230.15") == 1230.15)
+  assert(Yaml.load("+1.23015e+3") == 1.23015e+3)
+  assert(Yaml.load("+12.3015e+02") == 12.3015e+02)
+  assert(Yaml.load("+1230.15") == 1230.15)
+  assert(Yaml.load("-1.23015e+3") == -1.23015e+3)
+  assert(Yaml.load("-12.3015e+02") == -12.3015e+02)
+  assert(Yaml.load("-1230.15") == -1230.15)
+  assert(Yaml.load("-01230.15") == -1230.15)
+  assert(Yaml.load("-12.3015e02") == -12.3015e+02)
 }
 
 func string () {
@@ -205,7 +205,7 @@ func example2 () {
     "rbi: 147   # Runs Batted In\n"
   )
   assert(value.count == 3)
-  assert(value["avg"].float == 0.278)
+  assert(value["avg"] == 0.278)
 }
 
 func example3 () {
@@ -236,7 +236,7 @@ func example4 () {
     "  avg:  0.288\n"
   )
   assert(value.count == 2)
-  assert(value[1]["avg"].float == 0.288)
+  assert(value[1]["avg"] == 0.288)
 }
 
 func example5 () {
@@ -247,7 +247,7 @@ func example5 () {
   )
   assert(value.count == 3)
   assert(value[2].count == 3)
-  assert(value[2][2].float == 0.288)
+  assert(value[2][2] == 0.288)
 }
 
 func example6 () {
