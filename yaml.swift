@@ -556,6 +556,21 @@ public enum Yaml: Hashable, Printable {
     }
   }
 
+  public subscript(index: Swift.Int) -> Yaml {
+    get {
+      switch self {
+      case .Seq(let seq):
+        if index >= seq.startIndex && index < seq.endIndex {
+          return seq[index]
+        } else {
+          return .Null
+        }
+      default:
+        return .Null
+      }
+    }
+  }
+
   public var description: Swift.String {
     switch self {
     case .Null:
