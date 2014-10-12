@@ -101,19 +101,19 @@ class Parser {
 
     case .InfinityP:
       advance()
-      return .Float(Float.infinity)
+      return .Double(Double.infinity)
 
     case .InfinityN:
       advance()
-      return .Float(-Float.infinity)
+      return .Double(-Double.infinity)
 
     case .NaN:
       advance()
-      return .Float(Float.NaN)
+      return .Double(Double.NaN)
 
-    case .Float:
+    case .Double:
       let m = advance().match as NSString
-      return .Float(m.floatValue)
+      return .Double(m.doubleValue)
 
     case .Dash:
       return parseBlockSeq()

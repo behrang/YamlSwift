@@ -66,37 +66,37 @@ func int () {
   assert(Yaml.load("2.5").int == nil)
 }
 
-func float () {
-  assert(Yaml.load(".inf") == .Float(Float.infinity))
-  assert(Yaml.load(".Inf").float == Float.infinity)
-  assert(Yaml.load(".INF") == Float.infinity)
-  assert(Yaml.load(".iNf") != Float.infinity)
-  assert(Yaml.load(".inf#") != Float.infinity)
-  assert(Yaml.load(".inf# string") != Float.infinity)
-  assert(Yaml.load(".inf # comment") == Float.infinity)
-  assert(Yaml.load(".inf .inf") != Float.infinity)
-  assert(Yaml.load("+.inf # comment") == Float.infinity)
+func double () {
+  assert(Yaml.load(".inf") == .Double(Double.infinity))
+  assert(Yaml.load(".Inf").double == Double.infinity)
+  assert(Yaml.load(".INF") == Double.infinity)
+  assert(Yaml.load(".iNf") != Double.infinity)
+  assert(Yaml.load(".inf#") != Double.infinity)
+  assert(Yaml.load(".inf# string") != Double.infinity)
+  assert(Yaml.load(".inf # comment") == Double.infinity)
+  assert(Yaml.load(".inf .inf") != Double.infinity)
+  assert(Yaml.load("+.inf # comment") == Double.infinity)
 
-  assert(Yaml.load("-.inf") == .Float(-Float.infinity))
-  assert(Yaml.load("-.Inf").float == -Float.infinity)
-  assert(Yaml.load("-.INF") == -Float.infinity)
-  assert(Yaml.load("-.iNf") != -Float.infinity)
-  assert(Yaml.load("-.inf#") != -Float.infinity)
-  assert(Yaml.load("-.inf# string") != -Float.infinity)
-  assert(Yaml.load("-.inf # comment") == -Float.infinity)
-  assert(Yaml.load("-.inf -.inf") != -Float.infinity)
+  assert(Yaml.load("-.inf") == .Double(-Double.infinity))
+  assert(Yaml.load("-.Inf").double == -Double.infinity)
+  assert(Yaml.load("-.INF") == -Double.infinity)
+  assert(Yaml.load("-.iNf") != -Double.infinity)
+  assert(Yaml.load("-.inf#") != -Double.infinity)
+  assert(Yaml.load("-.inf# string") != -Double.infinity)
+  assert(Yaml.load("-.inf # comment") == -Double.infinity)
+  assert(Yaml.load("-.inf -.inf") != -Double.infinity)
 
-  assert(Yaml.load(".nan") == .Float(Float.NaN))
-  assert(Yaml.load(".NaN") == .Float(Float.NaN))
-  assert(Yaml.load(".NAN") == .Float(Float.NaN))
-  assert(Yaml.load(".Nan") != .Float(Float.NaN))
-  assert(Yaml.load(".nan#") != .Float(Float.NaN))
-  assert(Yaml.load(".nan# string") != .Float(Float.NaN))
-  assert(Yaml.load(".nan # comment") == .Float(Float.NaN))
-  assert(Yaml.load(".nan .nan") != .Float(Float.NaN))
+  assert(Yaml.load(".nan") == .Double(Double.NaN))
+  assert(Yaml.load(".NaN") == .Double(Double.NaN))
+  assert(Yaml.load(".NAN") == .Double(Double.NaN))
+  assert(Yaml.load(".Nan") != .Double(Double.NaN))
+  assert(Yaml.load(".nan#") != .Double(Double.NaN))
+  assert(Yaml.load(".nan# string") != .Double(Double.NaN))
+  assert(Yaml.load(".nan # comment") == .Double(Double.NaN))
+  assert(Yaml.load(".nan .nan") != .Double(Double.NaN))
 
-  assert(Yaml.load("0.") == .Float(0))
-  assert(Yaml.load(".0").float == 0)
+  assert(Yaml.load("0.") == .Double(0))
+  assert(Yaml.load(".0").double == 0)
   assert(Yaml.load("+0.") == 0)
   assert(Yaml.load("+.0") == 0)
   assert(Yaml.load("+.") != 0)
@@ -136,9 +136,9 @@ func flowSeq () {
   assert(Yaml.load("[true, true  ,false,  false  ,  false]") ==
       .Seq([.Bool(true), .Bool(true), .Bool(false), .Bool(false), .Bool(false)]))
   assert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, .NaN, 0, 123, -456, 0o74, 0xFf, 1.23, -4.5]") ==
-      .Seq([.Null, .Null, .Bool(true), .Bool(false), .Float(Float.infinity), .Float(-Float.infinity),
-          .Float(Float.NaN), .Int(0), .Int(123), .Int(-456), .Int(60), .Int(255), .Float(1.23),
-          .Float(-4.5)]))
+      .Seq([.Null, .Null, .Bool(true), .Bool(false), .Double(Double.infinity), .Double(-Double.infinity),
+          .Double(Double.NaN), .Int(0), .Int(123), .Int(-456), .Int(60), .Int(255), .Double(1.23),
+          .Double(-4.5)]))
 }
 
 func blockSeq () {
@@ -372,7 +372,7 @@ func test () {
   null()
   bool()
   int()
-  float()
+  double()
   string()
 
   flowSeq()

@@ -3,7 +3,7 @@ public enum Yaml: Hashable, Printable {
   case Null
   case Bool(Swift.Bool)
   case Int(Swift.Int)
-  case Float(Swift.Float)
+  case Double(Swift.Double)
   case String(Swift.String)
   case Seq([Yaml])
   case Map([Yaml: Yaml])
@@ -67,8 +67,8 @@ public enum Yaml: Hashable, Printable {
     switch self {
     case .Int(let i):
       return i
-    case .Float(let f):
-      if Swift.Float(Swift.Int(f)) == f {
+    case .Double(let f):
+      if Swift.Double(Swift.Int(f)) == f {
         return Swift.Int(f)
       } else {
         return nil
@@ -78,12 +78,12 @@ public enum Yaml: Hashable, Printable {
     }
   }
 
-  public var float: Swift.Float? {
+  public var double: Swift.Double? {
     switch self {
-    case .Float(let f):
+    case .Double(let f):
       return f
     case .Int(let i):
-      return Swift.Float(i)
+      return Swift.Double(i)
     default:
       return nil
     }
@@ -161,8 +161,8 @@ public enum Yaml: Hashable, Printable {
       return "Bool(\(b))"
     case .Int(let i):
       return "Int(\(i))"
-    case .Float(let f):
-      return "Float(\(f))"
+    case .Double(let f):
+      return "Double(\(f))"
     case .String(let s):
       return "String(\(s))"
     case .Seq(let s):
@@ -206,9 +206,9 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
       return false
     }
 
-  case .Float(let lv):
+  case .Double(let lv):
     switch rhs {
-    case .Float(let rv):
+    case .Double(let rv):
       return lv == rv || lv.isNaN && rv.isNaN
     default:
       return false
@@ -290,8 +290,8 @@ public func == (lhs: Yaml, rhs: Int) -> Bool {
   switch lhs {
   case .Int(let lv):
     return lv == rhs
-  case .Float(let lv):
-    return lv == Float(rhs)
+  case .Double(let lv):
+    return lv == Double(rhs)
   default:
     return false
   }
@@ -309,27 +309,27 @@ public func != (lhs: Int, rhs: Yaml) -> Bool {
   return !(rhs == lhs)
 }
 
-// Float comparison operators
-public func == (lhs: Yaml, rhs: Float) -> Bool {
+// Double comparison operators
+public func == (lhs: Yaml, rhs: Double) -> Bool {
   switch lhs {
-  case .Float(let lv):
+  case .Double(let lv):
     return lv == rhs
   case .Int(let lv):
-    return Float(lv) == rhs
+    return Double(lv) == rhs
   default:
     return false
   }
 }
 
-public func != (lhs: Yaml, rhs: Float) -> Bool {
+public func != (lhs: Yaml, rhs: Double) -> Bool {
   return !(lhs == rhs)
 }
 
-public func == (lhs: Float, rhs: Yaml) -> Bool {
+public func == (lhs: Double, rhs: Yaml) -> Bool {
   return rhs == lhs
 }
 
-public func != (lhs: Float, rhs: Yaml) -> Bool {
+public func != (lhs: Double, rhs: Yaml) -> Bool {
   return !(rhs == lhs)
 }
 

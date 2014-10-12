@@ -13,7 +13,7 @@ enum TokenType: Swift.String, Printable {
   case InfinityP = "+infinity"
   case InfinityN = "-infinity"
   case NaN = "nan"
-  case Float = "float"
+  case Double = "double"
   case Int = "int"
   case IntOct = "int-oct"
   case IntHex = "int-hex"
@@ -63,7 +63,7 @@ let tokenPatterns: [TokenPattern] = [
   (.IntOct, "^0o[0-7]+\(finish)"),
   (.IntHex, "^0x[0-9a-fA-F]+\(finish)"),
   (.IntSex, "^[0-9]{2}(:[0-9]{2})+\(finish)"),
-  (.Float, "^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)"),
+  (.Double, "^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)"),
   (.Anchor, "^&\\w+"),
   (.Alias, "^\\*\\w+"),
   (.Comma, "^,"),
