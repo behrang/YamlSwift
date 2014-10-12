@@ -126,7 +126,7 @@ func string () {
 
 func flowSeq () {
   assert(Yaml.load("[]") == .Seq([]))
-  assert(Yaml.load("[]").seq!.count == 0)
+  assert(Yaml.load("[]").count == 0)
   assert(Yaml.load("[ true]") == .Seq([.Bool(true)]))
   assert(Yaml.load("[ true]")[0].bool == true)
   assert(Yaml.load("[true, true  ,false,  false  ,  false]") ==
@@ -179,7 +179,7 @@ func example0 () {
     "  - [here, and]\n" +
     "  - {it: updates, in: real-time}\n"
   )
-  assert(value.seq!.count == 2)
+  assert(value.count == 2)
   assert(value[0]["just"].string! == "write some")
   assert(value[1]["yaml"][0][1].string! == "and")
   assert(value[1]["yaml"][1]["in"].string! == "real-time")
@@ -191,7 +191,7 @@ func example1 () {
     "- Sammy Sosa\n" +
     "- Ken Griffey\n"
   )
-  assert(value.seq!.count == 3)
+  assert(value.count == 3)
   assert(value[1].string! == "Sammy Sosa")
 }
 
@@ -201,7 +201,7 @@ func example2 () {
     "avg: 0.278 # Batting average\n" +
     "rbi: 147   # Runs Batted In\n"
   )
-  assert(value.map!.count == 3)
+  assert(value.count == 3)
   assert(value["avg"].float! == 0.278)
 }
 
@@ -216,8 +216,8 @@ func example3 () {
     "  - Chicago Cubs\n" +
     "  - Atlanta Braves\n"
   )
-  assert(value.map!.count == 2)
-  assert(value["national"].seq!.count == 3)
+  assert(value.count == 2)
+  assert(value["national"].count == 3)
   assert(value["national"][2].string! == "Atlanta Braves")
 }
 
@@ -232,7 +232,7 @@ func example4 () {
     "  hr:   63\n" +
     "  avg:  0.288\n"
   )
-  assert(value.seq!.count == 2)
+  assert(value.count == 2)
   assert(value[1]["avg"].float! == 0.288)
 }
 
@@ -242,8 +242,8 @@ func example5 () {
     "- [Mark McGwire, 65, 0.278]\n" +
     "- [Sammy Sosa  , 63, 0.288]\n"
   )
-  assert(value.seq!.count == 3)
-  assert(value[2].seq!.count == 3)
+  assert(value.count == 3)
+  assert(value[2].count == 3)
   assert(value[2][2].float! == 0.288)
 }
 
@@ -272,10 +272,10 @@ func example7 () {
     "- Chicago Cubs\n" +
     "- St Louis Cardinals\n"
   )
-  assert(value.seq!.count == 2)
-  assert(value[0].seq!.count == 3)
+  assert(value.count == 2)
+  assert(value[0].count == 3)
   assert(value[0][1].string! == "Sammy Sosa")
-  assert(value[1].seq!.count == 2)
+  assert(value[1].count == 2)
   assert(value[1][1].string! == "St Louis Cardinals")
 }
 
@@ -292,7 +292,7 @@ func example8 () {
     "action: grand slam\n" +
     "...\n"
   )
-  assert(value.seq!.count == 2)
+  assert(value.count == 2)
   assert(value[0]["player"].string! == "Sammy Sosa")
   assert(value[0]["time"].int! == 72200)
   assert(value[1]["player"].string! == "Sammy Sosa")
@@ -325,9 +325,9 @@ func example10 () {
     "  - *SS # Subsequent occurrence\n" +
     "  - Ken Griffey\n"
   )
-  assert(value["hr"].seq!.count == 2)
+  assert(value["hr"].count == 2)
   assert(value["hr"][1].string! == "Sammy Sosa")
-  assert(value["rbi"].seq!.count == 2)
+  assert(value["rbi"].count == 2)
   assert(value["rbi"][0].string! == "Sammy Sosa")
 }
 
@@ -343,9 +343,9 @@ func example11 () {
     ": [ 2001-07-02, 2001-08-12,\n" +
     "    2001-08-14 ]\n"
   )
-  assert(value.map!.count == 2)
-  assert(value.map!.keys.first!.seq!.count == 2)
-  assert(value.map!.keys.last!.seq!.count == 2)
+  assert(value.count == 2)
+  assert(value.map!.keys.first!.count == 2)
+  assert(value.map!.keys.last!.count == 2)
   assert(value.map!.keys.last! != value.map!.keys.first!)
 }
 

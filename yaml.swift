@@ -556,6 +556,17 @@ public enum Yaml: Hashable, Printable {
     }
   }
 
+  public var count: Swift.Int? {
+    switch self {
+    case .Seq(let seq):
+      return seq.count
+    case .Map(let map):
+      return map.count
+    default:
+      return nil
+    }
+  }
+
   public subscript(index: Swift.Int) -> Yaml {
     get {
       switch self {
