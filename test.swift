@@ -125,6 +125,7 @@ func float () {
 func string () {
   assert(Yaml.load("Behrang") == .String("Behrang"))
   assert(Yaml.load("Behrang Noruzi Niya").string == "Behrang Noruzi Niya")
+  assert(Yaml.load("Radin Noruzi Niya") == "Radin Noruzi Niya")
 }
 
 func flowSeq () {
@@ -159,8 +160,8 @@ func flowMap () {
   assert(Yaml.load("{\"x\":1, 'y': true, z: null}")["z"] == .Null)
   assert(Yaml.load("{first name: \"Behrang\", last name: 'Noruzi Niya'}") ==
       .Map([.String("first name"): .String("Behrang"), .String("last name"): .String("Noruzi Niya")]))
-  assert(Yaml.load("{fn: Behrang, ln: Noruzi Niya}")["ln"].string == "Noruzi Niya")
-  assert(Yaml.load("{fn: Behrang\n ,\nln: Noruzi Niya}")["ln"].string == "Noruzi Niya")
+  assert(Yaml.load("{fn: Behrang, ln: Noruzi Niya}")["ln"] == "Noruzi Niya")
+  assert(Yaml.load("{fn: Behrang\n ,\nln: Noruzi Niya}")["ln"] == "Noruzi Niya")
 }
 
 func blockMap () {
@@ -183,9 +184,9 @@ func example0 () {
     "  - {it: updates, in: real-time}\n"
   )
   assert(value.count == 2)
-  assert(value[0]["just"].string == "write some")
-  assert(value[1]["yaml"][0][1].string == "and")
-  assert(value[1]["yaml"][1]["in"].string == "real-time")
+  assert(value[0]["just"] == "write some")
+  assert(value[1]["yaml"][0][1] == "and")
+  assert(value[1]["yaml"][1]["in"] == "real-time")
 }
 
 func example1 () {
@@ -195,7 +196,7 @@ func example1 () {
     "- Ken Griffey\n"
   )
   assert(value.count == 3)
-  assert(value[1].string == "Sammy Sosa")
+  assert(value[1] == "Sammy Sosa")
 }
 
 func example2 () {
@@ -221,7 +222,7 @@ func example3 () {
   )
   assert(value.count == 2)
   assert(value["national"].count == 3)
-  assert(value["national"][2].string == "Atlanta Braves")
+  assert(value["national"][2] == "Atlanta Braves")
 }
 
 func example4 () {
@@ -277,9 +278,9 @@ func example7 () {
   )
   assert(value.count == 2)
   assert(value[0].count == 3)
-  assert(value[0][1].string == "Sammy Sosa")
+  assert(value[0][1] == "Sammy Sosa")
   assert(value[1].count == 2)
-  assert(value[1][1].string == "St Louis Cardinals")
+  assert(value[1][1] == "St Louis Cardinals")
 }
 
 func example8 () {
@@ -296,9 +297,9 @@ func example8 () {
     "...\n"
   )
   assert(value.count == 2)
-  assert(value[0]["player"].string == "Sammy Sosa")
+  assert(value[0]["player"] == "Sammy Sosa")
   assert(value[0]["time"] == 72200)
-  assert(value[1]["player"].string == "Sammy Sosa")
+  assert(value[1]["player"] == "Sammy Sosa")
   assert(value[1]["time"] == 72227)
 }
 
@@ -313,8 +314,8 @@ func example9 () {
     "  - Sammy Sosa\n" +
     "  - Ken Griffey\n"
   )
-  assert(value["hr"][1].string == "Sammy Sosa")
-  assert(value["rbi"][1].string == "Ken Griffey")
+  assert(value["hr"][1] == "Sammy Sosa")
+  assert(value["rbi"][1] == "Ken Griffey")
 }
 
 func example10 () {
@@ -329,9 +330,9 @@ func example10 () {
     "  - Ken Griffey\n"
   )
   assert(value["hr"].count == 2)
-  assert(value["hr"][1].string == "Sammy Sosa")
+  assert(value["hr"][1] == "Sammy Sosa")
   assert(value["rbi"].count == 2)
-  assert(value["rbi"][0].string == "Sammy Sosa")
+  assert(value["rbi"][0] == "Sammy Sosa")
 }
 
 func example11 () {
