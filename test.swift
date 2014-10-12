@@ -44,24 +44,25 @@ func bool () {
 func int () {
   assert(Yaml.load("0") == .Int(0))
   assert(Yaml.load("+0").int == 0)
-  assert(Yaml.load("-0").int == 0)
-  assert(Yaml.load("2").int == 2)
-  assert(Yaml.load("+2").int == 2)
-  assert(Yaml.load("-2").int == -2)
-  assert(Yaml.load("00123").int == 123)
-  assert(Yaml.load("+00123").int == 123)
-  assert(Yaml.load("-00123").int == -123)
-  assert(Yaml.load("0o10").int == 8)
-  assert(Yaml.load("0o010").int == 8)
-  assert(Yaml.load("0o0010").int == 8)
-  assert(Yaml.load("0x10").int == 16)
-  assert(Yaml.load("0x1a").int == 26)
-  assert(Yaml.load("0x01a").int == 26)
-  assert(Yaml.load("0x001a").int == 26)
-  assert(Yaml.load("10:10").int == 610)
-  assert(Yaml.load("10:10:10").int == 36610)
+  assert(Yaml.load("-0") == 0)
+  assert(Yaml.load("2") == 2)
+  assert(Yaml.load("+2") == 2)
+  assert(Yaml.load("-2") == -2)
+  assert(Yaml.load("00123") == 123)
+  assert(Yaml.load("+00123") == 123)
+  assert(Yaml.load("-00123") == -123)
+  assert(Yaml.load("0o10") == 8)
+  assert(Yaml.load("0o010") == 8)
+  assert(Yaml.load("0o0010") == 8)
+  assert(Yaml.load("0x10") == 16)
+  assert(Yaml.load("0x1a") == 26)
+  assert(Yaml.load("0x01a") == 26)
+  assert(Yaml.load("0x001a") == 26)
+  assert(Yaml.load("10:10") == 610)
+  assert(Yaml.load("10:10:10") == 36610)
 
-  assert(Yaml.load("2.0").int == 2)
+  assert(Yaml.load("2.0") == 2)
+  assert(Yaml.load("2.5") != 2)
   assert(Yaml.load("2.5").int == nil)
 }
 
@@ -141,7 +142,7 @@ func flowSeq () {
 
 func blockSeq () {
   assert(Yaml.load("- 1\n- 2") == .Seq([.Int(1), .Int(2)]))
-  assert(Yaml.load("- 1\n- 2")[1].int == 2)
+  assert(Yaml.load("- 1\n- 2")[1] == 2)
   assert(Yaml.load("- x: 1") == .Seq([.Map([.String("x"): .Int(1)])]))
   assert(Yaml.load("- x: 1\n  y: 2")[0] == .Map([.String("x"): .Int(1), .String("y"): .Int(2)]))
   assert(Yaml.load("- 1\n    \n- x: 1\n  y: 2") ==
@@ -151,9 +152,9 @@ func blockSeq () {
 func flowMap () {
   assert(Yaml.load("{}") == .Map([:]))
   assert(Yaml.load("{x: 1}") == .Map([.String("x"): .Int(1)]))
-  assert(Yaml.load("{x: 1}")["x"].int == 1)
+  assert(Yaml.load("{x: 1}")["x"] == 1)
   assert(Yaml.load("{x:1}").map == nil)
-  assert(Yaml.load("{\"x\":1}")["x"].int == 1)
+  assert(Yaml.load("{\"x\":1}")["x"] == 1)
   assert(Yaml.load("{\"x\":1, 'y': true}")["y"] == true)
   assert(Yaml.load("{\"x\":1, 'y': true, z: null}")["z"] == .Null)
   assert(Yaml.load("{first name: \"Behrang\", last name: 'Noruzi Niya'}") ==
@@ -168,8 +169,8 @@ func blockMap () {
   assert(Yaml.load("x: 1\n?  y\n:\n2") == .Map([.String("x"): .Int(1), .String("y"): .Int(2)]))
   assert(Yaml.load("x: 1\n?  y") == .Map([.String("x"): .Int(1), .String("y"): .Null]))
   assert(Yaml.load("?  y") == .Map([.String("y"): .Null]))
-  assert(Yaml.load(" \n  \n \n  \n\nx: 1  \n   \ny: 2\n   \n  \n ")["y"].int == 2)
-  assert(Yaml.load("x:\n a: 1 # comment \n b: 2\ny: \n  c: 3\n  ")["y"]["c"].int == 3)
+  assert(Yaml.load(" \n  \n \n  \n\nx: 1  \n   \ny: 2\n   \n  \n ")["y"] == 2)
+  assert(Yaml.load("x:\n a: 1 # comment \n b: 2\ny: \n  c: 3\n  ")["y"]["c"] == 3)
   assert(Yaml.load("# comment \n\n  # x\n  # y \n  \n  x: 1  \n  y: 2") ==
       .Map([.String("x"): .Int(1), .String("y"): .Int(2)]))
 }
@@ -257,8 +258,8 @@ func example6 () {
     "    avg: 0.288\n" +
     "  }\n"
   )
-  assert(value["Mark McGwire"]["hr"].int == 65)
-  assert(value["Sammy Sosa"]["hr"].int == 63)
+  assert(value["Mark McGwire"]["hr"] == 65)
+  assert(value["Sammy Sosa"]["hr"] == 63)
 }
 
 func example7 () {
@@ -296,9 +297,9 @@ func example8 () {
   )
   assert(value.count == 2)
   assert(value[0]["player"].string == "Sammy Sosa")
-  assert(value[0]["time"].int == 72200)
+  assert(value[0]["time"] == 72200)
   assert(value[1]["player"].string == "Sammy Sosa")
-  assert(value[1]["time"].int == 72227)
+  assert(value[1]["time"] == 72227)
 }
 
 func example9 () {
