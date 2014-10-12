@@ -571,6 +571,17 @@ public enum Yaml: Hashable, Printable {
     }
   }
 
+  public subscript(key: Swift.String) -> Yaml {
+    get {
+      switch self {
+      case .Map(let map):
+        return map[.String(key)] ?? .Null
+      default:
+        return .Null
+      }
+    }
+  }
+
   public var description: Swift.String {
     switch self {
     case .Null:
