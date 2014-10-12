@@ -262,3 +262,24 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
 public func != (lhs: Yaml, rhs: Yaml) -> Bool {
   return !(lhs == rhs)
 }
+
+public func == (lhs: Yaml, rhs: Bool) -> Bool {
+  switch lhs {
+  case .Bool(let lv):
+    return lv == rhs
+  default:
+    return false
+  }
+}
+
+public func != (lhs: Yaml, rhs: Bool) -> Bool {
+  return !(lhs == rhs)
+}
+
+public func == (lhs: Bool, rhs: Yaml) -> Bool {
+  return rhs == lhs
+}
+
+public func != (lhs: Bool, rhs: Yaml) -> Bool {
+  return !(rhs == lhs)
+}
