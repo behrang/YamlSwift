@@ -5,7 +5,7 @@ public enum Yaml: Hashable, Printable {
   case Int(Swift.Int)
   case Double(Swift.Double)
   case String(Swift.String)
-  case Seq([Yaml])
+  case Array([Yaml])
   case Map([Yaml: Yaml])
   case Invalid(Swift.String)
 
@@ -51,7 +51,7 @@ public enum Yaml: Hashable, Printable {
       parser.ignoreDocEnd()
     }
     // println(docs)
-    return .Seq(docs)
+    return .Array(docs)
   }
 
   public var bool: Swift.Bool? {
@@ -100,7 +100,7 @@ public enum Yaml: Hashable, Printable {
 
   public var seq: [Yaml]? {
     switch self {
-    case .Seq(let seq):
+    case .Array(let seq):
       return seq
     default:
       return nil
@@ -118,7 +118,7 @@ public enum Yaml: Hashable, Printable {
 
   public var count: Swift.Int? {
     switch self {
-    case .Seq(let seq):
+    case .Array(let seq):
       return seq.count
     case .Map(let map):
       return map.count
@@ -130,7 +130,7 @@ public enum Yaml: Hashable, Printable {
   public subscript(index: Swift.Int) -> Yaml {
     get {
       switch self {
-      case .Seq(let seq):
+      case .Array(let seq):
         if index >= seq.startIndex && index < seq.endIndex {
           return seq[index]
         } else {
@@ -165,8 +165,8 @@ public enum Yaml: Hashable, Printable {
       return "Double(\(f))"
     case .String(let s):
       return "String(\(s))"
-    case .Seq(let s):
-      return "Seq(\(s))"
+    case .Array(let s):
+      return "Array(\(s))"
     case .Map(let m):
       return "Map(\(m))"
     case .Invalid(let e):
@@ -222,9 +222,9 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
       return false
     }
 
-  case .Seq(let lv):
+  case .Array(let lv):
     switch rhs {
-    case .Seq(let rv) where lv.count == rv.count:
+    case .Array(let rv) where lv.count == rv.count:
       for i in 0..<lv.count {
         if lv[i] != rv[i] {
           return false

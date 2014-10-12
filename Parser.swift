@@ -182,7 +182,7 @@ class Parser {
       }
       ignoreSpace()
     }
-    return .Seq(seq)
+    return .Array(seq)
   }
 
   func parseFlowSeq () -> Yaml {
@@ -205,7 +205,7 @@ class Parser {
       }
       ignoreSpace()
     }
-    return .Seq(seq)
+    return .Array(seq)
   }
 
   func parseFlowMap () -> Yaml {

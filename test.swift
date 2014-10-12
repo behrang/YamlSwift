@@ -129,25 +129,25 @@ func string () {
 }
 
 func flowSeq () {
-  assert(Yaml.load("[]") == .Seq([]))
+  assert(Yaml.load("[]") == .Array([]))
   assert(Yaml.load("[]").count == 0)
-  assert(Yaml.load("[ true]") == .Seq([.Bool(true)]))
+  assert(Yaml.load("[ true]") == .Array([.Bool(true)]))
   assert(Yaml.load("[ true]")[0] == true)
   assert(Yaml.load("[true, true  ,false,  false  ,  false]") ==
-      .Seq([.Bool(true), .Bool(true), .Bool(false), .Bool(false), .Bool(false)]))
+      .Array([.Bool(true), .Bool(true), .Bool(false), .Bool(false), .Bool(false)]))
   assert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, .NaN, 0, 123, -456, 0o74, 0xFf, 1.23, -4.5]") ==
-      .Seq([.Null, .Null, .Bool(true), .Bool(false), .Double(Double.infinity), .Double(-Double.infinity),
+      .Array([.Null, .Null, .Bool(true), .Bool(false), .Double(Double.infinity), .Double(-Double.infinity),
           .Double(Double.NaN), .Int(0), .Int(123), .Int(-456), .Int(60), .Int(255), .Double(1.23),
           .Double(-4.5)]))
 }
 
 func blockSeq () {
-  assert(Yaml.load("- 1\n- 2") == .Seq([.Int(1), .Int(2)]))
+  assert(Yaml.load("- 1\n- 2") == .Array([.Int(1), .Int(2)]))
   assert(Yaml.load("- 1\n- 2")[1] == 2)
-  assert(Yaml.load("- x: 1") == .Seq([.Map([.String("x"): .Int(1)])]))
+  assert(Yaml.load("- x: 1") == .Array([.Map([.String("x"): .Int(1)])]))
   assert(Yaml.load("- x: 1\n  y: 2")[0] == .Map([.String("x"): .Int(1), .String("y"): .Int(2)]))
   assert(Yaml.load("- 1\n    \n- x: 1\n  y: 2") ==
-      .Seq([.Int(1), .Map([.String("x"): .Int(1), .String("y"): .Int(2)])]))
+      .Array([.Int(1), .Map([.String("x"): .Int(1), .String("y"): .Int(2)])]))
 }
 
 func flowMap () {
