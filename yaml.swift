@@ -6,7 +6,7 @@ public enum Yaml: Hashable, Printable {
   case Double(Swift.Double)
   case String(Swift.String)
   case Array([Yaml])
-  case Map([Yaml: Yaml])
+  case Dictionary([Yaml: Yaml])
   case Invalid(Swift.String)
 
   public static func load (text: Swift.String) -> Yaml {
@@ -109,7 +109,7 @@ public enum Yaml: Hashable, Printable {
 
   public var map: [Yaml: Yaml]? {
     switch self {
-    case .Map(let map):
+    case .Dictionary(let map):
       return map
     default:
       return nil
@@ -120,7 +120,7 @@ public enum Yaml: Hashable, Printable {
     switch self {
     case .Array(let seq):
       return seq.count
-    case .Map(let map):
+    case .Dictionary(let map):
       return map.count
     default:
       return nil
@@ -145,7 +145,7 @@ public enum Yaml: Hashable, Printable {
   public subscript(key: Swift.String) -> Yaml {
     get {
       switch self {
-      case .Map(let map):
+      case .Dictionary(let map):
         return map[.String(key)] ?? .Null
       default:
         return .Null
@@ -167,8 +167,8 @@ public enum Yaml: Hashable, Printable {
       return "String(\(s))"
     case .Array(let s):
       return "Array(\(s))"
-    case .Map(let m):
-      return "Map(\(m))"
+    case .Dictionary(let m):
+      return "Dictionary(\(m))"
     case .Invalid(let e):
       return "Invalid(\(e))"
     }
@@ -235,9 +235,9 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
       return false
     }
 
-  case .Map(let lv):
+  case .Dictionary(let lv):
     switch rhs {
-    case .Map(let rv) where lv.count == rv.count:
+    case .Dictionary(let rv) where lv.count == rv.count:
       for (k, v) in lv {
         if rv[k] == nil || rv[k]! != v {
           return false

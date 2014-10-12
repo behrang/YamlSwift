@@ -240,7 +240,7 @@ class Parser {
       }
       ignoreWhiteSpace()
     }
-    return .Map(map)
+    return .Dictionary(map)
   }
 
   func parseBlockMap () -> Yaml {
@@ -290,7 +290,7 @@ class Parser {
       }
       ignoreSpace()
     }
-    return .Map(map)
+    return .Dictionary(map)
   }
 }
 
