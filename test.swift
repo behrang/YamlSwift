@@ -180,9 +180,9 @@ func example0 () {
     "  - {it: updates, in: real-time}\n"
   )
   assert(value.count == 2)
-  assert(value[0]["just"].string! == "write some")
-  assert(value[1]["yaml"][0][1].string! == "and")
-  assert(value[1]["yaml"][1]["in"].string! == "real-time")
+  assert(value[0]["just"].string == "write some")
+  assert(value[1]["yaml"][0][1].string == "and")
+  assert(value[1]["yaml"][1]["in"].string == "real-time")
 }
 
 func example1 () {
@@ -192,7 +192,7 @@ func example1 () {
     "- Ken Griffey\n"
   )
   assert(value.count == 3)
-  assert(value[1].string! == "Sammy Sosa")
+  assert(value[1].string == "Sammy Sosa")
 }
 
 func example2 () {
@@ -202,7 +202,7 @@ func example2 () {
     "rbi: 147   # Runs Batted In\n"
   )
   assert(value.count == 3)
-  assert(value["avg"].float! == 0.278)
+  assert(value["avg"].float == 0.278)
 }
 
 func example3 () {
@@ -218,7 +218,7 @@ func example3 () {
   )
   assert(value.count == 2)
   assert(value["national"].count == 3)
-  assert(value["national"][2].string! == "Atlanta Braves")
+  assert(value["national"][2].string == "Atlanta Braves")
 }
 
 func example4 () {
@@ -233,7 +233,7 @@ func example4 () {
     "  avg:  0.288\n"
   )
   assert(value.count == 2)
-  assert(value[1]["avg"].float! == 0.288)
+  assert(value[1]["avg"].float == 0.288)
 }
 
 func example5 () {
@@ -244,7 +244,7 @@ func example5 () {
   )
   assert(value.count == 3)
   assert(value[2].count == 3)
-  assert(value[2][2].float! == 0.288)
+  assert(value[2][2].float == 0.288)
 }
 
 func example6 () {
@@ -255,8 +255,8 @@ func example6 () {
     "    avg: 0.288\n" +
     "  }\n"
   )
-  assert(value["Mark McGwire"]["hr"].int! == 65)
-  assert(value["Sammy Sosa"]["hr"].int! == 63)
+  assert(value["Mark McGwire"]["hr"].int == 65)
+  assert(value["Sammy Sosa"]["hr"].int == 63)
 }
 
 func example7 () {
@@ -274,9 +274,9 @@ func example7 () {
   )
   assert(value.count == 2)
   assert(value[0].count == 3)
-  assert(value[0][1].string! == "Sammy Sosa")
+  assert(value[0][1].string == "Sammy Sosa")
   assert(value[1].count == 2)
-  assert(value[1][1].string! == "St Louis Cardinals")
+  assert(value[1][1].string == "St Louis Cardinals")
 }
 
 func example8 () {
@@ -293,10 +293,10 @@ func example8 () {
     "...\n"
   )
   assert(value.count == 2)
-  assert(value[0]["player"].string! == "Sammy Sosa")
-  assert(value[0]["time"].int! == 72200)
-  assert(value[1]["player"].string! == "Sammy Sosa")
-  assert(value[1]["time"].int! == 72227)
+  assert(value[0]["player"].string == "Sammy Sosa")
+  assert(value[0]["time"].int == 72200)
+  assert(value[1]["player"].string == "Sammy Sosa")
+  assert(value[1]["time"].int == 72227)
 }
 
 func example9 () {
@@ -310,8 +310,8 @@ func example9 () {
     "  - Sammy Sosa\n" +
     "  - Ken Griffey\n"
   )
-  assert(value["hr"][1].string! == "Sammy Sosa")
-  assert(value["rbi"][1].string! == "Ken Griffey")
+  assert(value["hr"][1].string == "Sammy Sosa")
+  assert(value["rbi"][1].string == "Ken Griffey")
 }
 
 func example10 () {
@@ -326,9 +326,9 @@ func example10 () {
     "  - Ken Griffey\n"
   )
   assert(value["hr"].count == 2)
-  assert(value["hr"][1].string! == "Sammy Sosa")
+  assert(value["hr"][1].string == "Sammy Sosa")
   assert(value["rbi"].count == 2)
-  assert(value["rbi"][0].string! == "Sammy Sosa")
+  assert(value["rbi"][0].string == "Sammy Sosa")
 }
 
 func example11 () {
@@ -346,7 +346,7 @@ func example11 () {
   assert(value.count == 2)
   assert(value.map!.keys.first!.count == 2)
   assert(value.map!.keys.last!.count == 2)
-  assert(value.map!.keys.last! != value.map!.keys.first!)
+  assert(value.map!.keys.last != value.map!.keys.first)
 }
 
 func examples () {
