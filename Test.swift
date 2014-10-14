@@ -179,7 +179,7 @@ func blockMap () {
 }
 
 func example0 () {
-  let value = Yaml.load(
+  var value = Yaml.load(
     "- just: write some\n" +
     "- yaml: \n" +
     "  - [here, and]\n" +
@@ -189,6 +189,21 @@ func example0 () {
   assert(value[0]["just"] == "write some")
   assert(value[1]["yaml"][0][1] == "and")
   assert(value[1]["yaml"][1]["in"] == "real-time")
+
+  value[0]["just"] = .String("replaced string")
+  assert(value[0]["just"] == "replaced string")
+  value[0]["another"] = .Int(2)
+  assert(value[0]["another"] == 2)
+  value[0]["new"]["key"][10]["key"] = .String("Ten")
+  assert(value[0]["new"]["key"][10]["key"] == "Ten")
+  value[0]["new"]["key"][5]["key"] = .String("Five")
+  assert(value[0]["new"]["key"][5]["key"] == "Five")
+  value[0]["new"]["key"][15]["key"] = .String("Fifteen")
+  assert(value[0]["new"]["key"][15]["key"] == "Fifteen")
+  value[2] = .Double(2)
+  assert(value[2] == 2)
+  value = .Null
+  assert(value == .Null)
 }
 
 func example1 () {

@@ -129,6 +129,7 @@ public enum Yaml: Hashable, Printable {
 
   public subscript(index: Swift.Int) -> Yaml {
     get {
+      assert(index >= 0)
       switch self {
       case .Array(let seq):
         if index >= seq.startIndex && index < seq.endIndex {
@@ -140,6 +141,22 @@ public enum Yaml: Hashable, Printable {
         return .Null
       }
     }
+    set {
+      assert(index >= 0)
+      switch self {
+      case .Array(var seq):
+        seq.reserveCapacity(index + 1)
+        while seq.count <= index {
+          seq.append(.Null)
+        }
+        seq[index] = newValue
+        self = .Array(seq)
+      default:
+        var seq = [Yaml](count: index + 1, repeatedValue: .Null)
+        seq[index] = newValue
+        self = .Array(seq)
+      }
+    }
   }
 
   public subscript(key: Swift.String) -> Yaml {
@@ -149,6 +166,17 @@ public enum Yaml: Hashable, Printable {
         return map[.String(key)] ?? .Null
       default:
         return .Null
+      }
+    }
+    set {
+      switch self {
+      case .Dictionary(var map):
+        map[.String(key)] = newValue
+        self = .Dictionary(map)
+      default:
+        var map = [Yaml: Yaml]()
+        map[.String(key)] = newValue
+        self = .Dictionary(map)
       }
     }
   }
