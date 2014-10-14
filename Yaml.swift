@@ -281,6 +281,8 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
     switch rhs {
     case .Int(let rv):
       return lv == rv
+    case .Double(let rv):
+      return Double(lv) == rv
     default:
       return false
     }
@@ -289,6 +291,8 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
     switch rhs {
     case .Double(let rv):
       return lv == rv
+    case .Int(let rv):
+      return lv == Double(rv)
     default:
       return false
     }
@@ -340,186 +344,6 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
 
 public func != (lhs: Yaml, rhs: Yaml) -> Bool {
   return !(lhs == rhs)
-}
-
-// Bool comparison operators
-public func == (lhs: Yaml, rhs: Bool) -> Bool {
-  switch lhs {
-  case .Bool(let lv):
-    return lv == rhs
-  default:
-    return false
-  }
-}
-
-public func != (lhs: Yaml, rhs: Bool) -> Bool {
-  return !(lhs == rhs)
-}
-
-public func == (lhs: Bool, rhs: Yaml) -> Bool {
-  return rhs == lhs
-}
-
-public func != (lhs: Bool, rhs: Yaml) -> Bool {
-  return !(rhs == lhs)
-}
-
-// Int comparison operators
-public func == (lhs: Yaml, rhs: Int) -> Bool {
-  switch lhs {
-  case .Int(let lv):
-    return lv == rhs
-  case .Double(let lv):
-    return lv == Double(rhs)
-  default:
-    return false
-  }
-}
-
-public func != (lhs: Yaml, rhs: Int) -> Bool {
-  return !(lhs == rhs)
-}
-
-public func == (lhs: Int, rhs: Yaml) -> Bool {
-  return rhs == lhs
-}
-
-public func != (lhs: Int, rhs: Yaml) -> Bool {
-  return !(rhs == lhs)
-}
-
-// Double comparison operators
-public func == (lhs: Yaml, rhs: Double) -> Bool {
-  switch lhs {
-  case .Double(let lv):
-    return lv == rhs
-  case .Int(let lv):
-    return Double(lv) == rhs
-  default:
-    return false
-  }
-}
-
-public func != (lhs: Yaml, rhs: Double) -> Bool {
-  return !(lhs == rhs)
-}
-
-public func == (lhs: Double, rhs: Yaml) -> Bool {
-  return rhs == lhs
-}
-
-public func != (lhs: Double, rhs: Yaml) -> Bool {
-  return !(rhs == lhs)
-}
-
-// String comparison operators
-public func == (lhs: Yaml, rhs: String) -> Bool {
-  switch lhs {
-  case .String(let lv):
-    return lv == rhs
-  default:
-    return false
-  }
-}
-
-public func != (lhs: Yaml, rhs: String) -> Bool {
-  return !(lhs == rhs)
-}
-
-public func == (lhs: String, rhs: Yaml) -> Bool {
-  return rhs == lhs
-}
-
-public func != (lhs: String, rhs: Yaml) -> Bool {
-  return !(rhs == lhs)
-}
-
-// Array comparison operators
-public func == (lhs: Yaml, rhs: [Any]) -> Bool {
-  switch lhs {
-  case .Array(let lv) where lv.count == rhs.count:
-    for i in 0..<lv.count {
-      switch lv[i] {
-      case let v where v == rhs[i] as? Yaml:
-        continue
-      case .Bool(let v) where v == rhs[i] as Bool:
-        continue
-      case .Int(let v) where v == rhs[i] as Int:
-        continue
-      case .Double(let v) where v == rhs[i] as Double:
-        continue
-      case .String(let v) where v == rhs[i] as String:
-        continue
-      case .Array where lv[i] == rhs[i] as [Any]:
-        continue
-      case .Dictionary where lv[i] == rhs[i] as [String: Any]:
-        continue
-      default:
-        return false
-      }
-    }
-    return true
-  default:
-    return false
-  }
-}
-
-public func != (lhs: Yaml, rhs: [Any]) -> Bool {
-  return !(lhs == rhs)
-}
-
-public func == (lhs: [Any], rhs: Yaml) -> Bool {
-  return rhs == lhs
-}
-
-public func != (lhs: [Any], rhs: Yaml) -> Bool {
-  return !(rhs == lhs)
-}
-
-// Dictionary comparison operators
-public func == (lhs: Yaml, rhs: [String: Any]) -> Bool {
-  switch lhs {
-  case .Dictionary(let lv) where lv.count == rhs.count:
-    for (rk, rv) in rhs {
-      let lvv = lv[Yaml.String(rk)]
-      if lvv == nil {
-        return false
-      }
-      switch lvv! {
-      case let v where v == rv as? Yaml:
-        continue
-      case .Bool(let v) where v == rv as Bool:
-        continue
-      case .Int(let v) where v == rv as Int:
-        continue
-      case .Double(let v) where v == rv as Double:
-        continue
-      case .String(let v) where v == rv as String:
-        continue
-      case .Array where lvv! == rv as [Any]:
-        continue
-      case .Dictionary where lvv! == rv as [String: Any]:
-        continue
-      default:
-        return false
-      }
-    }
-    return true
-  default:
-    return false
-  }
-}
-
-public func != (lhs: Yaml, rhs: [String: Any]) -> Bool {
-  return !(lhs == rhs)
-}
-
-public func == (lhs: [String: Any], rhs: Yaml) -> Bool {
-  return rhs == lhs
-}
-
-public func != (lhs: [String: Any], rhs: Yaml) -> Bool {
-  return !(rhs == lhs)
 }
 
 // unary `-` operator
