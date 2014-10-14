@@ -188,7 +188,7 @@ func flowMap () {
   assert(Yaml.load("{}") == [:])
   assert(Yaml.load("{x: 1}") == ["x": 1])
   assert(Yaml.load("{x: 1}")["x"] == 1)
-  assert(Yaml.load("{x:1}").map == nil)
+  assert(Yaml.load("{x:1}").dictionary == nil)
   assert(Yaml.load("{\"x\":1}")["x"] == 1)
   assert(Yaml.load("{\"x\":1, 'y': true}")["y"] == true)
   assert(Yaml.load("{\"x\":1, 'y': true, z: null}")["z"] == .Null)
@@ -396,9 +396,9 @@ func example11 () {
     "    2001-08-14 ]\n"
   )
   assert(value.count == 2)
-  assert(value.map!.keys.first!.count == 2)
-  assert(value.map!.keys.last!.count == 2)
-  assert(value.map!.keys.last != value.map!.keys.first)
+  assert(value.dictionary!.keys.first!.count == 2)
+  assert(value.dictionary!.keys.last!.count == 2)
+  assert(value.dictionary!.keys.last != value.dictionary!.keys.first)
 }
 
 func examples () {

@@ -149,19 +149,19 @@ public enum Yaml:
     }
   }
 
-  public var seq: [Yaml]? {
+  public var array: [Yaml]? {
     switch self {
-    case .Array(let seq):
-      return seq
+    case .Array(let array):
+      return array
     default:
       return nil
     }
   }
 
-  public var map: [Yaml: Yaml]? {
+  public var dictionary: [Yaml: Yaml]? {
     switch self {
-    case .Dictionary(let map):
-      return map
+    case .Dictionary(let dictionary):
+      return dictionary
     default:
       return nil
     }
@@ -169,10 +169,10 @@ public enum Yaml:
 
   public var count: Swift.Int? {
     switch self {
-    case .Array(let seq):
-      return seq.count
-    case .Dictionary(let map):
-      return map.count
+    case .Array(let array):
+      return array.count
+    case .Dictionary(let dictionary):
+      return dictionary.count
     default:
       return nil
     }
@@ -182,9 +182,9 @@ public enum Yaml:
     get {
       assert(index >= 0)
       switch self {
-      case .Array(let seq):
-        if index >= seq.startIndex && index < seq.endIndex {
-          return seq[index]
+      case .Array(let array):
+        if index >= array.startIndex && index < array.endIndex {
+          return array[index]
         } else {
           return .Null
         }
@@ -195,17 +195,17 @@ public enum Yaml:
     set {
       assert(index >= 0)
       switch self {
-      case .Array(var seq):
-        seq.reserveCapacity(index + 1)
-        while seq.count <= index {
-          seq.append(.Null)
+      case .Array(var array):
+        array.reserveCapacity(index + 1)
+        while array.count <= index {
+          array.append(.Null)
         }
-        seq[index] = newValue
-        self = .Array(seq)
+        array[index] = newValue
+        self = .Array(array)
       default:
-        var seq = [Yaml](count: index + 1, repeatedValue: .Null)
-        seq[index] = newValue
-        self = .Array(seq)
+        var array = [Yaml](count: index + 1, repeatedValue: .Null)
+        array[index] = newValue
+        self = .Array(array)
       }
     }
   }
@@ -213,21 +213,21 @@ public enum Yaml:
   public subscript(key: Swift.String) -> Yaml {
     get {
       switch self {
-      case .Dictionary(let map):
-        return map[.String(key)] ?? .Null
+      case .Dictionary(let dictionary):
+        return dictionary[.String(key)] ?? .Null
       default:
         return .Null
       }
     }
     set {
       switch self {
-      case .Dictionary(var map):
-        map[.String(key)] = newValue
-        self = .Dictionary(map)
+      case .Dictionary(var dictionary):
+        dictionary[.String(key)] = newValue
+        self = .Dictionary(dictionary)
       default:
-        var map = [Yaml: Yaml]()
-        map[.String(key)] = newValue
-        self = .Dictionary(map)
+        var dictionary = [Yaml: Yaml]()
+        dictionary[.String(key)] = newValue
+        self = .Dictionary(dictionary)
       }
     }
   }
