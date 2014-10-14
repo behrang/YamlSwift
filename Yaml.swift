@@ -4,7 +4,8 @@ public enum Yaml:
     BooleanLiteralConvertible,
     IntegerLiteralConvertible,
     FloatLiteralConvertible,
-    StringLiteralConvertible {
+    StringLiteralConvertible,
+    ArrayLiteralConvertible {
 
   case Null
   case Bool(Swift.Bool)
@@ -39,6 +40,14 @@ public enum Yaml:
   public typealias UnicodeScalarLiteralType = StringLiteralType
   public init(unicodeScalarLiteral: UnicodeScalarLiteralType) {
     self = .String(unicodeScalarLiteral)
+  }
+
+  public init(arrayLiteral elements: Yaml...) {
+    var array = [Yaml]()
+    for element in elements {
+      array.append(element)
+    }
+    self = .Array(array)
   }
 
   public static func load (text: Swift.String) -> Yaml {

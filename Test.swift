@@ -162,7 +162,7 @@ func flowSeq () {
   assert(Yaml.load("[ true ]")[0] == true)
   assert(Yaml.load("[true, false, true]") == [true, false, true])
   assert(Yaml.load("[Behrang, Radin]") == ["Behrang", "Radin"])
-  assert(Yaml.load("[true, [false, true]]") == [true, [false, true] as [Any]])
+  assert(Yaml.load("[true, [false, true]]") == [true, [false, true]])
   assert(Yaml.load("[true, true  ,false,  false  ,  false]") == [true, true, false, false, false])
   assert(Yaml.load("[true, .NaN]") != [true, Double.NaN])
   assert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, 0, 123, -456, 0o74, 0xFf, 1.23, -4.5]") ==
