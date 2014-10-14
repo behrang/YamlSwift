@@ -133,6 +133,7 @@ func flowSeq () {
   assert(Yaml.load("[]") == .Array([]))
   assert(Yaml.load("[]").count == 0)
   assert(Yaml.load("[ true]") == .Array([.Bool(true)]))
+  assert(Yaml.load("[ true]") == [Yaml.Bool(true)])
   assert(Yaml.load("[ true]")[0] == true)
   assert(Yaml.load("[true, false, true]") == [true, false, true])
   assert(Yaml.load("[Behrang, Radin]") == ["Behrang", "Radin"])

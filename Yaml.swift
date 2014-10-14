@@ -361,7 +361,7 @@ public func == (lhs: Yaml, rhs: [Any]) -> Bool {
   case .Array(let lv) where lv.count == rhs.count:
     for i in 0..<lv.count {
       switch lv[i] {
-      case .Null where rhs[i] as Yaml == .Null:
+      case let v where v == rhs[i] as? Yaml:
         continue
       case .Bool(let v) where v == rhs[i] as Bool:
         continue
