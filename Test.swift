@@ -69,9 +69,13 @@ func int () {
   assert(Yaml.load("2.5") != 2)
   assert(Yaml.load("2.5").int == nil)
 
-  let value: Yaml = 2
-  assert(value == 2)
-  assert(value.int == 2)
+  let value1: Yaml = 2
+  assert(value1 == 2)
+  assert(value1.int == 2)
+  let value2 = -2
+  assert(value2 == -2)
+  assert(-value2 == 2)
+  assert(-value2 == value1)
 }
 
 func double () {
@@ -130,9 +134,13 @@ func double () {
   assert(Yaml.load("-01230.15") == -1230.15)
   assert(Yaml.load("-12.3015e02") == -12.3015e+02)
 
-  let value: Yaml = 0.2
-  assert(value == 0.2)
-  assert(value.double == 0.2)
+  let value1: Yaml = 0.2
+  assert(value1 == 0.2)
+  assert(value1.double == 0.2)
+  let value2: Yaml = -0.2
+  assert(value2 == -0.2)
+  assert(-value2 == 0.2)
+  assert(-value2 == value1)
 }
 
 func string () {

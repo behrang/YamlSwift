@@ -482,3 +482,15 @@ public func == (lhs: [String: Any], rhs: Yaml) -> Bool {
 public func != (lhs: [String: Any], rhs: Yaml) -> Bool {
   return !(rhs == lhs)
 }
+
+// unary `-` operator
+public prefix func - (value: Yaml) -> Yaml {
+  switch value {
+  case .Int(let v):
+    return .Int(-v)
+  case .Double(let v):
+    return .Double(-v)
+  default:
+    fatalError("`-` operator may only be used on .Int or .Double Yaml values")
+  }
+}
