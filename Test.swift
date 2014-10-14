@@ -147,6 +147,10 @@ func string () {
   assert(Yaml.load("Behrang") == .String("Behrang"))
   assert(Yaml.load("Behrang Noruzi Niya").string == "Behrang Noruzi Niya")
   assert(Yaml.load("Radin Noruzi Niya") == "Radin Noruzi Niya")
+
+  let value: Yaml = "Radin"
+  assert(value == "Radin")
+  assert(value.string == "Radin")
 }
 
 func flowSeq () {

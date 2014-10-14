@@ -1,4 +1,10 @@
-public enum Yaml: Hashable, Printable, BooleanLiteralConvertible, IntegerLiteralConvertible, FloatLiteralConvertible {
+public enum Yaml:
+    Hashable,
+    Printable,
+    BooleanLiteralConvertible,
+    IntegerLiteralConvertible,
+    FloatLiteralConvertible,
+    StringLiteralConvertible {
 
   case Null
   case Bool(Swift.Bool)
@@ -19,6 +25,20 @@ public enum Yaml: Hashable, Printable, BooleanLiteralConvertible, IntegerLiteral
 
   public init(floatLiteral: FloatLiteralType) {
     self = .Double(floatLiteral)
+  }
+
+  public init(stringLiteral: StringLiteralType) {
+    self = .String(stringLiteral)
+  }
+
+  public typealias ExtendedGraphemeClusterLiteralType = StringLiteralType
+  public init(extendedGraphemeClusterLiteral: ExtendedGraphemeClusterLiteralType) {
+    self = .String(extendedGraphemeClusterLiteral)
+  }
+
+  public typealias UnicodeScalarLiteralType = StringLiteralType
+  public init(unicodeScalarLiteral: UnicodeScalarLiteralType) {
+    self = .String(unicodeScalarLiteral)
   }
 
   public static func load (text: Swift.String) -> Yaml {
