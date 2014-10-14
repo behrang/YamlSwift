@@ -41,6 +41,7 @@ func bool () {
   assert(false == Yaml.load("\nfalse \n"))
 
   let value: Yaml = true
+  assert(value == true)
   assert(value.bool == true)
 }
 
@@ -67,6 +68,10 @@ func int () {
   assert(Yaml.load("2.0") == 2)
   assert(Yaml.load("2.5") != 2)
   assert(Yaml.load("2.5").int == nil)
+
+  let value: Yaml = 2
+  assert(value == 2)
+  assert(value.int == 2)
 }
 
 func double () {

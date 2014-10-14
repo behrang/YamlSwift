@@ -1,4 +1,4 @@
-public enum Yaml: Hashable, Printable, BooleanLiteralConvertible {
+public enum Yaml: Hashable, Printable, BooleanLiteralConvertible, IntegerLiteralConvertible {
 
   case Null
   case Bool(Swift.Bool)
@@ -11,6 +11,10 @@ public enum Yaml: Hashable, Printable, BooleanLiteralConvertible {
 
   public init(booleanLiteral: BooleanLiteralType) {
     self = .Bool(booleanLiteral)
+  }
+
+  public init(integerLiteral: IntegerLiteralType) {
+    self = .Int(integerLiteral)
   }
 
   public static func load (text: Swift.String) -> Yaml {
