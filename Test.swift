@@ -86,14 +86,15 @@ func double () {
   assert(Yaml.load("-.inf # comment") == -Double.infinity)
   assert(Yaml.load("-.inf -.inf") != -Double.infinity)
 
-  assert(Yaml.load(".nan") == .Double(Double.NaN))
-  assert(Yaml.load(".NaN") == .Double(Double.NaN))
-  assert(Yaml.load(".NAN") == .Double(Double.NaN))
-  assert(Yaml.load(".Nan") != .Double(Double.NaN))
-  assert(Yaml.load(".nan#") != .Double(Double.NaN))
-  assert(Yaml.load(".nan# string") != .Double(Double.NaN))
-  assert(Yaml.load(".nan # comment") == .Double(Double.NaN))
-  assert(Yaml.load(".nan .nan") != .Double(Double.NaN))
+  assert(Yaml.load(".nan") != .Double(Double.NaN))
+  assert(Yaml.load(".nan").double!.isNaN)
+  assert(Yaml.load(".NaN").double!.isNaN)
+  assert(Yaml.load(".NAN").double!.isNaN)
+  assert(Yaml.load(".Nan").double == nil)
+  assert(Yaml.load(".nan#").double == nil)
+  assert(Yaml.load(".nan# string").double == nil)
+  assert(Yaml.load(".nan # comment").double!.isNaN)
+  assert(Yaml.load(".nan .nan").double == nil)
 
   assert(Yaml.load("0.") == .Double(0))
   assert(Yaml.load(".0").double == 0)
@@ -137,8 +138,9 @@ func flowSeq () {
   assert(Yaml.load("[Behrang, Radin]") == ["Behrang", "Radin"])
   assert(Yaml.load("[true, [false, true]]") == [true, [false, true] as [Any]])
   assert(Yaml.load("[true, true  ,false,  false  ,  false]") == [true, true, false, false, false])
-  assert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, .NaN, 0, 123, -456, 0o74, 0xFf, 1.23, -4.5]") ==
-      [Yaml.Null, Yaml.Null, true, false, Double.infinity, -Double.infinity, Double.NaN,
+  assert(Yaml.load("[true, .NaN]") != [true, Double.NaN])
+  assert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, 0, 123, -456, 0o74, 0xFf, 1.23, -4.5]") ==
+      [Yaml.Null, Yaml.Null, true, false, Double.infinity, -Double.infinity,
           0, 123, -456, 60, 255, 1.23, -4.5])
 }
 

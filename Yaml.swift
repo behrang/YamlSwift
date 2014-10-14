@@ -209,7 +209,7 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
   case .Double(let lv):
     switch rhs {
     case .Double(let rv):
-      return lv == rv || lv.isNaN && rv.isNaN
+      return lv == rv
     default:
       return false
     }
@@ -367,8 +367,7 @@ public func == (lhs: Yaml, rhs: [Any]) -> Bool {
         continue
       case .Int(let v) where v == rhs[i] as Int:
         continue
-      case .Double(let v) where
-          (v == rhs[i] as Double) || (v.isNaN && (rhs[i] as Double).isNaN):
+      case .Double(let v) where v == rhs[i] as Double:
         continue
       case .String(let v) where v == rhs[i] as String:
         continue
