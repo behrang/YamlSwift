@@ -5,7 +5,8 @@ public enum Yaml:
     IntegerLiteralConvertible,
     FloatLiteralConvertible,
     StringLiteralConvertible,
-    ArrayLiteralConvertible {
+    ArrayLiteralConvertible,
+    DictionaryLiteralConvertible {
 
   case Null
   case Bool(Swift.Bool)
@@ -44,10 +45,19 @@ public enum Yaml:
 
   public init(arrayLiteral elements: Yaml...) {
     var array = [Yaml]()
+    array.reserveCapacity(elements.count)
     for element in elements {
       array.append(element)
     }
     self = .Array(array)
+  }
+
+  public init(dictionaryLiteral elements: (Yaml, Yaml)...) {
+    var dictionary = [Yaml: Yaml]()
+    for (k, v) in elements {
+      dictionary[k] = v
+    }
+    self = .Dictionary(dictionary)
   }
 
   public static func load (text: Swift.String) -> Yaml {
