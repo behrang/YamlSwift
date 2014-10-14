@@ -129,6 +129,10 @@ func double () {
   assert(Yaml.load("-1230.15") == -1230.15)
   assert(Yaml.load("-01230.15") == -1230.15)
   assert(Yaml.load("-12.3015e02") == -12.3015e+02)
+
+  let value: Yaml = 0.2
+  assert(value == 0.2)
+  assert(value.double == 0.2)
 }
 
 func string () {
