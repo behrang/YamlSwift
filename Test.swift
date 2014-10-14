@@ -39,6 +39,9 @@ func bool () {
   assert(Yaml.load("false\n") == false)
   assert(Yaml.load("false \n") == false)
   assert(false == Yaml.load("\nfalse \n"))
+
+  let value: Yaml = true
+  assert(value.bool == true)
 }
 
 func int () {
@@ -132,9 +135,10 @@ func string () {
 func flowSeq () {
   assert(Yaml.load("[]") == .Array([]))
   assert(Yaml.load("[]").count == 0)
-  assert(Yaml.load("[ true]") == .Array([.Bool(true)]))
-  assert(Yaml.load("[ true]") == [Yaml.Bool(true)])
-  assert(Yaml.load("[ true]")[0] == true)
+  assert(Yaml.load("[ true ]") == [Yaml.Bool(true)])
+  assert(Yaml.load("[ true ]") == .Array([true]))
+  assert(Yaml.load("[ true ]") == [true])
+  assert(Yaml.load("[ true ]")[0] == true)
   assert(Yaml.load("[true, false, true]") == [true, false, true])
   assert(Yaml.load("[Behrang, Radin]") == ["Behrang", "Radin"])
   assert(Yaml.load("[true, [false, true]]") == [true, [false, true] as [Any]])

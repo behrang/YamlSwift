@@ -1,4 +1,4 @@
-public enum Yaml: Hashable, Printable {
+public enum Yaml: Hashable, Printable, BooleanLiteralConvertible {
 
   case Null
   case Bool(Swift.Bool)
@@ -8,6 +8,10 @@ public enum Yaml: Hashable, Printable {
   case Array([Yaml])
   case Dictionary([Yaml: Yaml])
   case Invalid(Swift.String)
+
+  public init(booleanLiteral: BooleanLiteralType) {
+    self = .Bool(booleanLiteral)
+  }
 
   public static func load (text: Swift.String) -> Yaml {
     let result = tokenize(text)
