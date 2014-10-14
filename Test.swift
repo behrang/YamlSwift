@@ -148,36 +148,34 @@ func flowSeq () {
 func blockSeq () {
   assert(Yaml.load("- 1\n- 2") == [1, 2])
   assert(Yaml.load("- 1\n- 2")[1] == 2)
-  assert(Yaml.load("- x: 1") == .Array([.Dictionary([.String("x"): .Int(1)])]))
-  assert(Yaml.load("- x: 1\n  y: 2")[0] == .Dictionary([.String("x"): .Int(1), .String("y"): .Int(2)]))
-  assert(Yaml.load("- 1\n    \n- x: 1\n  y: 2") ==
-      .Array([.Int(1), .Dictionary([.String("x"): .Int(1), .String("y"): .Int(2)])]))
+  assert(Yaml.load("- x: 1") == [["x": 1] as [String: Any]])
+  assert(Yaml.load("- x: 1\n  y: 2")[0] == ["x": 1, "y": 2])
+  assert(Yaml.load("- 1\n    \n- x: 1\n  y: 2") == [1, ["x": 1, "y": 2] as [String: Any]])
 }
 
 func flowMap () {
-  assert(Yaml.load("{}") == .Dictionary([:]))
-  assert(Yaml.load("{x: 1}") == .Dictionary([.String("x"): .Int(1)]))
+  assert(Yaml.load("{}") == [:])
+  assert(Yaml.load("{x: 1}") == ["x": 1])
   assert(Yaml.load("{x: 1}")["x"] == 1)
   assert(Yaml.load("{x:1}").map == nil)
   assert(Yaml.load("{\"x\":1}")["x"] == 1)
   assert(Yaml.load("{\"x\":1, 'y': true}")["y"] == true)
   assert(Yaml.load("{\"x\":1, 'y': true, z: null}")["z"] == .Null)
   assert(Yaml.load("{first name: \"Behrang\", last name: 'Noruzi Niya'}") ==
-      .Dictionary([.String("first name"): .String("Behrang"), .String("last name"): .String("Noruzi Niya")]))
+      ["first name": "Behrang", "last name": "Noruzi Niya"])
   assert(Yaml.load("{fn: Behrang, ln: Noruzi Niya}")["ln"] == "Noruzi Niya")
   assert(Yaml.load("{fn: Behrang\n ,\nln: Noruzi Niya}")["ln"] == "Noruzi Niya")
 }
 
 func blockMap () {
   assert(Yaml.load("x: 1\ny: 2") == .Dictionary([.String("x"): .Int(1), .String("y"): .Int(2)]))
-  assert(Yaml.load("x: 1\n? y\n: 2") == .Dictionary([.String("x"): .Int(1), .String("y"): .Int(2)]))
-  assert(Yaml.load("x: 1\n?  y\n:\n2") == .Dictionary([.String("x"): .Int(1), .String("y"): .Int(2)]))
-  assert(Yaml.load("x: 1\n?  y") == .Dictionary([.String("x"): .Int(1), .String("y"): .Null]))
-  assert(Yaml.load("?  y") == .Dictionary([.String("y"): .Null]))
+  assert(Yaml.load("x: 1\n? y\n: 2") == ["x": 1, "y": 2])
+  assert(Yaml.load("x: 1\n?  y\n:\n2") == ["x": 1, "y": 2])
+  assert(Yaml.load("x: 1\n?  y") == ["x": 1, "y": Yaml.Null])
+  assert(Yaml.load("?  y") == ["y": Yaml.Null])
   assert(Yaml.load(" \n  \n \n  \n\nx: 1  \n   \ny: 2\n   \n  \n ")["y"] == 2)
   assert(Yaml.load("x:\n a: 1 # comment \n b: 2\ny: \n  c: 3\n  ")["y"]["c"] == 3)
-  assert(Yaml.load("# comment \n\n  # x\n  # y \n  \n  x: 1  \n  y: 2") ==
-      .Dictionary([.String("x"): .Int(1), .String("y"): .Int(2)]))
+  assert(Yaml.load("# comment \n\n  # x\n  # y \n  \n  x: 1  \n  y: 2") == ["x": 1, "y": 2])
 }
 
 func example0 () {

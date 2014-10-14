@@ -373,6 +373,8 @@ public func == (lhs: Yaml, rhs: [Any]) -> Bool {
         continue
       case .Array where lv[i] == rhs[i] as [Any]:
         continue
+      case .Dictionary where lv[i] == rhs[i] as [String: Any]:
+        continue
       default:
         return false
       }
@@ -392,5 +394,51 @@ public func == (lhs: [Any], rhs: Yaml) -> Bool {
 }
 
 public func != (lhs: [Any], rhs: Yaml) -> Bool {
+  return !(rhs == lhs)
+}
+
+// Dictionary comparison operators
+public func == (lhs: Yaml, rhs: [String: Any]) -> Bool {
+  switch lhs {
+  case .Dictionary(let lv) where lv.count == rhs.count:
+    for (rk, rv) in rhs {
+      let lvv = lv[Yaml.String(rk)]
+      if lvv == nil {
+        return false
+      }
+      switch lvv! {
+      case let v where v == rv as? Yaml:
+        continue
+      case .Bool(let v) where v == rv as Bool:
+        continue
+      case .Int(let v) where v == rv as Int:
+        continue
+      case .Double(let v) where v == rv as Double:
+        continue
+      case .String(let v) where v == rv as String:
+        continue
+      case .Array where lvv! == rv as [Any]:
+        continue
+      case .Dictionary where lvv! == rv as [String: Any]:
+        continue
+      default:
+        return false
+      }
+    }
+    return true
+  default:
+    return false
+  }
+}
+
+public func != (lhs: Yaml, rhs: [String: Any]) -> Bool {
+  return !(lhs == rhs)
+}
+
+public func == (lhs: [String: Any], rhs: Yaml) -> Bool {
+  return rhs == lhs
+}
+
+public func != (lhs: [String: Any], rhs: Yaml) -> Bool {
   return !(rhs == lhs)
 }
