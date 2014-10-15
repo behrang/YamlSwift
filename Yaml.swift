@@ -38,13 +38,11 @@ public enum Yaml:
     self = .String(stringLiteral)
   }
 
-  public typealias ExtendedGraphemeClusterLiteralType = StringLiteralType
-  public init(extendedGraphemeClusterLiteral: ExtendedGraphemeClusterLiteralType) {
+  public init(extendedGraphemeClusterLiteral: StringLiteralType) {
     self = .String(extendedGraphemeClusterLiteral)
   }
 
-  public typealias UnicodeScalarLiteralType = StringLiteralType
-  public init(unicodeScalarLiteral: UnicodeScalarLiteralType) {
+  public init(unicodeScalarLiteral: StringLiteralType) {
     self = .String(unicodeScalarLiteral)
   }
 
