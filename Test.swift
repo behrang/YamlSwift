@@ -4,13 +4,16 @@ func null () {
   assert(Yaml.load("# comment line") == .Null)
   assert(Yaml.load("") == .Null)
   assert(Yaml.load("null") == .Null)
-  assert(Yaml.load("Null") == .Null)
-  assert(Yaml.load("NULL") == .Null)
-  assert(Yaml.load("~") == .Null)
-  assert(Yaml.load("NuLL") != .Null)
-  assert(Yaml.load("null#") != .Null)
-  assert(Yaml.load("null#string") != .Null)
-  assert(Yaml.load("null #comment") == .Null)
+  assert(Yaml.load("Null") == nil)
+  assert(Yaml.load("NULL") == nil)
+  assert(Yaml.load("~") == nil)
+  assert(Yaml.load("NuLL") != nil)
+  assert(Yaml.load("null#") != nil)
+  assert(Yaml.load("null#string") != nil)
+  assert(Yaml.load("null #comment") == nil)
+
+  let value: Yaml = nil
+  assert(value == nil)
 }
 
 func bool () {
@@ -172,7 +175,7 @@ func flowSeq () {
   assert(Yaml.load("[true, true  ,false,  false  ,  false]") == [true, true, false, false, false])
   assert(Yaml.load("[true, .NaN]") != [true, .Double(Double.NaN)])
   assert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, 0, 123, -456, 0o74, 0xFf, 1.23, -4.5]") ==
-      [Yaml.Null, Yaml.Null, true, false, .Double(Double.infinity), .Double(-Double.infinity),
+      [nil, nil, true, false, .Double(Double.infinity), .Double(-Double.infinity),
           0, 123, -456, 60, 255, 1.23, -4.5])
 }
 
@@ -191,7 +194,7 @@ func flowMap () {
   assert(Yaml.load("{x:1}").dictionary == nil)
   assert(Yaml.load("{\"x\":1}")["x"] == 1)
   assert(Yaml.load("{\"x\":1, 'y': true}")["y"] == true)
-  assert(Yaml.load("{\"x\":1, 'y': true, z: null}")["z"] == .Null)
+  assert(Yaml.load("{\"x\":1, 'y': true, z: null}")["z"] == nil)
   assert(Yaml.load("{first name: \"Behrang\", last name: 'Noruzi Niya'}") ==
       ["first name": "Behrang", "last name": "Noruzi Niya"])
   assert(Yaml.load("{fn: Behrang, ln: Noruzi Niya}")["ln"] == "Noruzi Niya")
@@ -202,8 +205,8 @@ func blockMap () {
   assert(Yaml.load("x: 1\ny: 2") == .Dictionary([.String("x"): .Int(1), .String("y"): .Int(2)]))
   assert(Yaml.load("x: 1\n? y\n: 2") == ["x": 1, "y": 2])
   assert(Yaml.load("x: 1\n?  y\n:\n2") == ["x": 1, "y": 2])
-  assert(Yaml.load("x: 1\n?  y") == ["x": 1, "y": Yaml.Null])
-  assert(Yaml.load("?  y") == ["y": Yaml.Null])
+  assert(Yaml.load("x: 1\n?  y") == ["x": 1, "y": nil])
+  assert(Yaml.load("?  y") == ["y": nil])
   assert(Yaml.load(" \n  \n \n  \n\nx: 1  \n   \ny: 2\n   \n  \n ")["y"] == 2)
   assert(Yaml.load("x:\n a: 1 # comment \n b: 2\ny: \n  c: 3\n  ")["y"]["c"] == 3)
   assert(Yaml.load("# comment \n\n  # x\n  # y \n  \n  x: 1  \n  y: 2") == ["x": 1, "y": 2])
@@ -233,8 +236,8 @@ func example0 () {
   assert(value[0]["new"]["key"][15]["key"] == "Fifteen")
   value[2] = .Double(2)
   assert(value[2] == 2)
-  value = .Null
-  assert(value == .Null)
+  value = nil
+  assert(value == nil)
 }
 
 func example1 () {

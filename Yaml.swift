@@ -1,6 +1,7 @@
 public enum Yaml:
     Hashable,
     Printable,
+    NilLiteralConvertible,
     BooleanLiteralConvertible,
     IntegerLiteralConvertible,
     FloatLiteralConvertible,
@@ -16,6 +17,10 @@ public enum Yaml:
   case Array([Yaml])
   case Dictionary([Yaml: Yaml])
   case Invalid(Swift.String)
+
+  public init(nilLiteral: ()) {
+    self = .Null
+  }
 
   public init(booleanLiteral: BooleanLiteralType) {
     self = .Bool(booleanLiteral)
