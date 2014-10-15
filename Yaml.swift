@@ -213,11 +213,11 @@ public enum Yaml:
     }
   }
 
-  public subscript(key: Swift.String) -> Yaml {
+  public subscript(key: Yaml) -> Yaml {
     get {
       switch self {
       case .Dictionary(let dictionary):
-        return dictionary[.String(key)] ?? .Null
+        return dictionary[key] ?? .Null
       default:
         return .Null
       }
@@ -225,11 +225,11 @@ public enum Yaml:
     set {
       switch self {
       case .Dictionary(var dictionary):
-        dictionary[.String(key)] = newValue
+        dictionary[key] = newValue
         self = .Dictionary(dictionary)
       default:
         var dictionary = [Yaml: Yaml]()
-        dictionary[.String(key)] = newValue
+        dictionary[key] = newValue
         self = .Dictionary(dictionary)
       }
     }

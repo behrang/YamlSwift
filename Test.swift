@@ -398,10 +398,12 @@ func example11 () {
     ": [ 2001-07-02, 2001-08-12,\n" +
     "    2001-08-14 ]\n"
   )
+  let key1 = Yaml.load("- Detroit Tigers\n- Chicago cubs\n")
+  let key2 = Yaml.load("- New York Yankees\n- Atlanta Braves")
   assert(value.count == 2)
-  assert(value.dictionary!.keys.first!.count == 2)
-  assert(value.dictionary!.keys.last!.count == 2)
-  assert(value.dictionary!.keys.last != value.dictionary!.keys.first)
+  assert(value[key1].count == 1)
+  assert(value[key2].count == 3)
+  assert(value[key2][2] == "2001-08-14")
 }
 
 func example12 () {
@@ -419,6 +421,8 @@ func example12 () {
   assert(value[1].count == 2)
   assert(value[1]["item"] == "Basketball")
   assert(value[1]["quantity"] == 4)
+  let key = Yaml.load("quantity")
+  assert(value[2][key] == 1)
 }
 
 func examples () {
