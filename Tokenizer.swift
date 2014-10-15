@@ -1,4 +1,5 @@
 enum TokenType: Swift.String, Printable {
+  case YamlDirective = "%YAML"
   case DocStart = "doc-start"
   case DocEnd = "doc-end"
   case Comment = "comment"
@@ -46,6 +47,7 @@ typealias TokenMatch = (type: TokenType, match: String)
 
 let finish = "(?= *(,|\\]|\\}|( #[^\\n]*)?(\\n|$)))"
 let tokenPatterns: [TokenPattern] = [
+  (.YamlDirective, "^%YAML(?= )"),
   (.DocStart, "^---"),
   (.DocEnd, "^\\.\\.\\."),
   (.Comment, "^#[^\\n]*"),

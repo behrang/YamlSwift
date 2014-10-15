@@ -71,8 +71,9 @@ public enum Yaml:
     }
     // println(result.tokens!)
     let parser = Parser(result.tokens!)
-    parser.ignoreSpace()
-    parser.accept(.DocStart)
+    if let error = parser.parseHeader() {
+      return .Invalid(error)
+    }
     let value = parser.parse()
     parser.ignoreDocEnd()
     if let error = parser.expect(.End, message: "expected end") {
@@ -90,10 +91,11 @@ public enum Yaml:
     }
     // println(result.tokens!)
     let parser = Parser(result.tokens!)
-    parser.ignoreSpace()
     var docs: [Yaml] = []
     while parser.peek().type != .End {
-      parser.accept(.DocStart)
+      if let error = parser.parseHeader() {
+        return .Invalid(error)
+      }
       let value = parser.parse()
       switch value {
       case .Invalid:

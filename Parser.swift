@@ -64,6 +64,36 @@ class Parser {
     }
   }
 
+  func parseHeader () -> String? {
+    var readYaml = false
+    while true {
+      switch peek().type {
+      case .Comment, .Space, .BlankLine, .NewLine:
+        advance()
+      case .YamlDirective:
+        if readYaml {
+          return expect(.DocStart, message: "expected ---")
+        }
+        readYaml = true
+        advance()
+        expect(.Space, message: "expected space")
+        let version = advance().match
+        if version != "1.1" && version != "1.2" {
+          return "invalid yaml version, " + context(buildContext())
+        }
+      case .DocStart:
+        advance()
+        return nil
+      default:
+        if readYaml {
+          return expect(.DocStart, message: "expected ---")
+        } else {
+          return nil
+        }
+      }
+    }
+  }
+
   func parse () -> Yaml {
     switch peek().type {
 

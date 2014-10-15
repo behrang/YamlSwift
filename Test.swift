@@ -212,6 +212,17 @@ func blockMap () {
   assert(Yaml.load("# comment \n\n  # x\n  # y \n  \n  x: 1  \n  y: 2") == ["x": 1, "y": 2])
 }
 
+func directives () {
+  assert(Yaml.load("%YAML 1.2\n1") != 1)
+  assert(Yaml.load("%YAML   1.2\n---1") == 1)
+  assert(Yaml.load("%YAML   1.2  #\n---1") == 1)
+  assert(Yaml.load("%YAML   1.2\n%YAML 1.2\n---1") != 1)
+  assert(Yaml.load("%YAML 1.0\n---1") != 1)
+  assert(Yaml.load("%YAML 1\n---1") != 1)
+  assert(Yaml.load("%YAML 1.3\n---1") != 1)
+  assert(Yaml.load("%YAML \n---1") != 1)
+}
+
 func example0 () {
   var value = Yaml.load(
     "- just: write some\n" +
@@ -453,6 +464,8 @@ func test () {
 
   flowMap()
   blockMap()
+
+  directives()
 
   examples()
 
