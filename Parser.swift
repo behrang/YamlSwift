@@ -35,7 +35,7 @@ class Parser {
     return "\(message), \(context(buildContext()))"
   }
 
-  func buildContext (count: Int = 25) -> String {
+  func buildContext (count: Int = 50) -> String {
     var text = ""
     while peek().type != .End {
       text += advance().match
@@ -269,6 +269,7 @@ class Parser {
       default:
         return .Invalid(expect(.Key, message: "expected key")!)
       }
+      ignoreSpace()
       if let error = expect(.Colon, message: "expected colon") {
         return .Invalid(error)
       }

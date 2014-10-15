@@ -71,7 +71,7 @@ let tokenPatterns: [TokenPattern] = [
   (.CloseSB, "^\\]"),
   (.OpenCB, "^\\{"),
   (.CloseCB, "^\\}"),
-  (.Key, "^\\w[\\w -]*(?= *:( |\\n))"),
+  (.Key, "^\\w( *[\\w-]+)*(?= *:( |\\n))"),
   (.KeyDQ, "^\".*?\"(?= *:)"),
   (.KeySQ, "^'.*?'(?= *:)"),
   (.QuestionMark, "^\\?( +|(?=\\n))"),
@@ -82,7 +82,7 @@ let tokenPatterns: [TokenPattern] = [
 ]
 
 func context (var text: String) -> String {
-  let endIndex = advance(text.startIndex, 25, text.endIndex)
+  let endIndex = advance(text.startIndex, 50, text.endIndex)
   text = text.substringToIndex(endIndex)
   text = text.stringByReplacingOccurrencesOfString("\n", withString: "\\n")
   text = text.stringByReplacingOccurrencesOfString("\"", withString: "\\\"")
@@ -111,6 +111,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
               indents.removeLast()
               matches.append(TokenMatch(.Dedent, ""))
             }
+            matches.append(TokenMatch(.NewLine, match))
           }
         case .Dash, .QuestionMark:
           let match = text.substringWithRange(range)

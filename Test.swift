@@ -404,6 +404,23 @@ func example11 () {
   assert(value.dictionary!.keys.last != value.dictionary!.keys.first)
 }
 
+func example12 () {
+  let value = Yaml.load(
+    "---\n" +
+    "# Products purchased\n" +
+    "- item    : Super Hoop\n" +
+    "  quantity: 1\n" +
+    "- item    : Basketball\n" +
+    "  quantity: 4\n" +
+    "- item    : Big Shoes\n" +
+    "  quantity: 1\n"
+  )
+  assert(value.count == 3)
+  assert(value[1].count == 2)
+  assert(value[1]["item"] == "Basketball")
+  assert(value[1]["quantity"] == 4)
+}
+
 func examples () {
   example0()
   example1()
@@ -417,6 +434,7 @@ func examples () {
   example9()
   example10()
   example11()
+  example12()
 }
 
 func test () {
