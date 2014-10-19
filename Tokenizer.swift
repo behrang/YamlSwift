@@ -33,6 +33,7 @@ enum TokenType: Swift.String, Printable {
   case QuestionMark = "?"
   case Colon = ":"
   case Literal = "|"
+  case Folded = ">"
   case StringDQ = "string-dq"
   case StringSQ = "string-sq"
   case String = "string"
@@ -80,6 +81,7 @@ let tokenPatterns: [TokenPattern] = [
   (.QuestionMark, "^\\?( +|(?=\\n))"),
   (.Colon, "^:"),
   (.Literal, "^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #[^\\n]*)?(\\n|$)"),
+  (.Folded, "^>([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #[^\\n]*)?(\\n|$)"),
   (.StringDQ, "^\".*?\""),
   (.StringSQ, "^'.*?'"),
   (.String, "^.*?\(finish)"),
@@ -135,7 +137,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           insideFlow -= 1
           matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
 
-        case .Literal:
+        case .Literal, .Folded:
           matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
           text = text.substringFromIndex(range.endIndex)
           let lastIndent = indents.last!

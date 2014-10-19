@@ -193,6 +193,12 @@ func string () {
   assert(Yaml.load("|22\n  Radin\n  \n  ") != "Radin\n\n")
   assert(Yaml.load("|--\n  Radin\n  \n  ") != "Radin\n\n")
 
+  assert(Yaml.load(">\n  \n Behrang").string == nil)
+  assert(Yaml.load(">\n  \n  Behrang") == "\nBehrang")
+  assert(Yaml.load(">\n\n folded\n line\n\n next\n line\n" +
+      "   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n# Comment") ==
+      "\nfolded line\nnext line\n  * bullet\n\n  * list\n  * lines\n\nlast line\n")
+
   let value: Yaml = "Radin"
   assert(value == "Radin")
   assert(value.string == "Radin")
@@ -482,6 +488,31 @@ func example13 () {
   assert(value == "\\//||\\/||\n// ||  ||__\n")
 }
 
+func example14 () {
+  let value = Yaml.load(
+    "--- >\n" +
+    "  Mark McGwire's\n" +
+    "  year was crippled\n" +
+    "  by a knee injury.\n"
+  )
+  assert(value == "Mark McGwire's year was crippled by a knee injury.\n")
+}
+
+func example15 () {
+  let value = Yaml.load(
+    ">\n" +
+    " Sammy Sosa completed another\n" +
+    " fine season with great stats.\n" +
+    "\n" +
+    "   63 Home Runs\n" +
+    "   0.288 Batting Average\n" +
+    "\n" +
+    " What a year!\n"
+  )
+  assert(value == .String("Sammy Sosa completed another fine season with great stats.\n\n" +
+      "  63 Home Runs\n  0.288 Batting Average\n\nWhat a year!\n"))
+}
+
 func examples () {
   example0()
   example1()
@@ -497,6 +528,8 @@ func examples () {
   example11()
   example12()
   example13()
+  example14()
+  example15()
 }
 
 func test () {

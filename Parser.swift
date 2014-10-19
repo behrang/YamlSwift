@@ -168,6 +168,13 @@ class Parser {
     case .Literal:
       return parseLiteral()
 
+    case .Folded:
+      let block = parseLiteral()
+      if block.string == nil {
+        return block
+      }
+      return .String(foldBlock(block.string!))
+
     case .StringDQ, .StringSQ:
       let m = advance().match
       let r = Range(start: Swift.advance(m.startIndex, 1), end: Swift.advance(m.endIndex, -1))
@@ -325,6 +332,14 @@ class Parser {
       ignoreSpace()
     }
     return .Dictionary(map)
+  }
+
+  func foldBlock (var block: String) -> String {
+    block = block.stringByReplacingOccurrencesOfString(
+        "(?! |\\n)([^ ].*)\\n(?!\\n| |$)", withString: "$1 ", options: .RegularExpressionSearch)
+    block = block.stringByReplacingOccurrencesOfString(
+        "(\n[^ \n].*)\n\n(?!\n| |$)", withString: "$1\n", options: .RegularExpressionSearch)
+    return block
   }
 
   func parseLiteral () -> Yaml {
