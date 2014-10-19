@@ -165,6 +165,9 @@ class Parser {
       }
       return result
 
+    case .Literal:
+      return parseLiteral()
+
     case .StringDQ, .StringSQ:
       let m = advance().match
       let r = Range(start: Swift.advance(m.startIndex, 1), end: Swift.advance(m.endIndex, -1))
@@ -322,6 +325,56 @@ class Parser {
       ignoreSpace()
     }
     return .Dictionary(map)
+  }
+
+  func parseLiteral () -> Yaml {
+    let literal = advance().match
+    var chomp = 0
+    if literal.rangeOfString("-") != nil {
+      chomp = -1
+    } else if literal.rangeOfString("+") != nil {
+      chomp = 1
+    }
+    var indent = 0
+    if let range = literal.rangeOfString("[1-9]", options: .RegularExpressionSearch) {
+      indent = parseInt(literal.substringWithRange(range), radix: 10)
+    }
+    let token = advance()
+    if token.type != .String {
+      return .Invalid("expected scalar block, \(context(buildContext()))")
+    }
+    var block = token.match
+    let findIndentPattern = "^( *\\n)* {1,}(?! |\\n|$)"
+    var foundIndent = 0
+    if let range = block.rangeOfString(findIndentPattern, options: .RegularExpressionSearch) {
+      let indentText = block.substringWithRange(range)
+      foundIndent = countElements(indentText.stringByReplacingOccurrencesOfString(
+          "^( *\\n)*", withString: "", options: .RegularExpressionSearch))
+      let invalidPattern = "^( {0,\(foundIndent)}\\n)* {\(foundIndent + 1),}"
+      if let range = block.rangeOfString(invalidPattern, options: .RegularExpressionSearch) {
+        return .Invalid(
+            "leading all-space line must not have to many spaces, \(context(buildContext()))")
+      }
+    }
+    if indent > 0 && foundIndent < indent {
+      return .Invalid(
+          "less indented block scalar than the indicated level, \(context(buildContext()))")
+    } else if indent == 0 {
+      indent = foundIndent
+    }
+    block = block.stringByReplacingOccurrencesOfString(
+        "^ {0,\(indent)}", withString: "", options: .RegularExpressionSearch)
+    block = block.stringByReplacingOccurrencesOfString(
+        "\\n {0,\(indent)}", withString: "\n", options: .RegularExpressionSearch)
+
+    if chomp == -1 {
+      block = block.stringByReplacingOccurrencesOfString(
+          "(\\n *)*$", withString: "", options: .RegularExpressionSearch)
+    } else if chomp == 0 {
+      block = block.stringByReplacingOccurrencesOfString(
+          "(?=[^ ])(\\n *)*$", withString: "\n", options: .RegularExpressionSearch)
+    }
+    return .String(block)
   }
 }
 

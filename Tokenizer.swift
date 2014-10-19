@@ -32,6 +32,7 @@ enum TokenType: Swift.String, Printable {
   case KeySQ = "key-sq"
   case QuestionMark = "?"
   case Colon = ":"
+  case Literal = "|"
   case StringDQ = "string-dq"
   case StringSQ = "string-sq"
   case String = "string"
@@ -78,6 +79,7 @@ let tokenPatterns: [TokenPattern] = [
   (.KeySQ, "^'.*?'(?= *:)"),
   (.QuestionMark, "^\\?( +|(?=\\n))"),
   (.Colon, "^:"),
+  (.Literal, "^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #[^\\n]*)?(\\n|$)"),
   (.StringDQ, "^\".*?\""),
   (.StringSQ, "^'.*?'"),
   (.String, "^.*?\(finish)"),
@@ -100,6 +102,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
     for tokenPattern in tokenPatterns {
       if let range = text.rangeOfString(tokenPattern.pattern, options: .RegularExpressionSearch) {
         switch tokenPattern.type {
+
         case .NewLine:
           let match = text.substringWithRange(range)
           let spaces = countElements(match.substringFromIndex(advance(match.startIndex, 1)))
@@ -115,6 +118,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
             }
             matches.append(TokenMatch(.NewLine, match))
           }
+
         case .Dash, .QuestionMark:
           let match = text.substringWithRange(range)
           let index = advance(match.startIndex, 1)
@@ -122,12 +126,32 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           indents.append(indents.last! + indent)
           matches.append(TokenMatch(tokenPattern.type, match.substringToIndex(index)))
           matches.append(TokenMatch(.Indent, match.substringFromIndex(index)))
+
         case .OpenSB, .OpenCB:
           insideFlow += 1
           matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
+
         case .CloseSB, .CloseCB:
           insideFlow -= 1
           matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
+
+        case .Literal:
+          matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
+          text = text.substringFromIndex(range.endIndex)
+          let lastIndent = indents.last!
+          let minIndent = 1 + lastIndent
+          let blockPattern = "^( *\\n)*(( {\(minIndent),})[^ ].*(\\n|$)(( *|\\3.*)(\\n|$))*)?"
+          if let range = text.rangeOfString(blockPattern, options: .RegularExpressionSearch) {
+            var block = text.substringWithRange(range)
+            block = block.stringByReplacingOccurrencesOfString(
+                "^ {0,\(lastIndent)}", withString: "", options: .RegularExpressionSearch)
+            block = block.stringByReplacingOccurrencesOfString(
+                "\\n {0,\(lastIndent)}", withString: "\n", options: .RegularExpressionSearch)
+            matches.append(TokenMatch(.String, block))
+            text = text.substringFromIndex(range.endIndex)
+          }
+          continue next
+
         default:
           matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
         }

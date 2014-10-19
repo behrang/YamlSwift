@@ -156,6 +156,42 @@ func string () {
   assert(Yaml.load("Behrang") == .String("Behrang"))
   assert(Yaml.load("Behrang Noruzi Niya").string == "Behrang Noruzi Niya")
   assert(Yaml.load("Radin Noruzi Niya") == "Radin Noruzi Niya")
+  assert(Yaml.load("|") == "")
+  assert(Yaml.load("| ") == "")
+  assert(Yaml.load("|  # comment") == "")
+  assert(Yaml.load("|  # comment\n") == "")
+  assert(Yaml.load("|\nRadin") != "Radin")
+  assert(Yaml.load("|\n Radin") == "Radin")
+  assert(Yaml.load("|  \n Radin") == "Radin")
+  assert(Yaml.load("|  # comment\n Radin") == "Radin")
+  assert(Yaml.load("|\n  Radin") == "Radin")
+  assert(Yaml.load("|2\n  Radin") == "Radin")
+  assert(Yaml.load("|1\n  Radin") == " Radin")
+  assert(Yaml.load("|1\n\n  Radin") == "\n Radin")
+  assert(Yaml.load("|\n\n  Radin") == "\nRadin")
+  assert(Yaml.load("|3\n\n  Radin") != "\nRadin")
+  assert(Yaml.load("|3\n    \n   Radin") != " \nRadin")
+  assert(Yaml.load("|3\n   \n   Radin") == "\nRadin")
+  assert(Yaml.load("|\n  \n\n \n  Radin\n\n \n\n  Noruzi Niya") == "\n\n\nRadin\n\n\n\nNoruzi Niya")
+  assert(Yaml.load("|\n  \n\n \n  Radin\n\n \n\n  Noruzi Niya\n  #1") ==
+      "\n\n\nRadin\n\n\n\nNoruzi Niya\n#1")
+  assert(Yaml.load("|\n  \n\n \n  Radin\n\n \n\n  Noruzi Niya\n  #1\n # Comment") ==
+      "\n\n\nRadin\n\n\n\nNoruzi Niya\n#1\n")
+  assert(Yaml.load("|\n Radin\n") == "Radin\n")
+  assert(Yaml.load("|\n Radin\n\n") == "Radin\n")
+  assert(Yaml.load("|\n Radin\n \n ") == "Radin\n")
+  assert(Yaml.load("|\n Radin\n  \n  ") == "Radin\n")
+  assert(Yaml.load("|-\n Radin\n  \n  ") == "Radin")
+  assert(Yaml.load("|+\n Radin\n") == "Radin\n")
+  assert(Yaml.load("|+\n Radin\n\n") == "Radin\n\n")
+  assert(Yaml.load("|+\n Radin\n \n ") == "Radin\n\n")
+  assert(Yaml.load("|+\n Radin\n  \n  ") == "Radin\n \n ")
+  assert(Yaml.load("|2+\n  Radin\n  \n  ") == "Radin\n\n")
+  assert(Yaml.load("|+2\n  Radin\n  \n  ") == "Radin\n\n")
+  assert(Yaml.load("|-2\n  Radin\n  \n  ") == "Radin")
+  assert(Yaml.load("|2-\n  Radin\n  \n  ") == "Radin")
+  assert(Yaml.load("|22\n  Radin\n  \n  ") != "Radin\n\n")
+  assert(Yaml.load("|--\n  Radin\n  \n  ") != "Radin\n\n")
 
   let value: Yaml = "Radin"
   assert(value == "Radin")
@@ -436,6 +472,16 @@ func example12 () {
   assert(value[2][key] == 1)
 }
 
+func example13 () {
+  let value = Yaml.load(
+    "# ASCII Art\n" +
+    "--- |\n" +
+    "  \\//||\\/||\n" +
+    "  // ||  ||__\n"
+  )
+  assert(value == "\\//||\\/||\n// ||  ||__\n")
+}
+
 func examples () {
   example0()
   example1()
@@ -450,6 +496,7 @@ func examples () {
   example10()
   example11()
   example12()
+  example13()
 }
 
 func test () {
