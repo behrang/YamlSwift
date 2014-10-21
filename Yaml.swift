@@ -70,7 +70,7 @@ public enum Yaml:
       return .Invalid(error)
     }
     // println(result.tokens?)
-    let parser = Parser(result.tokens? ?? [])
+    let parser = Parser(result.tokens ?? [])
     if let error = parser.parseHeader() {
       return .Invalid(error)
     }
@@ -90,7 +90,7 @@ public enum Yaml:
       return .Invalid(error)
     }
     // println(result.tokens?)
-    let parser = Parser(result.tokens? ?? [])
+    let parser = Parser(result.tokens ?? [])
     var docs: [Yaml] = []
     while parser.peek().type != .End {
       if let error = parser.parseHeader() {

@@ -173,12 +173,15 @@ class Parser {
       if block.string == nil {
         return block
       }
-      return .String(foldBlock(block.string? ?? ""))
+      return .String(foldBlock(block.string ?? ""))
 
-    case .StringDQ, .StringSQ:
-      let m = advance().match
-      let r = Range(start: Swift.advance(m.startIndex, 1), end: Swift.advance(m.endIndex, -1))
-      return .String(m.substringWithRange(r))
+    case .StringDQ:
+      let m = unwrapQuotedString(advance().match)
+      return .String(unescapeDoubleQuotes(m))
+
+    case .StringSQ:
+      let m = unwrapQuotedString(advance().match)
+      return .String(unescapeSingleQuotes(m))
 
     case .String:
       return .String(advance().match)
@@ -396,7 +399,7 @@ class Parser {
 func parseInt (s: String, #radix: Int) -> Int {
   if radix == 60 {
     return reduce(s.componentsSeparatedByString(":").map {
-      $0.toInt()? ?? 0
+      $0.toInt() ?? 0
     }, 0, {$0 * radix + $1})
   } else {
     return reduce(lazy(s.unicodeScalars).map {
@@ -417,4 +420,79 @@ func parseInt (s: String, #radix: Int) -> Int {
 
 func unwrapQuotedString (s: String) -> String {
   return s.substringWithRange(Range(start: advance(s.startIndex, 1), end: advance(s.endIndex, -1)))
+}
+
+func unescapeSingleQuotes (s: String) -> String {
+  return s.stringByReplacingOccurrencesOfString("''", withString: "'")
+}
+
+func unescapeDoubleQuotes (input: String) -> String {
+  var result = replace(input, "\\\\([0abtnvfre \"\\/N_LP])") {
+    captures in
+    escapeCharacters[captures[1] ?? ""] ?? ""
+  } ?? input
+  result = replace(result, "\\\\x([0-9A-Fa-f]{2})") {
+    captures in
+    String(UnicodeScalar(parseInt(captures[1] ?? "", radix: 16)))
+  } ?? result
+  result = replace(result, "\\\\u([0-9A-Fa-f]{4})") {
+    captures in
+    String(UnicodeScalar(parseInt(captures[1] ?? "", radix: 16)))
+  } ?? result
+  result = replace(result, "\\\\U([0-9A-Fa-f]{8})") {
+    captures in
+    String(UnicodeScalar(parseInt(captures[1] ?? "", radix: 16)))
+  } ?? result
+  return result
+}
+
+let escapeCharacters = [
+  "0": "\0",
+  "a": "\u{7}",
+  "b": "\u{8}",
+  "t": "\t",
+  "n": "\n",
+  "v": "\u{B}",
+  "f": "\u{C}",
+  "r": "\r",
+  "e": "\u{1B}",
+  " ": " ",
+  "\"": "\"",
+  "\\": "\\",
+  "/": "/",
+  "N": "\u{85}",
+  "_": "\u{A0}",
+  "L": "\u{2028}",
+  "P": "\u{2029}"
+]
+
+func replace (input: String, regex: String, block: ([String?]) -> String) -> String? {
+  if let regex = NSRegularExpression(pattern: regex, options: nil, error: nil) {
+    let matches = regex.matchesInString(input, options: nil,
+        range: NSRange(location: 0, length: countElements(input))) as [NSTextCheckingResult]
+    var result = ""
+    var lastIndex = input.startIndex
+    for match in matches {
+      var captures = [String?]()
+      captures.reserveCapacity(regex.numberOfCaptureGroups + 1)
+      for i in 0...regex.numberOfCaptureGroups {
+        if let r = match.rangeAtIndex(i).toRange() {
+          captures.append(input.substringWithRange(Range(
+              start: advance(input.startIndex, r.startIndex),
+              end: advance(input.startIndex, r.endIndex))))
+        } else {
+          captures.append(nil)
+        }
+      }
+      result += input.substringWithRange(Range(
+          start: lastIndex, end: advance(input.startIndex, match.range.location)))
+      result += regex.replacementStringForResult(match, inString: input, offset: 0, template:
+          block(captures))
+      lastIndex = advance(input.startIndex, match.range.location + match.range.length)
+    }
+    result += input.substringFromIndex(lastIndex)
+    return result
+  } else {
+    return nil
+  }
 }

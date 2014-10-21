@@ -154,6 +154,8 @@ func double () {
 
 func string () {
   assert(Yaml.load("Behrang") == .String("Behrang"))
+  assert(Yaml.load("\"Behrang\"") == .String("Behrang"))
+  assert(Yaml.load("\"B\\\"ehran\\\"g\"") == .String("B\"ehran\"g"))
   assert(Yaml.load("Behrang Noruzi Niya").string == "Behrang Noruzi Niya")
   assert(Yaml.load("Radin Noruzi Niya") == "Radin Noruzi Niya")
   assert(Yaml.load("|") == "")
@@ -527,6 +529,24 @@ func example16 () {
   assert(value["stats"] == "65 Home Runs\n0.278 Batting Average\n")
 }
 
+func example17 () {
+  let value = Yaml.load(
+    "unicode: \"Sosa did fine.\\u263A\"\n" +
+    "control: \"\\b1998\\t1999\\t2000\\n\"\n" +
+    "hex esc: \"\\x0d\\x0a is \\r\\n\"\n" +
+    "\n" +
+    "single: '\"Howdy!\" he cried.'\n" +
+    "quoted: ' # Not a ''comment''.'\n" +
+    "tie-fighter: '|\\-*-/|'\n"
+  )
+  assert(value["unicode"] == "Sosa did fine.\u{263A}")
+  assert(value["control"] == "\u{8}1998\t1999\t2000\n")
+  assert(value["hex esc"] == "\u{d}\u{a} is \r\n")
+  assert(value["single"] == "\"Howdy!\" he cried.")
+  assert(value["quoted"] == " # Not a 'comment'.")
+  assert(value["tie-fighter"] == "|\\-*-/|")
+}
+
 func examples () {
   example0()
   example1()
@@ -545,6 +565,7 @@ func examples () {
   example14()
   example15()
   example16()
+  example17()
 }
 
 func test () {

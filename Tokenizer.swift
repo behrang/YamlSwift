@@ -82,8 +82,8 @@ let tokenPatterns: [TokenPattern] = [
   (.Colon, "^:"),
   (.Literal, "^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #[^\\n]*)?(\\n|$)"),
   (.Folded, "^>([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #[^\\n]*)?(\\n|$)"),
-  (.StringDQ, "^\".*?\""),
-  (.StringSQ, "^'.*?'"),
+  (.StringDQ, "^\"([^\\\\\"]|\\\\(.|\n))*\""),
+  (.StringSQ, "^'([^']|'')*'"),
   (.String, "^.*?\(finish)"),
 ]
 
@@ -108,13 +108,13 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
         case .NewLine:
           let match = text.substringWithRange(range)
           let spaces = countElements(match.substringFromIndex(advance(match.startIndex, 1)))
-          if insideFlow > 0 || spaces == (indents.last? ?? 0) {
+          if insideFlow > 0 || spaces == (indents.last ?? 0) {
             matches.append(TokenMatch(.NewLine, match))
-          } else if spaces > (indents.last? ?? 0) {
+          } else if spaces > (indents.last ?? 0) {
             indents.append(spaces)
             matches.append(TokenMatch(.Indent, match))
           } else {
-            while spaces < (indents.last? ?? 0) {
+            while spaces < (indents.last ?? 0) {
               indents.removeLast()
               matches.append(TokenMatch(.Dedent, ""))
             }
@@ -125,7 +125,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           let match = text.substringWithRange(range)
           let index = advance(match.startIndex, 1)
           let indent = countElements(match)
-          indents.append((indents.last? ?? 0) + indent)
+          indents.append((indents.last ?? 0) + indent)
           matches.append(TokenMatch(tokenPattern.type, match.substringToIndex(index)))
           matches.append(TokenMatch(.Indent, match.substringFromIndex(index)))
 
@@ -140,7 +140,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
         case .Literal, .Folded:
           matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
           text = text.substringFromIndex(range.endIndex)
-          let lastIndent = indents.last? ?? 0
+          let lastIndent = indents.last ?? 0
           let minIndent = 1 + lastIndent
           let blockPattern = "^( *\\n)*(( {\(minIndent),})[^ ].*(\\n|$)(( *|\\3.*)(\\n|$))*)?"
           if let range = text.rangeOfString(blockPattern, options: .RegularExpressionSearch) {
