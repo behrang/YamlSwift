@@ -69,8 +69,8 @@ public enum Yaml:
       // println("Error: \(error)")
       return .Invalid(error)
     }
-    // println(result.tokens!)
-    let parser = Parser(result.tokens!)
+    // println(result.tokens?)
+    let parser = Parser(result.tokens? ?? [])
     if let error = parser.parseHeader() {
       return .Invalid(error)
     }
@@ -89,8 +89,8 @@ public enum Yaml:
       // println("Error: \(error)")
       return .Invalid(error)
     }
-    // println(result.tokens!)
-    let parser = Parser(result.tokens!)
+    // println(result.tokens?)
+    let parser = Parser(result.tokens? ?? [])
     var docs: [Yaml] = []
     while parser.peek().type != .End {
       if let error = parser.parseHeader() {
@@ -327,7 +327,7 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
     switch rhs {
     case .Dictionary(let rv) where lv.count == rv.count:
       for (k, v) in lv {
-        if rv[k] == nil || rv[k]! != v {
+        if rv[k] == nil || rv[k]? != v {
           return false
         }
       }

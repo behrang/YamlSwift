@@ -173,7 +173,7 @@ class Parser {
       if block.string == nil {
         return block
       }
-      return .String(foldBlock(block.string!))
+      return .String(foldBlock(block.string? ?? ""))
 
     case .StringDQ, .StringSQ:
       let m = advance().match
@@ -266,7 +266,7 @@ class Parser {
       case .KeyDQ, .KeySQ:
         k = .String(unwrapQuotedString(advance().match))
       default:
-        return .Invalid(expect(.Key, message: "expected key")!)
+        return .Invalid("expected key, \(context(buildContext()))")
       }
       if let error = expect(.Colon, message: "expected colon") {
         return .Invalid(error)
@@ -307,7 +307,7 @@ class Parser {
       case .KeyDQ, .KeySQ:
         k = .String(unwrapQuotedString(advance().match))
       default:
-        return .Invalid(expect(.Key, message: "expected key")!)
+        return .Invalid("expected key, \(context(buildContext()))")
       }
       ignoreSpace()
       if let error = expect(.Colon, message: "expected colon") {
@@ -396,7 +396,7 @@ class Parser {
 func parseInt (s: String, #radix: Int) -> Int {
   if radix == 60 {
     return reduce(s.componentsSeparatedByString(":").map {
-      $0.toInt()!
+      $0.toInt()? ?? 0
     }, 0, {$0 * radix + $1})
   } else {
     return reduce(lazy(s.unicodeScalars).map {
