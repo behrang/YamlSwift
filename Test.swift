@@ -513,6 +513,20 @@ func example15 () {
       "  63 Home Runs\n  0.288 Batting Average\n\nWhat a year!\n"))
 }
 
+func example16 () {
+  let value = Yaml.load(
+    "name: Mark McGwire\n" +
+    "accomplishment: >\n" +
+    "  Mark set a major league\n" +
+    "  home run record in 1998.\n" +
+    "stats: |\n" +
+    "  65 Home Runs\n" +
+    "  0.278 Batting Average\n"
+  )
+  assert(value["accomplishment"] == "Mark set a major league home run record in 1998.\n")
+  assert(value["stats"] == "65 Home Runs\n0.278 Batting Average\n")
+}
+
 func examples () {
   example0()
   example1()
@@ -530,6 +544,7 @@ func examples () {
   example13()
   example14()
   example15()
+  example16()
 }
 
 func test () {
