@@ -177,7 +177,7 @@ class Parser {
 
     case .StringDQ:
       let m = unwrapQuotedString(advance().match)
-      return .String(unescapeDoubleQuotes(m))
+      return .String(unescapeDoubleQuotes(foldFlow(m)))
 
     case .StringSQ:
       let m = unwrapQuotedString(advance().match)
@@ -338,11 +338,17 @@ class Parser {
   }
 
   func foldBlock (var block: String) -> String {
-    block = block.stringByReplacingOccurrencesOfString(
-        "(?! |\\n)([^ ].*)\\n(?!\\n| |$)", withString: "$1 ", options: .RegularExpressionSearch)
-    block = block.stringByReplacingOccurrencesOfString(
-        "(\n[^ \n].*)\n\n(?!\n| |$)", withString: "$1\n", options: .RegularExpressionSearch)
+    block = replace(block, "(?! |\\n)([^ ].*)\\n(?!\\n| |$)", "$1 ")
+    block = replace(block, "(\\n[^ \\n].*)\\n\\n(?!\\n| |$)", "$1\n")
     return block
+  }
+
+  func foldFlow (var flow: String) -> String {
+    flow = replace(flow, "[ \\t]*\\n[ \\t]*", "\n")
+    flow = replace(flow, "\\\\\\n", "")
+    flow = replace(flow, "(^|[^\\n])\\n([^\\n]|$)", "$1 $2")
+    flow = replace(flow, "(.)\\n(?=\\n|$)", "$1")
+    return flow
   }
 
   func parseLiteral () -> Yaml {
@@ -495,4 +501,9 @@ func replace (input: String, regex: String, block: ([String?]) -> String) -> Str
   } else {
     return nil
   }
+}
+
+func replace (input: String, regex: String, template: String) -> String {
+  return input.stringByReplacingOccurrencesOfString(
+      regex, withString: template, options: .RegularExpressionSearch)
 }

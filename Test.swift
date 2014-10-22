@@ -201,6 +201,10 @@ func string () {
       "   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n# Comment") ==
       "\nfolded line\nnext line\n  * bullet\n\n  * list\n  * lines\n\nlast line\n")
 
+  assert(Yaml.load("\"\n  foo \n \n  \t bar\n\n  baz\n\"") == " foo\nbar\nbaz ")
+  assert(Yaml.load("\"folded \nto a space,\t\n \nto a line feed, or \t\\\n \\ \tnon-content\"") ==
+      "folded to a space,\nto a line feed, or \t \tnon-content")
+
   let value: Yaml = "Radin"
   assert(value == "Radin")
   assert(value.string == "Radin")
