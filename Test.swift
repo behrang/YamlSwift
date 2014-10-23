@@ -194,6 +194,9 @@ func string () {
   assert(Yaml.load("|2-\n  Radin\n  \n  ") == "Radin")
   assert(Yaml.load("|22\n  Radin\n  \n  ") != "Radin\n\n")
   assert(Yaml.load("|--\n  Radin\n  \n  ") != "Radin\n\n")
+  assert(Yaml.load(">+\n  trimmed\n  \n \n\n  as\n  space\n\n   \n") == "trimmed\n\n\nas space\n\n \n")
+  assert(Yaml.load(">-\n  trimmed\n  \n \n\n  as\n  space") == "trimmed\n\n\nas space")
+  assert(Yaml.load(">\n  foo \n \n  \t bar\n\n  baz\n") == "foo \n\n\t bar\n\nbaz\n")
 
   assert(Yaml.load(">\n  \n Behrang").string == nil)
   assert(Yaml.load(">\n  \n  Behrang") == "\nBehrang")
@@ -204,6 +207,12 @@ func string () {
   assert(Yaml.load("\"\n  foo \n \n  \t bar\n\n  baz\n\"") == " foo\nbar\nbaz ")
   assert(Yaml.load("\"folded \nto a space,\t\n \nto a line feed, or \t\\\n \\ \tnon-content\"") ==
       "folded to a space,\nto a line feed, or \t \tnon-content")
+  assert(Yaml.load("\" 1st non-empty\n\n 2nd non-empty \n\t3rd non-empty \"") ==
+      " 1st non-empty\n2nd non-empty 3rd non-empty ")
+
+  assert(Yaml.load("'here''s to \"quotes\"'") == "here's to \"quotes\"")
+  assert(Yaml.load("' 1st non-empty\n\n 2nd non-empty \n\t3rd non-empty '") ==
+      " 1st non-empty\n2nd non-empty 3rd non-empty ")
 
   let value: Yaml = "Radin"
   assert(value == "Radin")

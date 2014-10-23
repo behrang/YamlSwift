@@ -181,7 +181,7 @@ class Parser {
 
     case .StringSQ:
       let m = unwrapQuotedString(advance().match)
-      return .String(unescapeSingleQuotes(m))
+      return .String(unescapeSingleQuotes(foldFlow(m)))
 
     case .String:
       return .String(advance().match)
@@ -338,17 +338,40 @@ class Parser {
   }
 
   func foldBlock (var block: String) -> String {
-    block = replace(block, "(?! |\\n)([^ ].*)\\n(?!\\n| |$)", "$1 ")
-    block = replace(block, "(\\n[^ \\n].*)\\n\\n(?!\\n| |$)", "$1\n")
-    return block
+    var trail = ""
+    if let range = block.rangeOfString("\\n*$", options: .RegularExpressionSearch) {
+      trail = block.substringFromIndex(range.startIndex)
+      block = block.substringToIndex(range.startIndex)
+    }
+    block = replace(block, "^([^ \\t\\n].*)\\n(?=[^ \\t\\n])", .AnchorsMatchLines) {
+      captures in
+      (captures[1] ?? "") + " "
+    } ?? block
+    block = replace(block, "^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])", .AnchorsMatchLines) {
+      captures in
+      (captures[1] ?? "") + (captures[2] ?? "")
+    } ?? block
+    return block + trail
   }
 
   func foldFlow (var flow: String) -> String {
-    flow = replace(flow, "[ \\t]*\\n[ \\t]*", "\n")
-    flow = replace(flow, "\\\\\\n", "")
-    flow = replace(flow, "(^|[^\\n])\\n([^\\n]|$)", "$1 $2")
-    flow = replace(flow, "(.)\\n(?=\\n|$)", "$1")
-    return flow
+    var lead = ""
+    var trail = ""
+    if let range = flow.rangeOfString("^[ \\t]", options: .RegularExpressionSearch) {
+      lead = flow.substringToIndex(range.endIndex)
+      flow = flow.substringFromIndex(range.endIndex)
+    }
+    if let range = flow.rangeOfString("[ \\t]$", options: .RegularExpressionSearch) {
+      trail = flow.substringFromIndex(range.startIndex)
+      flow = flow.substringToIndex(range.startIndex)
+    }
+    flow = replace(flow, "^[ \\t]*|[ \\t]*$|\\\\\\n", .AnchorsMatchLines) {
+      captures in
+      ""
+    } ?? flow
+    flow = replace(flow, "(^|.)\\n(.|$)", "$1 $2")
+    flow = replace(flow, "(.)\\n(\\n+)", "$1$2")
+    return lead + flow + trail
   }
 
   func parseLiteral () -> Yaml {
@@ -433,19 +456,19 @@ func unescapeSingleQuotes (s: String) -> String {
 }
 
 func unescapeDoubleQuotes (input: String) -> String {
-  var result = replace(input, "\\\\([0abtnvfre \"\\/N_LP])") {
+  var result = replace(input, "\\\\([0abtnvfre \"\\/N_LP])", nil) {
     captures in
     escapeCharacters[captures[1] ?? ""] ?? ""
   } ?? input
-  result = replace(result, "\\\\x([0-9A-Fa-f]{2})") {
+  result = replace(result, "\\\\x([0-9A-Fa-f]{2})", nil) {
     captures in
     String(UnicodeScalar(parseInt(captures[1] ?? "", radix: 16)))
   } ?? result
-  result = replace(result, "\\\\u([0-9A-Fa-f]{4})") {
+  result = replace(result, "\\\\u([0-9A-Fa-f]{4})", nil) {
     captures in
     String(UnicodeScalar(parseInt(captures[1] ?? "", radix: 16)))
   } ?? result
-  result = replace(result, "\\\\U([0-9A-Fa-f]{8})") {
+  result = replace(result, "\\\\U([0-9A-Fa-f]{8})", nil) {
     captures in
     String(UnicodeScalar(parseInt(captures[1] ?? "", radix: 16)))
   } ?? result
@@ -472,8 +495,9 @@ let escapeCharacters = [
   "P": "\u{2029}"
 ]
 
-func replace (input: String, regex: String, block: ([String?]) -> String) -> String? {
-  if let regex = NSRegularExpression(pattern: regex, options: nil, error: nil) {
+func replace (input: String, regex: String, options: NSRegularExpressionOptions,
+    block: ([String?]) -> String) -> String? {
+  if let regex = NSRegularExpression(pattern: regex, options: options, error: nil) {
     let matches = regex.matchesInString(input, options: nil,
         range: NSRange(location: 0, length: countElements(input))) as [NSTextCheckingResult]
     var result = ""
