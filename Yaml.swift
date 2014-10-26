@@ -63,13 +63,15 @@ public enum Yaml:
     self = .Dictionary(dictionary)
   }
 
+  public static func debug (text: Swift.String) {
+    println(tokenize(text))
+  }
+
   public static func load (text: Swift.String) -> Yaml {
     let result = tokenize(text)
     if let error = result.error {
-      // println("Error: \(error)")
       return .Invalid(error)
     }
-    // println(result.tokens?)
     let parser = Parser(result.tokens ?? [])
     if let error = parser.parseHeader() {
       return .Invalid(error)
@@ -79,17 +81,14 @@ public enum Yaml:
     if let error = parser.expect(.End, message: "expected end") {
       return .Invalid(error)
     }
-    // println(value)
     return value
   }
 
   public static func loadMultiple (text: Swift.String) -> Yaml {
     let result = tokenize(text)
     if let error = result.error {
-      // println("Error: \(error)")
       return .Invalid(error)
     }
-    // println(result.tokens?)
     let parser = Parser(result.tokens ?? [])
     var docs: [Yaml] = []
     while parser.peek().type != .End {
@@ -106,7 +105,6 @@ public enum Yaml:
       docs.append(value)
       parser.ignoreDocEnd()
     }
-    // println(docs)
     return .Array(docs)
   }
 

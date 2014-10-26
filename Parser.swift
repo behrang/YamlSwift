@@ -154,16 +154,11 @@ class Parser {
     case .OpenCB:
       return parseFlowMap()
 
-    case .KeyDQ, .KeySQ, .Key, .QuestionMark:
+    case .QuestionMark:
       return parseBlockMap()
 
-    case .Indent:
-      accept(.Indent)
-      let result = parse()
-      if let error = expect(.Dedent, message: "expected dedent") {
-        return .Invalid(error)
-      }
-      return result
+    case .StringDQ, .StringSQ, .String:
+      return parseBlockMapOrString()
 
     case .Literal:
       return parseLiteral()
@@ -175,16 +170,13 @@ class Parser {
       }
       return .String(foldBlock(block.string ?? ""))
 
-    case .StringDQ:
-      let m = unwrapQuotedString(advance().match)
-      return .String(unescapeDoubleQuotes(foldFlow(m)))
-
-    case .StringSQ:
-      let m = unwrapQuotedString(advance().match)
-      return .String(unescapeSingleQuotes(foldFlow(m)))
-
-    case .String:
-      return .String(advance().match)
+    case .Indent:
+      accept(.Indent)
+      let result = parse()
+      if let error = expect(.Dedent, message: "expected dedent") {
+        return .Invalid(error)
+      }
+      return result
 
     case .Anchor:
       let m = advance().match
@@ -202,7 +194,7 @@ class Parser {
       return .Null
 
     default:
-      return .Invalid(context(buildContext()))
+      return .Invalid("unexpected type \(peek().type), \(context(buildContext()))")
 
     }
   }
@@ -264,10 +256,8 @@ class Parser {
       ignoreWhiteSpace()
       var k: Yaml
       switch peek().type {
-      case .Key:
-        k = .String(advance().match)
-      case .KeyDQ, .KeySQ:
-        k = .String(unwrapQuotedString(advance().match))
+      case .String, .StringDQ, .StringSQ:
+        k = parseString()
       default:
         return .Invalid("expected key, \(context(buildContext()))")
       }
@@ -288,7 +278,7 @@ class Parser {
 
   func parseBlockMap () -> Yaml {
     var map: [Yaml: Yaml] = [:]
-    while contains([.Key, .KeyDQ, .KeySQ, .QuestionMark], peek().type) {
+    while contains([.String, .StringDQ, .StringSQ, .QuestionMark], peek().type) {
       var k: Yaml
       switch peek().type {
       case .QuestionMark:
@@ -305,10 +295,8 @@ class Parser {
           map.updateValue(.Null, forKey: k)
           continue
         }
-      case .Key:
-        k = .String(advance().match)
-      case .KeyDQ, .KeySQ:
-        k = .String(unwrapQuotedString(advance().match))
+      case .String, .StringDQ, .StringSQ:
+        k = parseString()
       default:
         return .Invalid("expected key, \(context(buildContext()))")
       }
@@ -320,6 +308,7 @@ class Parser {
       var v: Yaml
       if accept(.Indent) {
         v = parse()
+        ignoreSpace()
         if let error = expect(.Dedent, message: "expected dedent") {
           return .Invalid(error)
         }
@@ -335,6 +324,30 @@ class Parser {
       ignoreSpace()
     }
     return .Dictionary(map)
+  }
+
+  func parseString () -> Yaml {
+    switch peek().type {
+    case .String:
+      return .String(foldFlow(replace(advance().match, "^[ \\t\\n]+|[ \\t\\n]+$", "")))
+    case .StringDQ:
+      let m = unwrapQuotedString(advance().match)
+      return .String(unescapeDoubleQuotes(foldFlow(m)))
+    case .StringSQ:
+      let m = unwrapQuotedString(advance().match)
+      return .String(unescapeSingleQuotes(foldFlow(m)))
+    default:
+      return .Invalid("expected string, \(context(buildContext()))")
+    }
+  }
+
+  func parseBlockMapOrString () -> Yaml {
+    let match = peek().match
+    if tokens[index + 1].type != .Colon || match.rangeOfString("\n") != nil {
+      return parseString()
+    } else {
+      return parseBlockMap()
+    }
   }
 
   func foldBlock (var block: String) -> String {

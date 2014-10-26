@@ -31,11 +31,15 @@ enum TokenType: Swift.String, Printable {
   case KeyDQ = "key-dq"
   case KeySQ = "key-sq"
   case QuestionMark = "?"
+  case ColonFO = ":-flow-out"
+  case ColonFI = ":-flow-in"
   case Colon = ":"
   case Literal = "|"
   case Folded = ">"
   case StringDQ = "string-dq"
   case StringSQ = "string-sq"
+  case StringFI = "string-flow-in"
+  case StringFO = "string-flow-out"
   case String = "string"
   case End = "end"
 
@@ -47,6 +51,13 @@ enum TokenType: Swift.String, Printable {
 typealias TokenPattern = (type: TokenType, pattern: String)
 typealias TokenMatch = (type: TokenType, match: String)
 
+// printable non-space chars, except `:`(3a), `#`(23), `,`(2c), `[`(5b), `]`(5d), `{`(7b), `}`(7d)
+let safeIn = "\\x21\\x22\\x24-\\x2b\\x2d-\\x39\\x3b-\\x5a\\x5c\\x5e-\\x7a\\x7c\\x7e\\x85" +
+    "\\xa0-\\ud7ff\\ue000-\\ufefe\\uff00\\ufffd\\U00010000-\\U0010ffff"
+// with flow indicators: `,`, `[`, `]`, `{`, `}`
+let safeOut = "\\x2c\\x5b\\x5d\\x7b\\x7d" + safeIn
+let plainOutPattern = "([\(safeOut)]#|:[\(safeOut)]|[\(safeOut)]|[ \\t])+"
+let plainInPattern = "([\(safeIn)]#|:[\(safeIn)]|[\(safeIn)]|[ \\t\\n])+"
 let finish = "(?= *(,|\\]|\\}|( #[^\\n]*)?(\\n|$)))"
 let tokenPatterns: [TokenPattern] = [
   (.YamlDirective, "^%YAML(?= )"),
@@ -75,16 +86,15 @@ let tokenPatterns: [TokenPattern] = [
   (.CloseSB, "^\\]"),
   (.OpenCB, "^\\{"),
   (.CloseCB, "^\\}"),
-  (.Key, "^\\w( *[\\w-]+)*(?= *:( |\\n))"),
-  (.KeyDQ, "^\"([^\\\\\"]|\\\\.)*\"(?= *:)"),
-  (.KeySQ, "^'([^'\\n]|'')*'(?= *:)"),
   (.QuestionMark, "^\\?( +|(?=\\n))"),
-  (.Colon, "^:"),
+  (.ColonFO, "^:(?!\(safeOut))"),
+  (.ColonFI, "^:(?!\(safeIn))"),
   (.Literal, "^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #[^\\n]*)?(\\n|$)"),
   (.Folded, "^>([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #[^\\n]*)?(\\n|$)"),
   (.StringDQ, "^\"([^\\\\\"]|\\\\(.|\\n))*\""),
   (.StringSQ, "^'([^']|'')*'"),
-  (.String, "^.*?\(finish)"),
+  (.StringFO, "^\(plainOutPattern)(?=:|\\n|$)"),
+  (.StringFI, "^\(plainInPattern)"),
 ]
 
 func context (var text: String) -> String {
@@ -129,6 +139,10 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           matches.append(TokenMatch(tokenPattern.type, match.substringToIndex(index)))
           matches.append(TokenMatch(.Indent, match.substringFromIndex(index)))
 
+        case .ColonFO, .ColonFI:
+          let match = text.substringWithRange(range)
+          matches.append(TokenMatch(.Colon, match))
+
         case .OpenSB, .OpenCB:
           insideFlow += 1
           matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
@@ -153,6 +167,26 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
             text = text.substringFromIndex(range.endIndex)
           }
           continue next
+
+        case .StringFO:
+          if insideFlow > 0 {
+            continue
+          }
+          let indent = (indents.last ?? 0) + 1
+          let blockPattern = "^\\n( *| {\(indent),}\(plainOutPattern))(?=\\n|$)"
+          var block = text.substringWithRange(range)
+          text = text.substringFromIndex(range.endIndex)
+          while let range = text.rangeOfString(blockPattern, options: .RegularExpressionSearch) {
+            block += text.substringWithRange(range)
+            text = text.substringFromIndex(range.endIndex)
+          }
+          matches.append(TokenMatch(.String, block))
+          continue next
+
+        case .StringFI:
+          let match = text.substringWithRange(range).stringByReplacingOccurrencesOfString(
+              "^[ \\t]|[ \\t]$", withString: "", options: .RegularExpressionSearch)
+          matches.append(TokenMatch(.String, match))
 
         default:
           matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
