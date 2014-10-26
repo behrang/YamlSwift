@@ -51,23 +51,25 @@ enum TokenType: Swift.String, Printable {
 typealias TokenPattern = (type: TokenType, pattern: String)
 typealias TokenMatch = (type: TokenType, match: String)
 
+let bBreak = "(?:\\r\\n|\\r|\\n)"
+
 // printable non-space chars, except `:`(3a), `#`(23), `,`(2c), `[`(5b), `]`(5d), `{`(7b), `}`(7d)
 let safeIn = "\\x21\\x22\\x24-\\x2b\\x2d-\\x39\\x3b-\\x5a\\x5c\\x5e-\\x7a\\x7c\\x7e\\x85" +
     "\\xa0-\\ud7ff\\ue000-\\ufefe\\uff00\\ufffd\\U00010000-\\U0010ffff"
 // with flow indicators: `,`, `[`, `]`, `{`, `}`
 let safeOut = "\\x2c\\x5b\\x5d\\x7b\\x7d" + safeIn
 let plainOutPattern = "([\(safeOut)]#|:[\(safeOut)]|[\(safeOut)]|[ \\t])+"
-let plainInPattern = "([\(safeIn)]#|:[\(safeIn)]|[\(safeIn)]|[ \\t\\n])+"
-let finish = "(?= *(,|\\]|\\}|( #[^\\n]*)?(\\n|$)))"
+let plainInPattern = "([\(safeIn)]#|:[\(safeIn)]|[\(safeIn)]|[ \\t]|\(bBreak))+"
+let finish = "(?= *(,|\\]|\\}|( #.*)?(\(bBreak)|$)))"
 let tokenPatterns: [TokenPattern] = [
   (.YamlDirective, "^%YAML(?= )"),
   (.DocStart, "^---"),
   (.DocEnd, "^\\.\\.\\."),
-  (.Comment, "^#[^\\n]*"),
+  (.Comment, "^#.*"),
   (.Space, "^ +"),
-  (.BlankLine, "^\\n *(#[^\\n]*)?(?=\\n|$)"),
-  (.NewLine, "^\\n *"),
-  (.Dash, "^-( +|(?=\\n))"),
+  (.BlankLine, "^\(bBreak) *(#.*)?(?=\(bBreak)|$)"),
+  (.NewLine, "^\(bBreak) *"),
+  (.Dash, "^-( +|(?=\(bBreak)))"),
   (.Null, "^(null|Null|NULL|~)\(finish)"),
   (.True, "^(true|True|TRUE)\(finish)"),
   (.False, "^(false|False|FALSE)\(finish)"),
@@ -86,20 +88,21 @@ let tokenPatterns: [TokenPattern] = [
   (.CloseSB, "^\\]"),
   (.OpenCB, "^\\{"),
   (.CloseCB, "^\\}"),
-  (.QuestionMark, "^\\?( +|(?=\\n))"),
+  (.QuestionMark, "^\\?( +|(?=\(bBreak)))"),
   (.ColonFO, "^:(?!\(safeOut))"),
   (.ColonFI, "^:(?!\(safeIn))"),
-  (.Literal, "^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #[^\\n]*)?(\\n|$)"),
-  (.Folded, "^>([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #[^\\n]*)?(\\n|$)"),
-  (.StringDQ, "^\"([^\\\\\"]|\\\\(.|\\n))*\""),
+  (.Literal, "^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(\(bBreak)|$)"),
+  (.Folded, "^>([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(\(bBreak)|$)"),
+  (.StringDQ, "^\"([^\\\\\"]|\\\\(.|\(bBreak)))*\""),
   (.StringSQ, "^'([^']|'')*'"),
-  (.StringFO, "^\(plainOutPattern)(?=:|\\n|$)"),
+  (.StringFO, "^\(plainOutPattern)(?=:|\(bBreak)|$)"),
   (.StringFI, "^\(plainInPattern)"),
 ]
 
 func context (var text: String) -> String {
   let endIndex = advance(text.startIndex, 50, text.endIndex)
   text = text.substringToIndex(endIndex)
+  text = text.stringByReplacingOccurrencesOfString("\r", withString: "\\r")
   text = text.stringByReplacingOccurrencesOfString("\n", withString: "\\n")
   text = text.stringByReplacingOccurrencesOfString("\"", withString: "\\\"")
   return "near \"\(text)\""
@@ -156,13 +159,13 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           text = text.substringFromIndex(range.endIndex)
           let lastIndent = indents.last ?? 0
           let minIndent = 1 + lastIndent
-          let blockPattern = "^( *\\n)*(( {\(minIndent),})[^ ].*(\\n|$)(( *|\\3.*)(\\n|$))*)?"
+          let blockPattern = "^( *\(bBreak))*(( {\(minIndent),})[^ ].*(\(bBreak)|$)(( *|\\3.*)(\(bBreak)|$))*)?"
           if let range = text.rangeOfString(blockPattern, options: .RegularExpressionSearch) {
             var block = text.substringWithRange(range)
             block = block.stringByReplacingOccurrencesOfString(
                 "^ {0,\(lastIndent)}", withString: "", options: .RegularExpressionSearch)
             block = block.stringByReplacingOccurrencesOfString(
-                "\\n {0,\(lastIndent)}", withString: "\n", options: .RegularExpressionSearch)
+                "\(bBreak) {0,\(lastIndent)}", withString: "\n", options: .RegularExpressionSearch)
             matches.append(TokenMatch(.String, block))
             text = text.substringFromIndex(range.endIndex)
           }
@@ -173,7 +176,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
             continue
           }
           let indent = (indents.last ?? 0) + 1
-          let blockPattern = "^\\n( *| {\(indent),}\(plainOutPattern))(?=\\n|$)"
+          let blockPattern = "^\(bBreak)( *| {\(indent),}\(plainOutPattern))(?=\(bBreak)|$)"
           var block = text.substringWithRange(range)
           text = text.substringFromIndex(range.endIndex)
           while let range = text.rangeOfString(blockPattern, options: .RegularExpressionSearch) {

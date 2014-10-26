@@ -329,12 +329,13 @@ class Parser {
   func parseString () -> Yaml {
     switch peek().type {
     case .String:
-      return .String(foldFlow(replace(advance().match, "^[ \\t\\n]+|[ \\t\\n]+$", "")))
+      let m = normalizeBreaks(advance().match)
+      return .String(foldFlow(replace(m, "^[ \\t\\n]+|[ \\t\\n]+$", "")))
     case .StringDQ:
-      let m = unwrapQuotedString(advance().match)
+      let m = unwrapQuotedString(normalizeBreaks(advance().match))
       return .String(unescapeDoubleQuotes(foldFlow(m)))
     case .StringSQ:
-      let m = unwrapQuotedString(advance().match)
+      let m = unwrapQuotedString(normalizeBreaks(advance().match))
       return .String(unescapeSingleQuotes(foldFlow(m)))
     default:
       return .Invalid("expected string, \(context(buildContext()))")
@@ -403,7 +404,7 @@ class Parser {
     if token.type != .String {
       return .Invalid("expected scalar block, \(context(buildContext()))")
     }
-    var block = token.match
+    var block = normalizeBreaks(token.match)
     let findIndentPattern = "^( *\\n)* {1,}(?! |\\n|$)"
     var foundIndent = 0
     if let range = block.rangeOfString(findIndentPattern, options: .RegularExpressionSearch) {
@@ -458,6 +459,10 @@ func parseInt (s: String, #radix: Int) -> Int {
       }
     }, 0, {$0 * radix + $1})
   }
+}
+
+func normalizeBreaks (s: String) -> String {
+  return replace(s, "\\r\\n|\\r", "\n")
 }
 
 func unwrapQuotedString (s: String) -> String {
