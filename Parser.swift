@@ -47,19 +47,19 @@ class Parser {
   }
 
   func ignoreSpace () {
-    while contains([.Comment, .Space, .BlankLine, .NewLine], peek().type) {
+    while contains([.Comment, .Space, .NewLine], peek().type) {
       advance()
     }
   }
 
   func ignoreWhiteSpace () {
-    while contains([.Comment, .Space, .BlankLine, .NewLine, .Indent, .Dedent], peek().type) {
+    while contains([.Comment, .Space, .NewLine, .Indent, .Dedent], peek().type) {
       advance()
     }
   }
 
   func ignoreDocEnd () {
-    while contains([.Comment, .Space, .BlankLine, .NewLine, .DocEnd], peek().type) {
+    while contains([.Comment, .Space, .NewLine, .DocEnd], peek().type) {
       advance()
     }
   }
@@ -68,7 +68,7 @@ class Parser {
     var readYaml = false
     while true {
       switch peek().type {
-      case .Comment, .Space, .BlankLine, .NewLine:
+      case .Comment, .Space, .NewLine:
         advance()
       case .YamlDirective:
         if readYaml {
@@ -97,7 +97,7 @@ class Parser {
   func parse () -> Yaml {
     switch peek().type {
 
-    case .Comment, .Space, .BlankLine, .NewLine:
+    case .Comment, .Space, .NewLine:
       advance()
       return parse()
 

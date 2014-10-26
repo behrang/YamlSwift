@@ -4,7 +4,6 @@ enum TokenType: Swift.String, Printable {
   case DocEnd = "doc-end"
   case Comment = "comment"
   case Space = "space"
-  case BlankLine = "blankline"
   case NewLine = "newline"
   case Indent = "indent"
   case Dedent = "dedent"
@@ -66,9 +65,8 @@ let tokenPatterns: [TokenPattern] = [
   (.YamlDirective, "^%YAML(?= )"),
   (.DocStart, "^---"),
   (.DocEnd, "^\\.\\.\\."),
-  (.Comment, "^#.*"),
+  (.Comment, "^#.*|^\(bBreak) *(#.*)?(?=\(bBreak)|$)"),
   (.Space, "^ +"),
-  (.BlankLine, "^\(bBreak) *(#.*)?(?=\(bBreak)|$)"),
   (.NewLine, "^\(bBreak) *"),
   (.Dash, "^-( +|(?=\(bBreak)))"),
   (.Null, "^(null|Null|NULL|~)\(finish)"),
