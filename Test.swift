@@ -280,6 +280,12 @@ func directives () {
   assert(Yaml.load("%YAML \n---1") != 1)
 }
 
+func reserves () {
+  assert(Yaml.load("`reserved").string == nil)
+  assert(Yaml.load("@behrangn").string == nil)
+  assert(Yaml.load("twitter handle: @behrangn").dictionary == nil)
+}
+
 func example0 () {
   var value = Yaml.load(
     "- just: write some\n" +
@@ -595,6 +601,7 @@ func test () {
   blockMap()
 
   directives()
+  reserves()
 
   examples()
 

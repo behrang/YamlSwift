@@ -36,6 +36,7 @@ enum TokenType: Swift.String, Printable {
   case Colon = ":"
   case Literal = "|"
   case Folded = ">"
+  case Reserved = "reserved"
   case StringDQ = "string-dq"
   case StringSQ = "string-sq"
   case StringFI = "string-flow-in"
@@ -93,6 +94,7 @@ let tokenPatterns: [TokenPattern] = [
   (.ColonFI, "^:(?!\(safeIn))"),
   (.Literal, "^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(\(bBreak)|$)"),
   (.Folded, "^>([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(\(bBreak)|$)"),
+  (.Reserved, "^[@`]"),
   (.StringDQ, "^\"([^\\\\\"]|\\\\(.|\(bBreak)))*\""),
   (.StringSQ, "^'([^']|'')*'"),
   (.StringFO, "^\(plainOutPattern)(?=:|\(bBreak)|$)"),
@@ -190,6 +192,9 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           let match = text.substringWithRange(range).stringByReplacingOccurrencesOfString(
               "^[ \\t]|[ \\t]$", withString: "", options: .RegularExpressionSearch)
           matches.append(TokenMatch(.String, match))
+
+        case .Reserved:
+          return (context(text), nil)
 
         default:
           matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
