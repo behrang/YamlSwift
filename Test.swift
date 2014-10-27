@@ -594,6 +594,48 @@ func example18 () {
   assert(value["quoted"] == "So does this quoted scalar.\n")
 }
 
+func example19 () {
+  let value = Yaml.load(
+    "canonical: 12345\n" +
+    "decimal: +12345\n" +
+    "octal: 0o14\n" +
+    "hexadecimal: 0xC\n"
+  )
+  assert(value.count == 4)
+  assert(value["canonical"] == 12345)
+  assert(value["decimal"] == 12345)
+  assert(value["octal"] == 12)
+  assert(value["hexadecimal"] == 12)
+}
+
+func example20 () {
+  let value = Yaml.load(
+    "canonical: 1.23015e+3\n" +
+    "exponential: 12.3015e+02\n" +
+    "fixed: 1230.15\n" +
+    "negative infinity: -.inf\n" +
+    "not a number: .NaN\n"
+  )
+  assert(value.count == 5)
+  assert(value["canonical"] == 1.23015e+3)
+  assert(value["exponential"] == 1.23015e+3)
+  assert(value["fixed"] == 1.23015e+3)
+  assert(value["negative infinity"] == .Double(-Double.infinity))
+  assert(value["not a number"].double?.isNaN == true)
+}
+
+func example21 () {
+  let value = Yaml.load(
+    "null:\n" +
+    "booleans: [ true, false ]\n" +
+    "string: '012345'\n"
+  )
+  assert(value.count == 3)
+  assert(value["null"] == nil)
+  assert(value["booleans"] == [true, false])
+  assert(value["string"] == "012345")
+}
+
 func examples () {
   example0()
   example1()
@@ -614,6 +656,9 @@ func examples () {
   example16()
   example17()
   example18()
+  example19()
+  example20()
+  example21()
 }
 
 func test () {

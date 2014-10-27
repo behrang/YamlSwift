@@ -305,21 +305,22 @@ class Parser {
         return .Invalid(error)
       }
       ignoreSpace()
-      var v: Yaml
-      if accept(.Indent) {
-        v = parse()
+      accept(.Indent)
+      ignoreSpace()
+      if accept(.Dedent) {
+        map.updateValue(.Null, forKey: k)
+      } else {
+        let v = parse()
+        switch v {
+        case .Invalid:
+          return v
+        default:
+          map.updateValue(v, forKey: k)
+        }
         ignoreSpace()
         if let error = expect(.Dedent, message: "expected dedent") {
           return .Invalid(error)
         }
-      } else {
-        v = parse()
-      }
-      switch v {
-      case .Invalid:
-        return v
-      default:
-        map.updateValue(v, forKey: k)
       }
       ignoreSpace()
     }
