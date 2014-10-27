@@ -60,6 +60,7 @@ let safeIn = "\\x21\\x22\\x24-\\x2b\\x2d-\\x39\\x3b-\\x5a\\x5c\\x5e-\\x7a\\x7c\\
 let safeOut = "\\x2c\\x5b\\x5d\\x7b\\x7d" + safeIn
 let plainOutPattern = "([\(safeOut)]#|:[\(safeOut)]|[\(safeOut)]|[ \\t])+"
 let plainInPattern = "([\(safeIn)]#|:[\(safeIn)]|[\(safeIn)]|[ \\t]|\(bBreak))+"
+let dashPattern = "^-([ \\t]+(?!#|\(bBreak))|(?=[ \\t\\n]))"
 let finish = "(?= *(,|\\]|\\}|( #.*)?(\(bBreak)|$)))"
 let tokenPatterns: [TokenPattern] = [
   (.YamlDirective, "^%YAML(?= )"),
@@ -68,7 +69,7 @@ let tokenPatterns: [TokenPattern] = [
   (.Comment, "^#.*|^\(bBreak) *(#.*)?(?=\(bBreak)|$)"),
   (.Space, "^ +"),
   (.NewLine, "^\(bBreak) *"),
-  (.Dash, "^-( +|(?=\(bBreak)))"),
+  (.Dash, dashPattern),
   (.Null, "^(null|Null|NULL|~)\(finish)"),
   (.True, "^(true|True|TRUE)\(finish)"),
   (.False, "^(false|False|FALSE)\(finish)"),
@@ -90,8 +91,8 @@ let tokenPatterns: [TokenPattern] = [
   (.QuestionMark, "^\\?( +|(?=\(bBreak)))"),
   (.ColonFO, "^:(?!\(safeOut))"),
   (.ColonFI, "^:(?!\(safeIn))"),
-  (.Literal, "^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(\(bBreak)|$)"),
-  (.Folded, "^>([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(\(bBreak)|$)"),
+  (.Literal, "^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(?=\(bBreak)|$)"),
+  (.Folded, "^>([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(?=\(bBreak)|$)"),
   (.Reserved, "^[@`]"),
   (.StringDQ, "^\"([^\\\\\"]|\\\\(.|\(bBreak)))*\""),
   (.StringSQ, "^'([^']|'')*'"),
@@ -120,14 +121,27 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
 
         case .NewLine:
           let match = text.substringWithRange(range)
+          let lastIndent = indents.last ?? 0
           let spaces = countElements(match.substringFromIndex(advance(match.startIndex, 1)))
-          if insideFlow > 0 || spaces == (indents.last ?? 0) {
+          let nestedBlockSequence = text.substringFromIndex(range.endIndex).rangeOfString(
+              dashPattern, options: .RegularExpressionSearch)
+          if spaces == lastIndent {
             matches.append(TokenMatch(.NewLine, match))
-          } else if spaces > (indents.last ?? 0) {
-            indents.append(spaces)
-            matches.append(TokenMatch(.Indent, match))
+          } else if spaces > lastIndent {
+            if insideFlow == 0 {
+              if matches.last != nil && matches[matches.endIndex - 1].type == .Indent {
+                indents[indents.endIndex - 1] = spaces
+                matches[matches.endIndex - 1] = TokenMatch(.Indent, match)
+              } else {
+                indents.append(spaces)
+                matches.append(TokenMatch(.Indent, match))
+              }
+            }
+          } else if nestedBlockSequence != nil && spaces == lastIndent - 1 {
+            matches.append(TokenMatch(.NewLine, match))
           } else {
-            while spaces < (indents.last ?? 0) {
+            while nestedBlockSequence != nil && spaces < (indents.last ?? 0) - 1
+                || nestedBlockSequence == nil && spaces < indents.last {
               indents.removeLast()
               matches.append(TokenMatch(.Dedent, ""))
             }
@@ -142,9 +156,19 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           matches.append(TokenMatch(tokenPattern.type, match.substringToIndex(index)))
           matches.append(TokenMatch(.Indent, match.substringFromIndex(index)))
 
-        case .ColonFO, .ColonFI:
+        case .ColonFO:
+          if insideFlow > 0 {
+            continue
+          }
+          fallthrough
+
+        case .ColonFI:
           let match = text.substringWithRange(range)
           matches.append(TokenMatch(.Colon, match))
+          if insideFlow == 0 {
+            indents.append((indents.last ?? 0) + 1)
+            matches.append(TokenMatch(.Indent, ""))
+          }
 
         case .OpenSB, .OpenCB:
           insideFlow += 1
@@ -159,16 +183,23 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           text = text.substringFromIndex(range.endIndex)
           let lastIndent = indents.last ?? 0
           let minIndent = 1 + lastIndent
-          let blockPattern = "^( *\(bBreak))*(( {\(minIndent),})[^ ].*(\(bBreak)|$)(( *|\\3.*)(\(bBreak)|$))*)?"
+          let blockPattern =
+              "^(\(bBreak) *)*(\(bBreak)( {\(minIndent),})[^ ].*(\(bBreak)( *|\\3.*))*)(?=\(bBreak)|$)"
+          var block = ""
           if let range = text.rangeOfString(blockPattern, options: .RegularExpressionSearch) {
-            var block = text.substringWithRange(range)
+            block = text.substringWithRange(range)
+            block = block.stringByReplacingOccurrencesOfString(
+                "^\(bBreak)", withString: "", options: .RegularExpressionSearch)
             block = block.stringByReplacingOccurrencesOfString(
                 "^ {0,\(lastIndent)}", withString: "", options: .RegularExpressionSearch)
             block = block.stringByReplacingOccurrencesOfString(
                 "\(bBreak) {0,\(lastIndent)}", withString: "\n", options: .RegularExpressionSearch)
-            matches.append(TokenMatch(.String, block))
             text = text.substringFromIndex(range.endIndex)
+            if text.rangeOfString("^\(bBreak)", options: .RegularExpressionSearch) != nil {
+              block += "\n"
+            }
           }
+          matches.append(TokenMatch(.String, block))
           continue next
 
         case .StringFO:

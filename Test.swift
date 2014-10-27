@@ -234,6 +234,9 @@ func flowSeq () {
   assert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, 0, 123, -456, 0o74, 0xFf, 1.23, -4.5]") ==
       [nil, nil, true, false, .Double(Double.infinity), .Double(-Double.infinity),
           0, 123, -456, 60, 255, 1.23, -4.5])
+  assert(Yaml.load("x:\n y:\n  z: [\n1]") != ["x": ["y": ["z": [1]]]])
+  assert(Yaml.load("x:\n y:\n  z: [\n  1]") != ["x": ["y": ["z": [1]]]])
+  assert(Yaml.load("x:\n y:\n  z: [\n   1]") == ["x": ["y": ["z": [1]]]])
 }
 
 func blockSeq () {
@@ -261,7 +264,8 @@ func flowMap () {
 func blockMap () {
   assert(Yaml.load("x: 1\ny: 2") == .Dictionary([.String("x"): .Int(1), .String("y"): .Int(2)]))
   assert(Yaml.load("x: 1\n? y\n: 2") == ["x": 1, "y": 2])
-  assert(Yaml.load("x: 1\n?  y\n:\n2") == ["x": 1, "y": 2])
+  assert(Yaml.load("x: 1\n?  y\n:\n2") != ["x": 1, "y": 2])
+  assert(Yaml.load("x: 1\n?  y\n:\n 2") == ["x": 1, "y": 2])
   assert(Yaml.load("x: 1\n?  y") == ["x": 1, "y": nil])
   assert(Yaml.load("?  y") == ["y": nil])
   assert(Yaml.load(" \n  \n \n  \n\nx: 1  \n   \ny: 2\n   \n  \n ")["y"] == 2)

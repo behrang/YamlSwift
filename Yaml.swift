@@ -64,7 +64,27 @@ public enum Yaml:
   }
 
   public static func debug (text: Swift.String) {
-    println(tokenize(text))
+    let result = tokenize(text)
+    if let error = result.error {
+      println("Error: " + error)
+    } else {
+      println("======")
+      println(result.tokens)
+      let parser = Parser(result.tokens ?? [])
+      if let error = parser.parseHeader() {
+        println("Header error: " + error)
+      } else {
+        let value = parser.parse()
+        parser.ignoreDocEnd()
+        if let error = parser.expect(.End, message: "expected end") {
+          println("Footer error: " + error)
+        } else {
+          println("-----")
+          println(value)
+          println(".....")
+        }
+      }
+    }
   }
 
   public static func load (text: Swift.String) -> Yaml {
