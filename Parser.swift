@@ -371,11 +371,11 @@ class Parser {
   func foldFlow (var flow: String) -> String {
     var lead = ""
     var trail = ""
-    if let range = flow.rangeOfString("^[ \\t]", options: .RegularExpressionSearch) {
+    if let range = flow.rangeOfString("^[ \\t]+", options: .RegularExpressionSearch) {
       lead = flow.substringToIndex(range.endIndex)
       flow = flow.substringFromIndex(range.endIndex)
     }
-    if let range = flow.rangeOfString("[ \\t]$", options: .RegularExpressionSearch) {
+    if let range = flow.rangeOfString("[ \\t]+$", options: .RegularExpressionSearch) {
       trail = flow.substringFromIndex(range.startIndex)
       flow = flow.substringToIndex(range.startIndex)
     }

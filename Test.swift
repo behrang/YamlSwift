@@ -580,6 +580,20 @@ func example17 () {
   assert(value["tie-fighter"] == "|\\-*-/|")
 }
 
+func example18 () {
+  let value = Yaml.load(
+    "plain:\n" +
+    "  This unquoted scalar\n" +
+    "  spans many lines.\n" +
+    "\n" +
+    "quoted: \"So does this\n" +
+    "  quoted scalar.\\n\"\n"
+  )
+  assert(value.count == 2)
+  assert(value["plain"] == "This unquoted scalar spans many lines.")
+  assert(value["quoted"] == "So does this quoted scalar.\n")
+}
+
 func examples () {
   example0()
   example1()
@@ -599,6 +613,7 @@ func examples () {
   example15()
   example16()
   example17()
+  example18()
 }
 
 func test () {
