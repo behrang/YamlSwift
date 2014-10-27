@@ -379,11 +379,11 @@ class Parser {
       trail = flow.substringFromIndex(range.startIndex)
       flow = flow.substringToIndex(range.startIndex)
     }
-    flow = replace(flow, "^[ \\t]*|[ \\t]*$|\\\\\\n", .AnchorsMatchLines) {
+    flow = replace(flow, "^[ \\t]+|[ \\t]+$|\\\\\\n", .AnchorsMatchLines) {
       captures in
       ""
     } ?? flow
-    flow = replace(flow, "(^|.)\\n(.|$)", "$1 $2")
+    flow = replace(flow, "(^|.)\\n(?=.|$)", "$1 ")
     flow = replace(flow, "(.)\\n(\\n+)", "$1$2")
     return lead + flow + trail
   }

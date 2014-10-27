@@ -206,12 +206,14 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           if insideFlow > 0 {
             continue
           }
-          let indent = (indents.last ?? 0) + 1
+          let indent = (indents.last ?? 0)
           let blockPattern = "^\(bBreak)( *| {\(indent),}\(plainOutPattern))(?=\(bBreak)|$)"
-          var block = text.substringWithRange(range)
+          var block = text.substringWithRange(range).stringByReplacingOccurrencesOfString(
+              "^[ \\t]+|[ \\t]+$", withString: "", options: .RegularExpressionSearch)
           text = text.substringFromIndex(range.endIndex)
           while let range = text.rangeOfString(blockPattern, options: .RegularExpressionSearch) {
-            block += text.substringWithRange(range)
+            block += "\n" + text.substringWithRange(range).stringByReplacingOccurrencesOfString(
+                "^\(bBreak)[ \\t]*|[ \\t]+$", withString: "", options: .RegularExpressionSearch)
             text = text.substringFromIndex(range.endIndex)
           }
           matches.append(TokenMatch(.String, block))

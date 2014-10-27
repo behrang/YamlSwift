@@ -214,6 +214,15 @@ func string () {
   assert(Yaml.load("' 1st non-empty\n\n 2nd non-empty \n\t3rd non-empty '") ==
       " 1st non-empty\n2nd non-empty 3rd non-empty ")
 
+  assert(Yaml.load("x\n y\nz") == "x y z")
+  assert(Yaml.load(" x\ny\n z") == "x y z")
+  assert(Yaml.load("a: x\n y\n  z") == ["a": "x y z"])
+  assert(Yaml.load("a: x\ny\n  z") != ["a": "x y z"])
+  assert(Yaml.load("- a: x\n   y\n    z") == [["a": "x y z"]])
+  assert(Yaml.load("- a:\n   x\n    y\n   z") == [["a": "x y z"]])
+  assert(Yaml.load("- a:     \n   x\n    y\n   z") == [["a": "x y z"]])
+  assert(Yaml.load("- a: # comment\n   x\n    y\n   z") == [["a": "x y z"]])
+
   let value: Yaml = "Radin"
   assert(value == "Radin")
   assert(value.string == "Radin")
@@ -245,6 +254,7 @@ func blockSeq () {
   assert(Yaml.load("- x: 1") == [["x": 1]])
   assert(Yaml.load("- x: 1\n  y: 2")[0] == ["x": 1, "y": 2])
   assert(Yaml.load("- 1\n    \n- x: 1\n  y: 2") == [1, ["x": 1, "y": 2]])
+  assert(Yaml.load("- x:\n  - y: 1") == [["x": [["y": 1]]]])
 }
 
 func flowMap () {
