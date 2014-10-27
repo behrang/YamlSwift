@@ -636,6 +636,20 @@ func example21 () {
   assert(value["string"] == "012345")
 }
 
+func example22 () {
+  let value = Yaml.load(
+    "canonical: 2001-12-15T02:59:43.1Z\n" +
+    "iso8601: 2001-12-14t21:59:43.10-05:00\n" +
+    "spaced: 2001-12-14 21:59:43.10 -5\n" +
+    "date: 2002-12-14\n"
+  )
+  assert(value.count == 4)
+  assert(value["canonical"] == "2001-12-15T02:59:43.1Z")
+  assert(value["iso8601"] == "2001-12-14t21:59:43.10-05:00")
+  assert(value["spaced"] == "2001-12-14 21:59:43.10 -5")
+  assert(value["date"] == "2002-12-14")
+}
+
 func examples () {
   example0()
   example1()
@@ -659,6 +673,98 @@ func examples () {
   example19()
   example20()
   example21()
+  example22()
+}
+
+func yamlHomepage () {
+  let value = Yaml.load(
+    "%YAML 1.2\n" +
+    "---\n" +
+    "YAML: YAML Ain't Markup Language\n" +
+    "\n" +
+    "What It Is: YAML is a human friendly data serialization\n" +
+    "  standard for all programming languages.\n" +
+    "\n" +
+    "YAML Resources:\n" +
+    "  YAML 1.2 (3rd Edition): http://yaml.org/spec/1.2/spec.html\n" +
+    "  YAML 1.1 (2nd Edition): http://yaml.org/spec/1.1/\n" +
+    "  YAML 1.0 (1st Edition): http://yaml.org/spec/1.0/\n" +
+    "  YAML Issues Page: https://github.com/yaml/yaml/issues\n" +
+    "  YAML Mailing List: yaml-core@lists.sourceforge.net\n" +
+    "  YAML IRC Channel: \"#yaml on irc.freenode.net\"\n" +
+    "  YAML Cookbook (Ruby): http://yaml4r.sourceforge.net/cookbook/ (local)\n" +
+    "  YAML Reference Parser: http://yaml.org/ypaste/\n" +
+    "\n" +
+    "Projects:\n" +
+    "  C/C++ Libraries:\n" +
+    "  - libyaml       # \"C\" Fast YAML 1.1\n" +
+    "  - Syck          # (dated) \"C\" YAML 1.0\n" +
+    "  - yaml-cpp      # C++ YAML 1.2 implementation\n" +
+    "  Ruby:\n" +
+    "  - psych         # libyaml wrapper (in Ruby core for 1.9.2)\n" +
+    "  - RbYaml        # YAML 1.1 (PyYaml Port)\n" +
+    "  - yaml4r        # YAML 1.0, standard library syck binding\n" +
+    "  Python:\n" +
+    "  - PyYaml        # YAML 1.1, pure python and libyaml binding\n" +
+    "  - PySyck        # YAML 1.0, syck binding\n" +
+    "  Java:\n" +
+    "  - JvYaml        # Java port of RbYaml\n" +
+    "  - SnakeYAML     # Java 5 / YAML 1.1\n" +
+    "  - YamlBeans     # To/from JavaBeans\n" +
+    "  - JYaml         # Original Java Implementation\n" +
+    "  Perl Modules:\n" +
+    "  - YAML          # Pure Perl YAML Module\n" +
+    "  - YAML::XS      # Binding to libyaml\n" +
+    "  - YAML::Syck    # Binding to libsyck\n" +
+    "  - YAML::Tiny    # A small YAML subset module\n" +
+    "  - PlYaml        # Perl port of PyYaml\n" +
+    "  C#/.NET:\n" +
+    "  - yaml-net      # YAML 1.1 library\n" +
+    "  - yatools.net   # (in-progress) YAML 1.1 implementation\n" +
+    "  PHP:\n" +
+    "  - php-yaml      # libyaml bindings (YAML 1.1)\n" +
+    "  - syck          # syck bindings (YAML 1.0)\n" +
+    "  - spyc          # yaml loader/dumper (YAML 1.?)\n" +
+    "  OCaml:\n" +
+    "  - ocaml-syck    # YAML 1.0 via syck bindings\n" +
+    "  Javascript:\n" +
+    "  - JS-YAML       # Native PyYAML port to JavaScript.\n" +
+    "  - JS-YAML Online# Browserified JS-YAML demo, to play with YAML in your browser.\n" +
+    "  Actionscript:\n" +
+    "  - as3yaml       # port of JvYAML (1.1)\n" +
+    "  Haskell:\n" +
+    "  - YamlReference # Haskell 1.2 reference parser\n" +
+    "  Others:\n" +
+    "  - yamlvim (src) # YAML dumper/emitter in pure vimscript\n" +
+    "\n" +
+    "Related Projects:\n" +
+    "  - Rx            # Multi-Language Schemata Tool for JSON/YAML\n" +
+    "  - Kwalify       # Ruby Schemata Tool for JSON/YAML\n" +
+    "  - yaml_vim      # vim syntax files for YAML\n" +
+    "  - yatools.net   # Visual Studio editor for YAML\n" +
+    "  - JSON          # Official JSON Website\n" +
+    "  - Pygments      # Python language Syntax Colorizer /w YAML support\n" +
+    "\n" +
+    "News:\n" +
+    "  - 20-NOV-2011 -- JS-YAML, a JavaScript YAML parser by Alexey Zapparov and Vitaly Puzrin.\n" +
+    "  - 18-AUG-2010 -- Ruby 1.9.2 includes psych, a libyaml wrapper by Aaron Patterson.\n" +
+    "# Maintained by Clark C. Evans\n" +
+    "...\n"
+  )
+  assert(value.count == 6)
+  assert(value["YAML"] == "YAML Ain't Markup Language")
+  assert(value["What It Is"] == .String("YAML is a human friendly data serialization " +
+      "standard for all programming languages."))
+  assert(value["YAML Resources"].count == 8)
+  assert(value["YAML Resources"]["YAML 1.2 (3rd Edition)"] == "http://yaml.org/spec/1.2/spec.html")
+  assert(value["YAML Resources"]["YAML IRC Channel"] == "#yaml on irc.freenode.net")
+  assert(value["Projects"].count == 12)
+  assert(value["Projects"]["C/C++ Libraries"][2] == "yaml-cpp")
+  assert(value["Projects"]["Perl Modules"].count == 5)
+  assert(value["Projects"]["Perl Modules"][0] == "YAML")
+  assert(value["Projects"]["Perl Modules"][1] == "YAML::XS")
+  assert(value["Related Projects"].count == 6)
+  assert(value["News"].count == 2)
 }
 
 func test () {
@@ -678,6 +784,8 @@ func test () {
   reserves()
 
   examples()
+
+  yamlHomepage()
 
   println("Done.")
 }

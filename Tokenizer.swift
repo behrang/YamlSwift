@@ -58,8 +58,8 @@ let safeIn = "\\x21\\x22\\x24-\\x2b\\x2d-\\x39\\x3b-\\x5a\\x5c\\x5e-\\x7a\\x7c\\
     "\\xa0-\\ud7ff\\ue000-\\ufefe\\uff00\\ufffd\\U00010000-\\U0010ffff"
 // with flow indicators: `,`, `[`, `]`, `{`, `}`
 let safeOut = "\\x2c\\x5b\\x5d\\x7b\\x7d" + safeIn
-let plainOutPattern = "([\(safeOut)]#|:[\(safeOut)]|[\(safeOut)]|[ \\t])+"
-let plainInPattern = "([\(safeIn)]#|:[\(safeIn)]|[\(safeIn)]|[ \\t]|\(bBreak))+"
+let plainOutPattern = "([\(safeOut)]#|:(?![ \\t]|\(bBreak))|[\(safeOut)]|[ \\t])+"
+let plainInPattern = "([\(safeIn)]#|:(?![ \\t]|\(bBreak))|[\(safeIn)]|[ \\t]|\(bBreak))+"
 let dashPattern = "^-([ \\t]+(?!#|\(bBreak))|(?=[ \\t\\n]))"
 let finish = "(?= *(,|\\]|\\}|( #.*)?(\(bBreak)|$)))"
 let tokenPatterns: [TokenPattern] = [
@@ -96,7 +96,7 @@ let tokenPatterns: [TokenPattern] = [
   (.Reserved, "^[@`]"),
   (.StringDQ, "^\"([^\\\\\"]|\\\\(.|\(bBreak)))*\""),
   (.StringSQ, "^'([^']|'')*'"),
-  (.StringFO, "^\(plainOutPattern)(?=:|\(bBreak)|$)"),
+  (.StringFO, "^\(plainOutPattern)(?=:([ \\t]|\(bBreak))|\(bBreak)|$)"),
   (.StringFI, "^\(plainInPattern)"),
 ]
 
