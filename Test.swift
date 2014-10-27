@@ -223,9 +223,28 @@ func string () {
   assert(Yaml.load("- a:     \n   x\n    y\n   z") == [["a": "x y z"]])
   assert(Yaml.load("- a: # comment\n   x\n    y\n   z") == [["a": "x y z"]])
 
-  let value: Yaml = "Radin"
-  assert(value == "Radin")
-  assert(value.string == "Radin")
+  let value1: Yaml = "Radin"
+  assert(value1 == "Radin")
+  assert(value1.string == "Radin")
+
+  let value2 = Yaml.load(
+    "# Outside flow collection:\n" +
+    "- ::vector\n" +
+    "- \": - ()\"\n" +
+    "- Up, up, and away!\n" +
+    "- -123\n" +
+    "- http://example.com/foo#bar\n" +
+    "# Inside flow collection:\n" +
+    "- [ ::vector,\n" +
+    "  \": - ()\",\n" +
+    "  \"Up, up and away!\",\n" +
+    "  -123,\n" +
+    "  http://example.com/foo#bar ]\n"
+  )
+  assert(value2.count == 6)
+  assert(value2[0] == "::vector")
+  assert(value2[5][0] == "::vector")
+  assert(value2[5][4] == "http://example.com/foo#bar")
 }
 
 func flowSeq () {
