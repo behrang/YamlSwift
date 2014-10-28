@@ -189,6 +189,9 @@ class Parser {
     case .Alias:
       let m = advance().match
       let name = m.substringFromIndex(Swift.advance(m.startIndex, 1))
+      if aliases[name] == nil {
+        return .Invalid("unknown alias \(name), \(context(buildContext()))")
+      }
       return aliases[name] ?? .Null
 
     case .End:
