@@ -322,6 +322,11 @@ func reserves () {
   assert(Yaml.load("twitter handle: @behrangn").dictionary == nil)
 }
 
+func aliases () {
+  assert(Yaml.load("x: &a 1\ny: *a") == ["x": 1, "y": 1])
+  assert(Yaml.loadMultiple("x: &a 1\ny: *a\n---\nx: *a")[1]["x"] == nil)
+}
+
 func example0 () {
   var value = Yaml.load(
     "- just: write some\n" +
@@ -804,6 +809,7 @@ func test () {
 
   directives()
   reserves()
+  aliases()
 
   examples()
 

@@ -65,6 +65,7 @@ class Parser {
   }
 
   func parseHeader () -> String? {
+    aliases = [:]
     var readYaml = false
     while true {
       switch peek().type {
