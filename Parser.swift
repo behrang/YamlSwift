@@ -261,6 +261,9 @@ class Parser {
       default:
         return .Invalid("expected key, \(context(buildContext()))")
       }
+      if map[k] != nil {
+        return .Invalid("duplicate key, \(context(buildContext()))")
+      }
       if let error = expect(.Colon, message: "expected colon") {
         return .Invalid(error)
       }
@@ -290,6 +293,9 @@ class Parser {
         default:
           break
         }
+        if map[k] != nil {
+          return .Invalid("duplicate key, \(context(buildContext()))")
+        }
         ignoreSpace()
         if peek().type != .Colon {
           map.updateValue(.Null, forKey: k)
@@ -299,6 +305,9 @@ class Parser {
         k = parseString()
       default:
         return .Invalid("expected key, \(context(buildContext()))")
+      }
+      if map[k] != nil {
+        return .Invalid("duplicate key, \(context(buildContext()))")
       }
       ignoreSpace()
       if let error = expect(.Colon, message: "expected colon") {
