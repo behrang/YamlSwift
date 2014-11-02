@@ -358,7 +358,7 @@ class Parser {
 
   func parseBlockMapOrString () -> Yaml {
     let match = peek().match
-    if tokens[index + 1].type != .Colon || match.rangeOfString("\n") != nil {
+    if tokens[index + 1].type != .Colon || match ~ /"\n" {
       return parseString()
     } else {
       return parseBlockMap()
@@ -367,7 +367,7 @@ class Parser {
 
   func foldBlock (var block: String) -> String {
     var trail = ""
-    if let range = block.rangeOfString("\\n*$", options: .RegularExpressionSearch) {
+    if let range = block ~< /"\\n*$" {
       trail = block.substringFromIndex(range.startIndex)
       block = block.substringToIndex(range.startIndex)
     }
@@ -385,11 +385,11 @@ class Parser {
   func foldFlow (var flow: String) -> String {
     var lead = ""
     var trail = ""
-    if let range = flow.rangeOfString("^[ \\t]+", options: .RegularExpressionSearch) {
+    if let range = flow ~< /"^[ \\t]+" {
       lead = flow.substringToIndex(range.endIndex)
       flow = flow.substringFromIndex(range.endIndex)
     }
-    if let range = flow.rangeOfString("[ \\t]+$", options: .RegularExpressionSearch) {
+    if let range = flow ~< /"[ \\t]+$" {
       trail = flow.substringFromIndex(range.startIndex)
       flow = flow.substringToIndex(range.startIndex)
     }
@@ -405,13 +405,13 @@ class Parser {
   func parseLiteral () -> Yaml {
     let literal = advance().match
     var chomp = 0
-    if literal.rangeOfString("-") != nil {
+    if literal ~ /"-" {
       chomp = -1
-    } else if literal.rangeOfString("+") != nil {
+    } else if literal ~ /"\\+" {
       chomp = 1
     }
     var indent = 0
-    if let range = literal.rangeOfString("[1-9]", options: .RegularExpressionSearch) {
+    if let range = literal ~< /"[1-9]" {
       indent = parseInt(literal.substringWithRange(range), radix: 10)
     }
     let token = advance()
@@ -419,14 +419,13 @@ class Parser {
       return .Invalid("expected scalar block, \(context(buildContext()))")
     }
     var block = normalizeBreaks(token.match)
-    let findIndentPattern = "^( *\\n)* {1,}(?! |\\n|$)"
     var foundIndent = 0
-    if let range = block.rangeOfString(findIndentPattern, options: .RegularExpressionSearch) {
+    if let range = block ~< /"^( *\\n)* {1,}(?! |\\n|$)" {
       let indentText = block.substringWithRange(range)
       foundIndent = countElements(indentText.stringByReplacingOccurrencesOfString(
           "^( *\\n)*", withString: "", options: .RegularExpressionSearch))
-      let invalidPattern = "^( {0,\(foundIndent)}\\n)* {\(foundIndent + 1),}"
-      if let range = block.rangeOfString(invalidPattern, options: .RegularExpressionSearch) {
+      let invalidPattern = /"^( {0,\(foundIndent)}\\n)* {\(foundIndent + 1),}"
+      if block ~ invalidPattern {
         return .Invalid(
             "leading all-space line must not have to many spaces, \(context(buildContext()))")
       }

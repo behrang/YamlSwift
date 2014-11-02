@@ -1,5 +1,5 @@
 module-name = Yaml
-sources = Tokenizer.swift Parser.swift Yaml.swift
+sources = Tokenizer.swift Parser.swift Regex.swift Yaml.swift
 objects := $(patsubst %.swift,build/%.o,$(sources))
 sdk = $$(xcrun --show-sdk-path --sdk macosx)
 
@@ -34,6 +34,7 @@ build/test: Test.swift build/libyaml.a | build
 		-L build \
 		-lyaml \
 		-o $@ \
+		-O \
 		$<
 
 build:

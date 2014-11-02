@@ -1,3 +1,5 @@
+import Foundation
+
 enum TokenType: Swift.String, Printable {
   case YamlDirective = "%YAML"
   case DocStart = "doc-start"
@@ -48,7 +50,7 @@ enum TokenType: Swift.String, Printable {
   }
 }
 
-typealias TokenPattern = (type: TokenType, pattern: String)
+typealias TokenPattern = (type: TokenType, pattern: NSRegularExpression)
 typealias TokenMatch = (type: TokenType, match: String)
 
 let bBreak = "(?:\\r\\n|\\r|\\n)"
@@ -60,44 +62,44 @@ let safeIn = "\\x21\\x22\\x24-\\x2b\\x2d-\\x39\\x3b-\\x5a\\x5c\\x5e-\\x7a\\x7c\\
 let safeOut = "\\x2c\\x5b\\x5d\\x7b\\x7d" + safeIn
 let plainOutPattern = "([\(safeOut)]#|:(?![ \\t]|\(bBreak))|[\(safeOut)]|[ \\t])+"
 let plainInPattern = "([\(safeIn)]#|:(?![ \\t]|\(bBreak))|[\(safeIn)]|[ \\t]|\(bBreak))+"
-let dashPattern = "^-([ \\t]+(?!#|\(bBreak))|(?=[ \\t\\n]))"
+let dashPattern = /"^-([ \\t]+(?!#|\(bBreak))|(?=[ \\t\\n]))"
 let finish = "(?= *(,|\\]|\\}|( #.*)?(\(bBreak)|$)))"
 let tokenPatterns: [TokenPattern] = [
-  (.YamlDirective, "^%YAML(?= )"),
-  (.DocStart, "^---"),
-  (.DocEnd, "^\\.\\.\\."),
-  (.Comment, "^#.*|^\(bBreak) *(#.*)?(?=\(bBreak)|$)"),
-  (.Space, "^ +"),
-  (.NewLine, "^\(bBreak) *"),
+  (.YamlDirective, /"^%YAML(?= )"),
+  (.DocStart, /"^---"),
+  (.DocEnd, /"^\\.\\.\\."),
+  (.Comment, /"^#.*|^\(bBreak) *(#.*)?(?=\(bBreak)|$)"),
+  (.Space, /"^ +"),
+  (.NewLine, /"^\(bBreak) *"),
   (.Dash, dashPattern),
-  (.Null, "^(null|Null|NULL|~)\(finish)"),
-  (.True, "^(true|True|TRUE)\(finish)"),
-  (.False, "^(false|False|FALSE)\(finish)"),
-  (.InfinityP, "^\\+?\\.(inf|Inf|INF)\(finish)"),
-  (.InfinityN, "^-\\.(inf|Inf|INF)\(finish)"),
-  (.NaN, "^\\.(nan|NaN|NAN)\(finish)"),
-  (.Int, "^[-+]?[0-9]+\(finish)"),
-  (.IntOct, "^0o[0-7]+\(finish)"),
-  (.IntHex, "^0x[0-9a-fA-F]+\(finish)"),
-  (.IntSex, "^[0-9]{2}(:[0-9]{2})+\(finish)"),
-  (.Double, "^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)"),
-  (.Anchor, "^&\\w+"),
-  (.Alias, "^\\*\\w+"),
-  (.Comma, "^,"),
-  (.OpenSB, "^\\["),
-  (.CloseSB, "^\\]"),
-  (.OpenCB, "^\\{"),
-  (.CloseCB, "^\\}"),
-  (.QuestionMark, "^\\?( +|(?=\(bBreak)))"),
-  (.ColonFO, "^:(?!:)"),
-  (.ColonFI, "^:(?!:)"),
-  (.Literal, "^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(?=\(bBreak)|$)"),
-  (.Folded, "^>([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(?=\(bBreak)|$)"),
-  (.Reserved, "^[@`]"),
-  (.StringDQ, "^\"([^\\\\\"]|\\\\(.|\(bBreak)))*\""),
-  (.StringSQ, "^'([^']|'')*'"),
-  (.StringFO, "^\(plainOutPattern)(?=:([ \\t]|\(bBreak))|\(bBreak)|$)"),
-  (.StringFI, "^\(plainInPattern)"),
+  (.Null, /"^(null|Null|NULL|~)\(finish)"),
+  (.True, /"^(true|True|TRUE)\(finish)"),
+  (.False, /"^(false|False|FALSE)\(finish)"),
+  (.InfinityP, /"^\\+?\\.(inf|Inf|INF)\(finish)"),
+  (.InfinityN, /"^-\\.(inf|Inf|INF)\(finish)"),
+  (.NaN, /"^\\.(nan|NaN|NAN)\(finish)"),
+  (.Int, /"^[-+]?[0-9]+\(finish)"),
+  (.IntOct, /"^0o[0-7]+\(finish)"),
+  (.IntHex, /"^0x[0-9a-fA-F]+\(finish)"),
+  (.IntSex, /"^[0-9]{2}(:[0-9]{2})+\(finish)"),
+  (.Double, /"^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)"),
+  (.Anchor, /"^&\\w+"),
+  (.Alias, /"^\\*\\w+"),
+  (.Comma, /"^,"),
+  (.OpenSB, /"^\\["),
+  (.CloseSB, /"^\\]"),
+  (.OpenCB, /"^\\{"),
+  (.CloseCB, /"^\\}"),
+  (.QuestionMark, /"^\\?( +|(?=\(bBreak)))"),
+  (.ColonFO, /"^:(?!:)"),
+  (.ColonFI, /"^:(?!:)"),
+  (.Literal, /"^\\|([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(?=\(bBreak)|$)"),
+  (.Folded, /"^>([-+]|[1-9]|[-+][1-9]|[1-9][-+])? *( #.*)?(?=\(bBreak)|$)"),
+  (.Reserved, /"^[@`]"),
+  (.StringDQ, /"^\"([^\\\\\"]|\\\\(.|\(bBreak)))*\""),
+  (.StringSQ, /"^'([^']|'')*'"),
+  (.StringFO, /"^\(plainOutPattern)(?=:([ \\t]|\(bBreak))|\(bBreak)|$)"),
+  (.StringFI, /"^\(plainInPattern)"),
 ]
 
 func context (var text: String) -> String {
@@ -116,15 +118,14 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
   next:
   while countElements(text) > 0 {
     for tokenPattern in tokenPatterns {
-      if let range = text.rangeOfString(tokenPattern.pattern, options: .RegularExpressionSearch) {
+      if let range = text ~< tokenPattern.pattern {
         switch tokenPattern.type {
 
         case .NewLine:
           let match = text.substringWithRange(range)
           let lastIndent = indents.last ?? 0
           let spaces = countElements(match.substringFromIndex(advance(match.startIndex, 1)))
-          let nestedBlockSequence = text.substringFromIndex(range.endIndex).rangeOfString(
-              dashPattern, options: .RegularExpressionSearch)
+          let nestedBlockSequence = text.substringFromIndex(range.endIndex) ~ dashPattern
           if spaces == lastIndent {
             matches.append(TokenMatch(.NewLine, match))
           } else if spaces > lastIndent {
@@ -137,11 +138,11 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
                 matches.append(TokenMatch(.Indent, match))
               }
             }
-          } else if nestedBlockSequence != nil && spaces == lastIndent - 1 {
+          } else if nestedBlockSequence && spaces == lastIndent - 1 {
             matches.append(TokenMatch(.NewLine, match))
           } else {
-            while nestedBlockSequence != nil && spaces < (indents.last ?? 0) - 1
-                || nestedBlockSequence == nil && spaces < indents.last {
+            while nestedBlockSequence && spaces < (indents.last ?? 0) - 1
+                || !nestedBlockSequence && spaces < indents.last {
               indents.removeLast()
               matches.append(TokenMatch(.Dedent, ""))
             }
@@ -184,9 +185,9 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           let lastIndent = indents.last ?? 0
           let minIndent = 1 + lastIndent
           let blockPattern =
-              "^(\(bBreak) *)*(\(bBreak)( {\(minIndent),})[^ ].*(\(bBreak)( *|\\3.*))*)(?=\(bBreak)|$)"
+              /"^(\(bBreak) *)*(\(bBreak)( {\(minIndent),})[^ ].*(\(bBreak)( *|\\3.*))*)(?=\(bBreak)|$)"
           var block = ""
-          if let range = text.rangeOfString(blockPattern, options: .RegularExpressionSearch) {
+          if let range = text ~< blockPattern {
             block = text.substringWithRange(range)
             block = block.stringByReplacingOccurrencesOfString(
                 "^\(bBreak)", withString: "", options: .RegularExpressionSearch)
@@ -195,7 +196,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
             block = block.stringByReplacingOccurrencesOfString(
                 "\(bBreak) {0,\(lastIndent)}", withString: "\n", options: .RegularExpressionSearch)
             text = text.substringFromIndex(range.endIndex)
-            if text.rangeOfString("^\(bBreak)", options: .RegularExpressionSearch) != nil {
+            if text ~ /"^\(bBreak)" {
               block += "\n"
             }
           }
@@ -207,11 +208,11 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
             continue
           }
           let indent = (indents.last ?? 0)
-          let blockPattern = "^\(bBreak)( *| {\(indent),}\(plainOutPattern))(?=\(bBreak)|$)"
+          let blockPattern = /"^\(bBreak)( *| {\(indent),}\(plainOutPattern))(?=\(bBreak)|$)"
           var block = text.substringWithRange(range).stringByReplacingOccurrencesOfString(
               "^[ \\t]+|[ \\t]+$", withString: "", options: .RegularExpressionSearch)
           text = text.substringFromIndex(range.endIndex)
-          while let range = text.rangeOfString(blockPattern, options: .RegularExpressionSearch) {
+          while let range = text ~< blockPattern {
             block += "\n" + text.substringWithRange(range).stringByReplacingOccurrencesOfString(
                 "^\(bBreak)[ \\t]*|[ \\t]+$", withString: "", options: .RegularExpressionSearch)
             text = text.substringFromIndex(range.endIndex)
