@@ -119,11 +119,11 @@ class Parser {
       return .Int(m.integerValue) // will be between Int.min and Int.max
 
     case .IntOct:
-      let m = advance().match.stringByReplacingOccurrencesOfString("0o", withString: "")
+      let m = advance().match.replace(/"0o", "")
       return .Int(parseInt(m, radix: 8)) // will throw runtime error if overflows
 
     case .IntHex:
-      let m = advance().match.stringByReplacingOccurrencesOfString("0x", withString: "")
+      let m = advance().match.replace(/"0x", "")
       return .Int(parseInt(m, radix: 16)) // will throw runtime error if overflows
 
     case .IntSex:
@@ -344,7 +344,7 @@ class Parser {
     switch peek().type {
     case .String:
       let m = normalizeBreaks(advance().match)
-      return .String(foldFlow(replace(m, "^[ \\t\\n]+|[ \\t\\n]+$", "")))
+      return .String(foldFlow(m.replace(/"^[ \\t\\n]+|[ \\t\\n]+$", "")))
     case .StringDQ:
       let m = unwrapQuotedString(normalizeBreaks(advance().match))
       return .String(unescapeDoubleQuotes(foldFlow(m)))
@@ -397,8 +397,8 @@ class Parser {
       captures in
       ""
     } ?? flow
-    flow = replace(flow, "(^|.)\\n(?=.|$)", "$1 ")
-    flow = replace(flow, "(.)\\n(\\n+)", "$1$2")
+    flow = flow.replace(/"(^|.)\\n(?=.|$)", "$1 ")
+    flow = flow.replace(/"(.)\\n(\\n+)", "$1$2")
     return lead + flow + trail
   }
 
@@ -422,8 +422,7 @@ class Parser {
     var foundIndent = 0
     if let range = block ~< /"^( *\\n)* {1,}(?! |\\n|$)" {
       let indentText = block.substringWithRange(range)
-      foundIndent = countElements(indentText.stringByReplacingOccurrencesOfString(
-          "^( *\\n)*", withString: "", options: .RegularExpressionSearch))
+      foundIndent = countElements(indentText.replace(/"^( *\\n)*", ""))
       let invalidPattern = /"^( {0,\(foundIndent)}\\n)* {\(foundIndent + 1),}"
       if block ~ invalidPattern {
         return .Invalid(
@@ -436,17 +435,13 @@ class Parser {
     } else if indent == 0 {
       indent = foundIndent
     }
-    block = block.stringByReplacingOccurrencesOfString(
-        "^ {0,\(indent)}", withString: "", options: .RegularExpressionSearch)
-    block = block.stringByReplacingOccurrencesOfString(
-        "\\n {0,\(indent)}", withString: "\n", options: .RegularExpressionSearch)
+    block = block.replace(/"^ {0,\(indent)}", "")
+    block = block.replace(/"\\n {0,\(indent)}", "\n")
 
     if chomp == -1 {
-      block = block.stringByReplacingOccurrencesOfString(
-          "(\\n *)*$", withString: "", options: .RegularExpressionSearch)
+      block = block.replace(/"(\\n *)*$", "")
     } else if chomp == 0 {
-      block = block.stringByReplacingOccurrencesOfString(
-          "(?=[^ ])(\\n *)*$", withString: "\n", options: .RegularExpressionSearch)
+      block = block.replace(/"(?=[^ ])(\\n *)*$", "\n")
     }
     return .String(block)
   }
@@ -475,7 +470,7 @@ func parseInt (s: String, #radix: Int) -> Int {
 }
 
 func normalizeBreaks (s: String) -> String {
-  return replace(s, "\\r\\n|\\r", "\n")
+  return s.replace(/"\\r\\n|\\r", "\n")
 }
 
 func unwrapQuotedString (s: String) -> String {
@@ -483,7 +478,7 @@ func unwrapQuotedString (s: String) -> String {
 }
 
 func unescapeSingleQuotes (s: String) -> String {
-  return s.stringByReplacingOccurrencesOfString("''", withString: "'")
+  return s.replace(/"''", "'")
 }
 
 func unescapeDoubleQuotes (input: String) -> String {
@@ -556,9 +551,4 @@ func replace (input: String, regex: String, options: NSRegularExpressionOptions,
   } else {
     return nil
   }
-}
-
-func replace (input: String, regex: String, template: String) -> String {
-  return input.stringByReplacingOccurrencesOfString(
-      regex, withString: template, options: .RegularExpressionSearch)
 }

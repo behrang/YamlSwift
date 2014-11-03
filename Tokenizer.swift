@@ -105,9 +105,9 @@ let tokenPatterns: [TokenPattern] = [
 func context (var text: String) -> String {
   let endIndex = advance(text.startIndex, 50, text.endIndex)
   text = text.substringToIndex(endIndex)
-  text = text.stringByReplacingOccurrencesOfString("\r", withString: "\\r")
-  text = text.stringByReplacingOccurrencesOfString("\n", withString: "\\n")
-  text = text.stringByReplacingOccurrencesOfString("\"", withString: "\\\"")
+  text = text.replace(/"\\r", "\\\\r")
+  text = text.replace(/"\\n", "\\\\n")
+  text = text.replace(/"\"", "\\\\\"")
   return "near \"\(text)\""
 }
 
@@ -189,12 +189,9 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           var block = ""
           if let range = text ~< blockPattern {
             block = text.substringWithRange(range)
-            block = block.stringByReplacingOccurrencesOfString(
-                "^\(bBreak)", withString: "", options: .RegularExpressionSearch)
-            block = block.stringByReplacingOccurrencesOfString(
-                "^ {0,\(lastIndent)}", withString: "", options: .RegularExpressionSearch)
-            block = block.stringByReplacingOccurrencesOfString(
-                "\(bBreak) {0,\(lastIndent)}", withString: "\n", options: .RegularExpressionSearch)
+            block = block.replace(/"^\(bBreak)", "")
+            block = block.replace(/"^ {0,\(lastIndent)}", "")
+            block = block.replace(/"\(bBreak) {0,\(lastIndent)}", "\n")
             text = text.substringFromIndex(range.endIndex)
             if text ~ /"^\(bBreak)" {
               block += "\n"
@@ -209,20 +206,17 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           }
           let indent = (indents.last ?? 0)
           let blockPattern = /"^\(bBreak)( *| {\(indent),}\(plainOutPattern))(?=\(bBreak)|$)"
-          var block = text.substringWithRange(range).stringByReplacingOccurrencesOfString(
-              "^[ \\t]+|[ \\t]+$", withString: "", options: .RegularExpressionSearch)
+          var block = text.substringWithRange(range).replace(/"^[ \\t]+|[ \\t]+$", "")
           text = text.substringFromIndex(range.endIndex)
           while let range = text ~< blockPattern {
-            block += "\n" + text.substringWithRange(range).stringByReplacingOccurrencesOfString(
-                "^\(bBreak)[ \\t]*|[ \\t]+$", withString: "", options: .RegularExpressionSearch)
+            block += "\n" + text.substringWithRange(range).replace(/"^\(bBreak)[ \\t]*|[ \\t]+$", "")
             text = text.substringFromIndex(range.endIndex)
           }
           matches.append(TokenMatch(.String, block))
           continue next
 
         case .StringFI:
-          let match = text.substringWithRange(range).stringByReplacingOccurrencesOfString(
-              "^[ \\t]|[ \\t]$", withString: "", options: .RegularExpressionSearch)
+          let match = text.substringWithRange(range).replace(/"^[ \\t]|[ \\t]$", "")
           matches.append(TokenMatch(.String, match))
 
         case .Reserved:

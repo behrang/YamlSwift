@@ -33,3 +33,10 @@ func ~ (string: String, regex: NSRegularExpression) -> Bool {
 func ~ (regex: NSRegularExpression, string: String) -> Bool {
     return string ~ regex
 }
+
+extension String {
+  func replace (regex: NSRegularExpression, _ template: String) -> String {
+    return self.stringByReplacingOccurrencesOfString(
+        regex.pattern, withString: template, options: .RegularExpressionSearch)
+  }
+}
