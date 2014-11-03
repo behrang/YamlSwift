@@ -181,14 +181,14 @@ class Parser {
 
     case .Anchor:
       let m = advance().match
-      let name = m.substringFromIndex(Swift.advance(m.startIndex, 1))
+      let name = m.substringFromIndex(m.startIndex.successor())
       let value = parse()
       aliases[name] = value
       return value
 
     case .Alias:
       let m = advance().match
-      let name = m.substringFromIndex(Swift.advance(m.startIndex, 1))
+      let name = m.substringFromIndex(m.startIndex.successor())
       if aliases[name] == nil {
         return .Invalid("unknown alias \(name), \(context(buildContext()))")
       }
@@ -403,7 +403,7 @@ class Parser {
     }
     var indent = 0
     if let range = literal ~< /"[1-9]" {
-      indent = parseInt(literal.substringWithRange(range), radix: 10)
+      indent = parseInt(literal[range], radix: 10)
     }
     let token = advance()
     if token.type != .String {
@@ -412,7 +412,7 @@ class Parser {
     var block = normalizeBreaks(token.match)
     var foundIndent = 0
     if let range = block ~< /"^( *\\n)* {1,}(?! |\\n|$)" {
-      let indentText = block.substringWithRange(range)
+      let indentText = block[range]
       foundIndent = countElements(indentText.replace(/"^( *\\n)*", ""))
       let invalidPattern = /"^( {0,\(foundIndent)}\\n)* {\(foundIndent + 1),}"
       if block ~ invalidPattern {
@@ -465,7 +465,7 @@ func normalizeBreaks (s: String) -> String {
 }
 
 func unwrapQuotedString (s: String) -> String {
-  return s.substringWithRange(Range(start: advance(s.startIndex, 1), end: advance(s.endIndex, -1)))
+  return s[s.startIndex.successor()..<s.endIndex.predecessor()]
 }
 
 func unescapeSingleQuotes (s: String) -> String {

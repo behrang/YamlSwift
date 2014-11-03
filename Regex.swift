@@ -5,7 +5,7 @@ import Foundation
 prefix operator / {}
 
 prefix func / (pattern: String) -> NSRegularExpression {
-    return NSRegularExpression(pattern: pattern, options: nil, error: nil)!
+  return NSRegularExpression(pattern: pattern, options: nil, error: nil)!
 }
 
 
@@ -13,23 +13,23 @@ prefix func / (pattern: String) -> NSRegularExpression {
 infix operator / {}
 
 func / (pattern: String, options: String) -> NSRegularExpression! {
-    if options ~ /"[^ixsm]" {
-        return nil
-    }
-    var o = NSRegularExpressionOptions()
-    if options ~ /"i" {
-        o |= .CaseInsensitive
-    }
-    if options ~ /"x" {
-        o |= .AllowCommentsAndWhitespace
-    }
-    if options ~ /"s" {
-        o |= .DotMatchesLineSeparators
-    }
-    if options ~ /"m" {
-        o |= .AnchorsMatchLines
-    }
-    return NSRegularExpression(pattern: pattern, options: o, error: nil)
+  if options ~ /"[^ixsm]" {
+    return nil
+  }
+  var o = NSRegularExpressionOptions()
+  if options ~ /"i" {
+    o |= .CaseInsensitive
+  }
+  if options ~ /"x" {
+    o |= .AllowCommentsAndWhitespace
+  }
+  if options ~ /"s" {
+    o |= .DotMatchesLineSeparators
+  }
+  if options ~ /"m" {
+    o |= .AnchorsMatchLines
+  }
+  return NSRegularExpression(pattern: pattern, options: o, error: nil)
 }
 
 
@@ -37,19 +37,19 @@ func / (pattern: String, options: String) -> NSRegularExpression! {
 infix operator ~< { precedence 135}
 
 func ~< (string: String, regex: NSRegularExpression) -> Range<String.Index>? {
-    let srange = NSRange(location: 0, length: countElements(string))
-    let range = regex.rangeOfFirstMatchInString(string, options: nil, range: srange)
-    if range.location != NSNotFound && range.length != 0 {
-        let start = advance(string.startIndex, range.location)
-        let end = advance(start, range.length)
-        return Range(start: start, end: end)
-    } else {
-        return nil
-    }
+  let srange = NSRange(location: 0, length: countElements(string))
+  let range = regex.rangeOfFirstMatchInString(string, options: nil, range: srange)
+  if range.location != NSNotFound && range.length != 0 {
+    let start = advance(string.startIndex, range.location)
+    let end = advance(start, range.length)
+    return Range(start: start, end: end)
+  } else {
+    return nil
+  }
 }
 
 func ~< (regex: NSRegularExpression, string: String) -> Range<String.Index>? {
-    return string ~< regex
+  return string ~< regex
 }
 
 
@@ -57,11 +57,11 @@ func ~< (regex: NSRegularExpression, string: String) -> Range<String.Index>? {
 infix operator ~ { precedence 130 }
 
 func ~ (string: String, regex: NSRegularExpression) -> Bool {
-    return string ~< regex != nil
+  return string ~< regex != nil
 }
 
 func ~ (regex: NSRegularExpression, string: String) -> Bool {
-    return string ~ regex
+  return string ~ regex
 }
 
 
@@ -85,16 +85,15 @@ extension String {
       captures.reserveCapacity(result.numberOfRanges)
       for i in 0..<result.numberOfRanges {
         if let r = result.rangeAtIndex(i).toRange() {
-          let crange = Range(
-              start: advance(self.startIndex, r.startIndex),
-              end: advance(self.startIndex, r.endIndex))
-          captures[i] = self.substringWithRange(crange)
+          let start = advance(self.startIndex, r.startIndex)
+          let end = advance(self.startIndex, r.endIndex)
+          captures[i] = self[start..<end]
         }
       }
       let replacement = block(captures)
       let offsetRange = NSRange(location: result.range.location + offset, length: result.range.length)
-      s.replaceCharactersInRange(offsetRange, withString: replacement)
       offset += countElements(replacement) - result.range.length
+      s.replaceCharactersInRange(offsetRange, withString: replacement)
     }
     return s
   }

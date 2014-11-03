@@ -116,15 +116,15 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
   var indents = [0]
   var insideFlow = 0
   next:
-  while countElements(text) > 0 {
+  while text.endIndex > text.startIndex {
     for tokenPattern in tokenPatterns {
       if let range = text ~< tokenPattern.pattern {
         switch tokenPattern.type {
 
         case .NewLine:
-          let match = text.substringWithRange(range)
+          let match = text[range]
           let lastIndent = indents.last ?? 0
-          let spaces = countElements(match.substringFromIndex(advance(match.startIndex, 1)))
+          let spaces = countElements(match.substringFromIndex(match.startIndex.successor()))
           let nestedBlockSequence = text.substringFromIndex(range.endIndex) ~ dashPattern
           if spaces == lastIndent {
             matches.append(TokenMatch(.NewLine, match))
@@ -150,8 +150,8 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           }
 
         case .Dash, .QuestionMark:
-          let match = text.substringWithRange(range)
-          let index = advance(match.startIndex, 1)
+          let match = text[range]
+          let index = match.startIndex.successor()
           let indent = countElements(match)
           indents.append((indents.last ?? 0) + indent)
           matches.append(TokenMatch(tokenPattern.type, match.substringToIndex(index)))
@@ -164,7 +164,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           fallthrough
 
         case .ColonFI:
-          let match = text.substringWithRange(range)
+          let match = text[range]
           matches.append(TokenMatch(.Colon, match))
           if insideFlow == 0 {
             indents.append((indents.last ?? 0) + 1)
@@ -173,14 +173,14 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
 
         case .OpenSB, .OpenCB:
           insideFlow += 1
-          matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
+          matches.append(TokenMatch(tokenPattern.type, text[range]))
 
         case .CloseSB, .CloseCB:
           insideFlow -= 1
-          matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
+          matches.append(TokenMatch(tokenPattern.type, text[range]))
 
         case .Literal, .Folded:
-          matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
+          matches.append(TokenMatch(tokenPattern.type, text[range]))
           text = text.substringFromIndex(range.endIndex)
           let lastIndent = indents.last ?? 0
           let minIndent = 1 + lastIndent
@@ -188,7 +188,7 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
               /"^(\(bBreak) *)*(\(bBreak)( {\(minIndent),})[^ ].*(\(bBreak)( *|\\3.*))*)(?=\(bBreak)|$)"
           var block = ""
           if let range = text ~< blockPattern {
-            block = text.substringWithRange(range)
+            block = text[range]
             block = block.replace(/"^\(bBreak)", "")
             block = block.replace(/"^ {0,\(lastIndent)}", "")
             block = block.replace(/"\(bBreak) {0,\(lastIndent)}", "\n")
@@ -206,24 +206,24 @@ func tokenize (var text: String) -> (error: String?, tokens: [TokenMatch]?) {
           }
           let indent = (indents.last ?? 0)
           let blockPattern = /"^\(bBreak)( *| {\(indent),}\(plainOutPattern))(?=\(bBreak)|$)"
-          var block = text.substringWithRange(range).replace(/"^[ \\t]+|[ \\t]+$", "")
+          var block = text[range].replace(/"^[ \\t]+|[ \\t]+$", "")
           text = text.substringFromIndex(range.endIndex)
           while let range = text ~< blockPattern {
-            block += "\n" + text.substringWithRange(range).replace(/"^\(bBreak)[ \\t]*|[ \\t]+$", "")
+            block += "\n" + text[range].replace(/"^\(bBreak)[ \\t]*|[ \\t]+$", "")
             text = text.substringFromIndex(range.endIndex)
           }
           matches.append(TokenMatch(.String, block))
           continue next
 
         case .StringFI:
-          let match = text.substringWithRange(range).replace(/"^[ \\t]|[ \\t]$", "")
+          let match = text[range].replace(/"^[ \\t]|[ \\t]$", "")
           matches.append(TokenMatch(.String, match))
 
         case .Reserved:
           return (context(text), nil)
 
         default:
-          matches.append(TokenMatch(tokenPattern.type, text.substringWithRange(range)))
+          matches.append(TokenMatch(tokenPattern.type, text[range]))
         }
         text = text.substringFromIndex(range.endIndex)
         continue next
