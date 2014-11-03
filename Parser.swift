@@ -371,14 +371,8 @@ class Parser {
       trail = block.substringFromIndex(range.startIndex)
       block = block.substringToIndex(range.startIndex)
     }
-    block = replace(block, "^([^ \\t\\n].*)\\n(?=[^ \\t\\n])", .AnchorsMatchLines) {
-      captures in
-      (captures[1] ?? "") + " "
-    } ?? block
-    block = replace(block, "^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])", .AnchorsMatchLines) {
-      captures in
-      (captures[1] ?? "") + (captures[2] ?? "")
-    } ?? block
+    block = block.replace("^([^ \\t\\n].*)\\n(?=[^ \\t\\n])"/"m", "$1 ")
+    block = block.replace("^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])"/"m", "$1$2")
     return block + trail
   }
 
@@ -393,10 +387,7 @@ class Parser {
       trail = flow.substringFromIndex(range.startIndex)
       flow = flow.substringToIndex(range.startIndex)
     }
-    flow = replace(flow, "^[ \\t]+|[ \\t]+$|\\\\\\n", .AnchorsMatchLines) {
-      captures in
-      ""
-    } ?? flow
+    flow = flow.replace("^[ \\t]+|[ \\t]+$|\\\\\\n"/"m", "")
     flow = flow.replace(/"(^|.)\\n(?=.|$)", "$1 ")
     flow = flow.replace(/"(.)\\n(\\n+)", "$1$2")
     return lead + flow + trail
@@ -482,22 +473,18 @@ func unescapeSingleQuotes (s: String) -> String {
 }
 
 func unescapeDoubleQuotes (input: String) -> String {
-  var result = replace(input, "\\\\([0abtnvfre \"\\/N_LP])", nil) {
-    captures in
-    escapeCharacters[captures[1] ?? ""] ?? ""
-  } ?? input
-  result = replace(result, "\\\\x([0-9A-Fa-f]{2})", nil) {
-    captures in
-    String(UnicodeScalar(parseInt(captures[1] ?? "", radix: 16)))
-  } ?? result
-  result = replace(result, "\\\\u([0-9A-Fa-f]{4})", nil) {
-    captures in
-    String(UnicodeScalar(parseInt(captures[1] ?? "", radix: 16)))
-  } ?? result
-  result = replace(result, "\\\\U([0-9A-Fa-f]{8})", nil) {
-    captures in
-    String(UnicodeScalar(parseInt(captures[1] ?? "", radix: 16)))
-  } ?? result
+  var result = input.replace(/"\\\\([0abtnvfre \"\\/N_LP])") { $ in
+    escapeCharacters[$[1]] ?? ""
+  }
+  result = result.replace(/"\\\\x([0-9A-Fa-f]{2})") { $ in
+    String(UnicodeScalar(parseInt($[1], radix: 16)))
+  }
+  result = result.replace(/"\\\\u([0-9A-Fa-f]{4})") { $ in
+    String(UnicodeScalar(parseInt($[1], radix: 16)))
+  }
+  result = result.replace(/"\\\\U([0-9A-Fa-f]{8})") { $ in
+    String(UnicodeScalar(parseInt($[1], radix: 16)))
+  }
   return result
 }
 
@@ -520,35 +507,3 @@ let escapeCharacters = [
   "L": "\u{2028}",
   "P": "\u{2029}"
 ]
-
-func replace (input: String, regex: String, options: NSRegularExpressionOptions,
-    block: ([String?]) -> String) -> String? {
-  if let regex = NSRegularExpression(pattern: regex, options: options, error: nil) {
-    let matches = regex.matchesInString(input, options: nil,
-        range: NSRange(location: 0, length: countElements(input))) as [NSTextCheckingResult]
-    var result = ""
-    var lastIndex = input.startIndex
-    for match in matches {
-      var captures = [String?]()
-      captures.reserveCapacity(regex.numberOfCaptureGroups + 1)
-      for i in 0...regex.numberOfCaptureGroups {
-        if let r = match.rangeAtIndex(i).toRange() {
-          captures.append(input.substringWithRange(Range(
-              start: advance(input.startIndex, r.startIndex),
-              end: advance(input.startIndex, r.endIndex))))
-        } else {
-          captures.append(nil)
-        }
-      }
-      result += input.substringWithRange(Range(
-          start: lastIndex, end: advance(input.startIndex, match.range.location)))
-      result += regex.replacementStringForResult(match, inString: input, offset: 0, template:
-          block(captures))
-      lastIndex = advance(input.startIndex, match.range.location + match.range.length)
-    }
-    result += input.substringFromIndex(lastIndex)
-    return result
-  } else {
-    return nil
-  }
-}
