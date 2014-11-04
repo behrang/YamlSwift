@@ -27,12 +27,18 @@ class Parser {
     return false
   }
 
-  func expect (type: TokenType, message: String) -> String? {
-    if peek().type == type {
-      advance()
-      return nil
+  func expect (type: TokenType, _ message: String, _ value: Yaml) -> Yaml {
+    switch value {
+    case .Invalid:
+      return value
+    default:
+      if peek().type == type {
+        advance()
+        return value
+      } else {
+        return .Invalid("\(message), \(context(buildContext()))")
+      }
     }
-    return "\(message), \(context(buildContext()))"
   }
 
   func buildContext (count: Int = 50) -> String {
@@ -52,12 +58,6 @@ class Parser {
     }
   }
 
-  func ignoreWhiteSpace () {
-    while contains([.Comment, .Space, .NewLine, .Indent, .Dedent], peek().type) {
-      advance()
-    }
-  }
-
   func ignoreDocEnd () {
     while contains([.Comment, .Space, .NewLine, .DocEnd], peek().type) {
       advance()
@@ -73,21 +73,23 @@ class Parser {
         advance()
       case .YamlDirective:
         if readYaml {
-          return expect(.DocStart, message: "expected ---")
+          return "expected ---, \(context(buildContext()))"
         }
         readYaml = true
         advance()
-        expect(.Space, message: "expected space")
+        if !accept(.Space) {
+          return "expected space, \(context(buildContext()))"
+        }
         let version = advance().match
         if version != "1.1" && version != "1.2" {
-          return "invalid yaml version, " + context(buildContext())
+          return "invalid yaml version, \(context(buildContext()))"
         }
       case .DocStart:
         advance()
         return nil
       default:
         if readYaml {
-          return expect(.DocStart, message: "expected ---")
+          return "expected ---, \(context(buildContext()))"
         } else {
           return nil
         }
@@ -174,10 +176,7 @@ class Parser {
     case .Indent:
       accept(.Indent)
       let result = parse()
-      if let error = expect(.Dedent, message: "expected dedent") {
-        return .Invalid(error)
-      }
-      return result
+      return expect(.Dedent, "expected dedent", result)
 
     case .Anchor:
       let m = advance().match
@@ -189,10 +188,7 @@ class Parser {
     case .Alias:
       let m = advance().match
       let name = m.substringFromIndex(m.startIndex.successor())
-      if aliases[name] == nil {
-        return .Invalid("unknown alias \(name), \(context(buildContext()))")
-      }
-      return aliases[name] ?? .Null
+      return aliases[name] ?? .Invalid("unknown alias \(name), \(context(buildContext()))")
 
     case .End:
       return .Null
@@ -204,140 +200,94 @@ class Parser {
   }
 
   func parseBlockSeq () -> Yaml {
-    var seq: [Yaml] = []
-    while accept(.Dash) {
+    var seq: Yaml = []
+    var i = 0
+    while accept(.Dash) && seq.isValid {
       accept(.Indent)
       ignoreSpace()
-      let v = parse()
+      seq[i] = parse()
+      i += 1
       ignoreSpace()
-      if let error = expect(.Dedent, message: "expected dedent after dash indent") {
-        return .Invalid(error)
-      }
-      switch v {
-      case .Invalid:
-        return v
-      default:
-        seq.append(v)
-      }
+      seq = expect(.Dedent, "expected dedent after dash indent", seq)
       ignoreSpace()
     }
-    return .Array(seq)
+    return seq
   }
 
   func parseFlowSeq () -> Yaml {
-    var seq: [Yaml] = []
+    var seq: Yaml = []
+    var i = 0
     accept(.OpenSB)
-    while !accept(.CloseSB) {
+    while !accept(.CloseSB) && seq.isValid {
       ignoreSpace()
       if seq.count > 0 {
-        if let error = expect(.Comma, message: "expected comma") {
-          return .Invalid(error)
-        }
+        seq = expect(.Comma, "expected comma", seq)
       }
       ignoreSpace()
-      let v = parse()
-      switch v {
-      case .Invalid:
-        return v
-      default:
-        seq.append(v)
-      }
+      seq[i] = parse()
+      i += 1
       ignoreSpace()
     }
-    return .Array(seq)
+    return seq
   }
 
   func parseFlowMap () -> Yaml {
-    var map: [Yaml: Yaml] = [:]
+    var map: Yaml = [:]
     accept(.OpenCB)
-    while !accept(.CloseCB) {
-      ignoreWhiteSpace()
+    while !accept(.CloseCB) && map.isValid {
+      ignoreSpace()
       if map.count > 0 {
-        if let error = expect(.Comma, message: "expected comma") {
-          return .Invalid(error)
-        }
+        map = expect(.Comma, "expected comma", map)
       }
-      ignoreWhiteSpace()
-      var k: Yaml
-      switch peek().type {
-      case .String, .StringDQ, .StringSQ:
-        k = parseString()
-      default:
-        return .Invalid("expected key, \(context(buildContext()))")
-      }
-      if map[k] != nil {
+      ignoreSpace()
+      let k = parseString()
+      if map[k] != nil && map[k].isValid {
         return .Invalid("duplicate key \(k), \(context(buildContext()))")
       }
-      if let error = expect(.Colon, message: "expected colon") {
-        return .Invalid(error)
-      }
-      let v = parse()
-      switch v {
-      case .Invalid:
-        return v
-      default:
-        map.updateValue(v, forKey: k)
-      }
-      ignoreWhiteSpace()
+      map[k] = nil
+      map = expect(.Colon, "expected colon", map)
+      map[k] = parse()
+      ignoreSpace()
     }
-    return .Dictionary(map)
+    return map
   }
 
   func parseBlockMap () -> Yaml {
-    var map: [Yaml: Yaml] = [:]
-    while contains([.String, .StringDQ, .StringSQ, .QuestionMark], peek().type) {
+    var map: Yaml = [:]
+    while contains([.String, .StringDQ, .StringSQ, .QuestionMark], peek().type) && map.isValid {
       var k: Yaml
-      switch peek().type {
-      case .QuestionMark:
+      if peek().type == .QuestionMark {
         advance()
         k = parse()
-        switch k {
-        case .Invalid:
-          return k
-        default:
-          break
-        }
-        if map[k] != nil {
+        if map[k] != nil && map[k].isValid {
           return .Invalid("duplicate key \(k), \(context(buildContext()))")
         }
         ignoreSpace()
         if peek().type != .Colon {
-          map.updateValue(.Null, forKey: k)
+          map[k] = nil
           continue
         }
-      case .String, .StringDQ, .StringSQ:
+      } else {
         k = parseString()
-      default:
-        return .Invalid("expected key, \(context(buildContext()))")
       }
-      if map[k] != nil {
+      if map[k] != nil && map[k].isValid {
         return .Invalid("duplicate key \(k), \(context(buildContext()))")
       }
       ignoreSpace()
-      if let error = expect(.Colon, message: "expected colon") {
-        return .Invalid(error)
-      }
+      map = expect(.Colon, "expected colon", map)
       ignoreSpace()
       accept(.Indent)
       ignoreSpace()
       if accept(.Dedent) {
-        map.updateValue(.Null, forKey: k)
+        map[k] = nil
       } else {
-        let v = parse()
-        switch v {
-        case .Invalid:
-          return v
-        default:
-          map.updateValue(v, forKey: k)
-        }
+        map[k] = parse()
         ignoreSpace()
-        if let error = expect(.Dedent, message: "expected dedent") {
-          return .Invalid(error)
-        }
+        map = expect(.Dedent, "expected dedent", map)
       }
       ignoreSpace()
     }
-    return .Dictionary(map)
+    return map
   }
 
   func parseString () -> Yaml {

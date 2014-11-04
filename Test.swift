@@ -322,7 +322,7 @@ func reserves () {
 
 func aliases () {
   assert(Yaml.load("x: &a 1\ny: *a") == ["x": 1, "y": 1])
-  assert(Yaml.loadMultiple("x: &a 1\ny: *a\n---\nx: *a")[1]["x"] == nil)
+  assert(Yaml.loadMultiple("x: &a 1\ny: *a\n---\nx: *a").isValid == false)
   assert(Yaml.load("x: *a") != ["x": nil])
 }
 

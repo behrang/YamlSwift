@@ -16,7 +16,7 @@ Currently, you have to build it manually. Download and then run this command:
 make
 ```
 
-Then there will be a `build/libyaml.a` and `build/Yaml.swiftmodule` which you can add to your project.
+Then there will be a `build/libyaml.dylib` and `build/Yaml.swiftmodule` which you can add to your project.
 
 To run tests, run this command:
 

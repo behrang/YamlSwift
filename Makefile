@@ -2,9 +2,9 @@ module-name = Yaml
 sources = Tokenizer.swift Parser.swift Regex.swift Yaml.swift
 sdk = $$(xcrun --show-sdk-path --sdk macosx)
 
-all: build/libyaml.a build/Yaml.swiftmodule
+all: build/libyaml.dylib build/Yaml.swiftmodule
 
-build/libyaml.a: $(sources) | build
+build/libyaml.dylib: $(sources) | build
 	@echo Build lib...
 	@xcrun swiftc \
 		-emit-library \
@@ -14,7 +14,7 @@ build/libyaml.a: $(sources) | build
 		-o $@ \
 		$^
 
-build/Yaml.swiftmodule: build/libyaml.a
+build/Yaml.swiftmodule: build/libyaml.dylib
 	@echo Build swiftmodule...
 	@xcrun swiftc \
 		-emit-module \

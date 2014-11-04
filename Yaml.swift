@@ -74,15 +74,12 @@ public enum Yaml:
       if let error = parser.parseHeader() {
         println("Header error: " + error)
       } else {
-        let value = parser.parse()
+        var value = parser.parse()
         parser.ignoreDocEnd()
-        if let error = parser.expect(.End, message: "expected end") {
-          println("Footer error: " + error)
-        } else {
-          println("-----")
-          println(value)
-          println(".....")
-        }
+        value = parser.expect(.End, "expected end", value)
+        println("-----")
+        println(value)
+        println(".....")
       }
     }
   }
@@ -98,10 +95,7 @@ public enum Yaml:
     }
     let value = parser.parse()
     parser.ignoreDocEnd()
-    if let error = parser.expect(.End, message: "expected end") {
-      return .Invalid(error)
-    }
-    return value
+    return parser.expect(.End, "expected end", value)
   }
 
   public static func loadMultiple (text: Swift.String) -> Yaml {
@@ -110,22 +104,17 @@ public enum Yaml:
       return .Invalid(error)
     }
     let parser = Parser(result.tokens ?? [])
-    var docs: [Yaml] = []
-    while parser.peek().type != .End {
+    var docs: Yaml = []
+    var i = 0
+    while parser.peek().type != .End && docs.isValid {
       if let error = parser.parseHeader() {
         return .Invalid(error)
       }
-      let value = parser.parse()
-      switch value {
-      case .Invalid:
-        return value
-      default:
-        break
-      }
-      docs.append(value)
+      docs[i] = parser.parse()
+      i += 1
       parser.ignoreDocEnd()
     }
-    return .Array(docs)
+    return docs
   }
 
   public var bool: Swift.Bool? {
@@ -201,9 +190,21 @@ public enum Yaml:
     }
   }
 
+  public var isValid: Swift.Bool {
+    switch self {
+    case .Invalid:
+      return false
+    default:
+      return true
+    }
+  }
+
   public subscript(index: Swift.Int) -> Yaml {
     get {
       assert(index >= 0)
+      if !self.isValid {
+        return self
+      }
       switch self {
       case .Array(let array):
         if index >= array.startIndex && index < array.endIndex {
@@ -217,6 +218,13 @@ public enum Yaml:
     }
     set {
       assert(index >= 0)
+      if !self.isValid {
+        return
+      }
+      if !newValue.isValid {
+        self = newValue
+        return
+      }
       switch self {
       case .Array(var array):
         array.reserveCapacity(index + 1)
@@ -235,6 +243,12 @@ public enum Yaml:
 
   public subscript(key: Yaml) -> Yaml {
     get {
+      if !self.isValid {
+        return self
+      }
+      if !key.isValid {
+        return key
+      }
       switch self {
       case .Dictionary(let dictionary):
         return dictionary[key] ?? .Null
@@ -243,6 +257,17 @@ public enum Yaml:
       }
     }
     set {
+      if !self.isValid {
+        return
+      }
+      if !key.isValid {
+        self = key
+        return
+      }
+      if !newValue.isValid {
+        self = newValue
+        return
+      }
       switch self {
       case .Dictionary(var dictionary):
         dictionary[key] = newValue
