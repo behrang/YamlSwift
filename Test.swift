@@ -1,5 +1,3 @@
-import Yaml
-
 func null () {
   assert(Yaml.load("# comment line") == .Null)
   assert(Yaml.load("") == .Null)

@@ -63,7 +63,7 @@ public enum Yaml:
     self = .Dictionary(dictionary)
   }
 
-  public static func debug (text: Swift.String) {
+  static func debug (text: Swift.String) {
     let result = tokenize(text)
     if let error = result.error {
       println("Error: " + error)

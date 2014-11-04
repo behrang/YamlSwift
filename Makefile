@@ -1,41 +1,37 @@
 module-name = Yaml
 sources = Tokenizer.swift Parser.swift Regex.swift Yaml.swift
-objects := $(patsubst %.swift,build/%.o,$(sources))
 sdk = $$(xcrun --show-sdk-path --sdk macosx)
 
-build/libyaml.a: $(sources) | build
-	@echo Build module...
+all: build/libyaml.a build/Yaml.swiftmodule
 
-	@cd build && xcrun swiftc \
-		-emit-object \
+build/libyaml.a: $(sources) | build
+	@echo Build lib...
+	@xcrun swiftc \
+		-emit-library \
 		-module-name $(module-name) \
 		-sdk $(sdk) \
-		$(patsubst %,../%,$^)
+		-O \
+		-o $@ \
+		$^
 
+build/Yaml.swiftmodule: build/libyaml.a
+	@echo Build swiftmodule...
 	@xcrun swiftc \
 		-emit-module \
 		-module-name $(module-name) \
 		-sdk $(sdk) \
-		-o build/Yaml.swiftmodule \
-		$^
-
-	@xcrun swiftc \
-		-emit-library \
-		-module-name $(module-name) \
 		-o $@ \
-		$(objects)
+		$(sources)
 
-build/test: Test.swift build/libyaml.a | build
+build/test: Test.swift $(sources) | build
 	@echo Build test...
+	@cp $< build/main.swift
 	@xcrun swiftc \
 		-emit-executable \
 		-sdk $(sdk) \
-		-I build \
-		-L build \
-		-lyaml \
 		-o $@ \
-		-O \
-		$<
+		build/main.swift $(sources)
+	@rm build/main.swift
 
 build:
 	@mkdir -p $@
