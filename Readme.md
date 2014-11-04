@@ -171,7 +171,7 @@ println(value["age"])  // Int(1)
 ### Yaml#bool
 
 ```swift
-value.bool () -> Bool?
+value.bool -> Bool?
 ```
 
 Returns an `Optional<Bool>` value. If the value is a `Yaml.Bool` value, the wrapped value is returned. Otherwise `nil` is returned.
@@ -190,7 +190,7 @@ println(value["usage"].bool)  // nil
 ### Yaml#int
 
 ```swift
-value.int () -> Int?
+value.int -> Int?
 ```
 
 Returns an `Optional<Int>` value. If the value is a `Yaml.Int` value, the wrapped value is returned. Otherwise `nil` is returned.
@@ -209,7 +209,7 @@ println(value["c"].int)  // nil
 ### Yaml#double
 
 ```swift
-value.double () -> Double?
+value.double -> Double?
 ```
 
 Returns an `Optional<Double>` value. If the value is a `Yaml.Double` value, the wrapped value is returned. Otherwise `nil` is returned.
@@ -229,7 +229,7 @@ println(value["d"].double)  // nil
 ### Yaml#string
 
 ```swift
-value.string () -> String?
+value.string -> String?
 ```
 
 Returns an `Optional<String>` value. If the value is a `Yaml.String` value, the wrapped value is returned. Otherwise `nil` is returned.
@@ -248,7 +248,7 @@ println(value["age"].string)  // nil
 ### Yaml#array
 
 ```swift
-value.array () -> [Yaml]?
+value.array -> [Yaml]?
 ```
 
 Returns an `Optional<Array<Yaml>>` value. If the value is a `Yaml.Array` value, the wrapped value is returned. Otherwise `nil` is returned.
@@ -266,7 +266,7 @@ println(value["languages"].array)  // Optional([Dictionary([String(Swift): Bool(
 ### Yaml#dictionary
 
 ```swift
-value.dictionary () -> [Yaml: Yaml]?
+value.dictionary -> [Yaml: Yaml]?
 ```
 
 Returns an `Optional<Dictionary<Yaml, Yaml>>` value. If the value is a `Yaml.Dictionary` value, the wrapped value is returned. Otherwise `nil` is returned.
@@ -284,7 +284,7 @@ println(value[0].dictionary)  // Optional([String(Swift): Bool(true)])
 ### Yaml#count
 
 ```swift
-value.count () -> Int?
+value.count -> Int?
 ```
 
 Returns an `Optional<Int>` value. If the value is either a `Yaml.Array` or a `Yaml.Dictionary` value, the count of elements is returned. Otherwise `nil` is returned.
@@ -294,6 +294,25 @@ let value = Yaml.load("- Swift: true\n- Objective C: false")
 println(value.count)  // Optional(2)
 println(value[0].count)  // Optional(1)
 println(value[0]["Swift"].count)  // nil
+```
+
+
+
+
+
+### Yaml#isValid
+
+```swift
+value.isValid -> Bool
+```
+
+Returns a `Bool` value. If the value is a `Yaml.Invalid` value, `false` is returned. Otherwise `true` is returned.
+
+```swift
+let value1 = Yaml.load("a: 1")
+println(value1.isValid)  // true
+let value2 = Yaml.load("a: 1\n 2")
+println(value2.isValid)  // false
 ```
 
 
