@@ -1,14 +1,4 @@
-public enum Yaml:
-    Hashable,
-    Printable,
-    NilLiteralConvertible,
-    BooleanLiteralConvertible,
-    IntegerLiteralConvertible,
-    FloatLiteralConvertible,
-    StringLiteralConvertible,
-    ArrayLiteralConvertible,
-    DictionaryLiteralConvertible {
-
+public enum Yaml {
   case Null
   case Bool(Swift.Bool)
   case Int(Swift.Int)
@@ -17,23 +7,33 @@ public enum Yaml:
   case Array([Yaml])
   case Dictionary([Yaml: Yaml])
   case Invalid(Swift.String)
+}
 
+extension Yaml: NilLiteralConvertible {
   public init(nilLiteral: ()) {
     self = .Null
   }
+}
 
+extension Yaml: BooleanLiteralConvertible {
   public init(booleanLiteral: BooleanLiteralType) {
     self = .Bool(booleanLiteral)
   }
+}
 
+extension Yaml: IntegerLiteralConvertible {
   public init(integerLiteral: IntegerLiteralType) {
     self = .Int(integerLiteral)
   }
+}
 
+extension Yaml: FloatLiteralConvertible {
   public init(floatLiteral: FloatLiteralType) {
     self = .Double(floatLiteral)
   }
+}
 
+extension Yaml: StringLiteralConvertible {
   public init(stringLiteral: StringLiteralType) {
     self = .String(stringLiteral)
   }
@@ -45,7 +45,9 @@ public enum Yaml:
   public init(unicodeScalarLiteral: StringLiteralType) {
     self = .String(unicodeScalarLiteral)
   }
+}
 
+extension Yaml: ArrayLiteralConvertible {
   public init(arrayLiteral elements: Yaml...) {
     var array = [Yaml]()
     array.reserveCapacity(elements.count)
@@ -54,7 +56,9 @@ public enum Yaml:
     }
     self = .Array(array)
   }
+}
 
+extension Yaml: DictionaryLiteralConvertible {
   public init(dictionaryLiteral elements: (Yaml, Yaml)...) {
     var dictionary = [Yaml: Yaml]()
     for (k, v) in elements {
@@ -62,8 +66,39 @@ public enum Yaml:
     }
     self = .Dictionary(dictionary)
   }
+}
 
-  static func debug (text: Swift.String) {
+extension Yaml: Printable {
+  public var description: Swift.String {
+    switch self {
+    case .Null:
+      return "Null"
+    case .Bool(let b):
+      return "Bool(\(b))"
+    case .Int(let i):
+      return "Int(\(i))"
+    case .Double(let f):
+      return "Double(\(f))"
+    case .String(let s):
+      return "String(\(s))"
+    case .Array(let s):
+      return "Array(\(s))"
+    case .Dictionary(let m):
+      return "Dictionary(\(m))"
+    case .Invalid(let e):
+      return "Invalid(\(e))"
+    }
+  }
+}
+
+extension Yaml: Hashable {
+  public var hashValue: Swift.Int {
+    return description.hashValue
+  }
+}
+
+extension Yaml {
+  public static func debug (text: Swift.String) {
     let result = tokenize(text)
     if let error = result.error {
       println("Error: " + error)
@@ -116,89 +151,9 @@ public enum Yaml:
     }
     return docs
   }
+}
 
-  public var bool: Swift.Bool? {
-    switch self {
-    case .Bool(let b):
-      return b
-    default:
-      return nil
-    }
-  }
-
-  public var int: Swift.Int? {
-    switch self {
-    case .Int(let i):
-      return i
-    case .Double(let f):
-      if Swift.Double(Swift.Int(f)) == f {
-        return Swift.Int(f)
-      } else {
-        return nil
-      }
-    default:
-      return nil
-    }
-  }
-
-  public var double: Swift.Double? {
-    switch self {
-    case .Double(let f):
-      return f
-    case .Int(let i):
-      return Swift.Double(i)
-    default:
-      return nil
-    }
-  }
-
-  public var string: Swift.String? {
-    switch self {
-    case .String(let s):
-      return s
-    default:
-      return nil
-    }
-  }
-
-  public var array: [Yaml]? {
-    switch self {
-    case .Array(let array):
-      return array
-    default:
-      return nil
-    }
-  }
-
-  public var dictionary: [Yaml: Yaml]? {
-    switch self {
-    case .Dictionary(let dictionary):
-      return dictionary
-    default:
-      return nil
-    }
-  }
-
-  public var count: Swift.Int? {
-    switch self {
-    case .Array(let array):
-      return array.count
-    case .Dictionary(let dictionary):
-      return dictionary.count
-    default:
-      return nil
-    }
-  }
-
-  public var isValid: Swift.Bool {
-    switch self {
-    case .Invalid:
-      return false
-    default:
-      return true
-    }
-  }
-
+extension Yaml {
   public subscript(index: Swift.Int) -> Yaml {
     get {
       assert(index >= 0)
@@ -279,30 +234,89 @@ public enum Yaml:
       }
     }
   }
+}
 
-  public var description: Swift.String {
+extension Yaml {
+  public var bool: Swift.Bool? {
     switch self {
-    case .Null:
-      return "Null"
     case .Bool(let b):
-      return "Bool(\(b))"
-    case .Int(let i):
-      return "Int(\(i))"
-    case .Double(let f):
-      return "Double(\(f))"
-    case .String(let s):
-      return "String(\(s))"
-    case .Array(let s):
-      return "Array(\(s))"
-    case .Dictionary(let m):
-      return "Dictionary(\(m))"
-    case .Invalid(let e):
-      return "Invalid(\(e))"
+      return b
+    default:
+      return nil
     }
   }
 
-  public var hashValue: Swift.Int {
-    return description.hashValue
+  public var int: Swift.Int? {
+    switch self {
+    case .Int(let i):
+      return i
+    case .Double(let f):
+      if Swift.Double(Swift.Int(f)) == f {
+        return Swift.Int(f)
+      } else {
+        return nil
+      }
+    default:
+      return nil
+    }
+  }
+
+  public var double: Swift.Double? {
+    switch self {
+    case .Double(let f):
+      return f
+    case .Int(let i):
+      return Swift.Double(i)
+    default:
+      return nil
+    }
+  }
+
+  public var string: Swift.String? {
+    switch self {
+    case .String(let s):
+      return s
+    default:
+      return nil
+    }
+  }
+
+  public var array: [Yaml]? {
+    switch self {
+    case .Array(let array):
+      return array
+    default:
+      return nil
+    }
+  }
+
+  public var dictionary: [Yaml: Yaml]? {
+    switch self {
+    case .Dictionary(let dictionary):
+      return dictionary
+    default:
+      return nil
+    }
+  }
+
+  public var count: Swift.Int? {
+    switch self {
+    case .Array(let array):
+      return array.count
+    case .Dictionary(let dictionary):
+      return dictionary.count
+    default:
+      return nil
+    }
+  }
+
+  public var isValid: Swift.Bool {
+    switch self {
+    case .Invalid:
+      return false
+    default:
+      return true
+    }
   }
 }
 
@@ -402,6 +416,6 @@ public prefix func - (value: Yaml) -> Yaml {
   case .Double(let v):
     return .Double(-v)
   default:
-    fatalError("`-` operator may only be used on .Int or .Double Yaml values")
+    return .Invalid("`-` operator may only be used on .Int or .Double Yaml values")
   }
 }
