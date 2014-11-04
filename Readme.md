@@ -18,6 +18,12 @@ make
 
 Then there will be a `build/libyaml.dylib` and `build/Yaml.swiftmodule` which you can add to your project.
 
+To create a release optimized library, use this command:
+
+```sh
+make clean release
+```
+
 To run tests, run this command:
 
 ```sh

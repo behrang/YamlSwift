@@ -1,8 +1,15 @@
 module-name = Yaml
 sources = Tokenizer.swift Parser.swift Regex.swift Yaml.swift
 sdk = $$(xcrun --show-sdk-path --sdk macosx)
+flags =
+
+debug:   flags += -g
+release: flags += -O
 
 all: build/libyaml.dylib build/Yaml.swiftmodule
+
+debug:   all
+release: all
 
 build/libyaml.dylib: $(sources) | build
 	@echo Build lib...
@@ -10,8 +17,8 @@ build/libyaml.dylib: $(sources) | build
 		-emit-library \
 		-module-name $(module-name) \
 		-sdk $(sdk) \
-		-O \
 		-o $@ \
+		$(flags) \
 		$^
 
 build/Yaml.swiftmodule: build/libyaml.dylib
@@ -23,15 +30,16 @@ build/Yaml.swiftmodule: build/libyaml.dylib
 		-o $@ \
 		$(sources)
 
-build/test: Test.swift $(sources) | build
+build/test: Test.swift build/Yaml.swiftmodule
 	@echo Build test...
-	@cp $< build/main.swift
 	@xcrun swiftc \
 		-emit-executable \
 		-sdk $(sdk) \
+		-I build \
+		-L build \
+		-lyaml \
 		-o $@ \
-		build/main.swift $(sources)
-	@rm build/main.swift
+		$<
 
 build:
 	@mkdir -p $@
