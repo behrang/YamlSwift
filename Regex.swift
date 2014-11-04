@@ -4,15 +4,15 @@ import Foundation
 
 prefix operator / {}
 
-prefix func / (pattern: String) -> NSRegularExpression {
-  return NSRegularExpression(pattern: pattern, options: nil, error: nil)!
+prefix func / (pattern: String) -> NSRegularExpression! {
+  return NSRegularExpression(pattern: pattern, options: nil, error: nil)
 }
 
 
 
-infix operator / {}
+infix operator / { precedence 136 }
 
-func / (pattern: String, options: String) -> NSRegularExpression! {
+func / (options: String, pattern: String) -> NSRegularExpression! {
   if options ~ /"[^ixsm]" {
     return nil
   }
@@ -34,7 +34,7 @@ func / (pattern: String, options: String) -> NSRegularExpression! {
 
 
 
-infix operator ~< { precedence 135}
+infix operator ~< { precedence 135 }
 
 func ~< (string: String, regex: NSRegularExpression) -> Range<String.Index>? {
   let srange = NSRange(location: 0, length: countElements(string))

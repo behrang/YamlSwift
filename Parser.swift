@@ -371,8 +371,8 @@ class Parser {
       trail = block.substringFromIndex(range.startIndex)
       block = block.substringToIndex(range.startIndex)
     }
-    block = block.replace("^([^ \\t\\n].*)\\n(?=[^ \\t\\n])"/"m", "$1 ")
-    block = block.replace("^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])"/"m", "$1$2")
+    block = block.replace("m"/"^([^ \\t\\n].*)\\n(?=[^ \\t\\n])", "$1 ")
+    block = block.replace("m"/"^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])", "$1$2")
     return block + trail
   }
 
@@ -387,7 +387,7 @@ class Parser {
       trail = flow.substringFromIndex(range.startIndex)
       flow = flow.substringToIndex(range.startIndex)
     }
-    flow = flow.replace("^[ \\t]+|[ \\t]+$|\\\\\\n"/"m", "")
+    flow = flow.replace("m"/"^[ \\t]+|[ \\t]+$|\\\\\\n", "")
     flow = flow.replace(/"(^|.)\\n(?=.|$)", "$1 ")
     flow = flow.replace(/"(.)\\n(\\n+)", "$1$2")
     return lead + flow + trail
