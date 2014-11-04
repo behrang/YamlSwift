@@ -36,7 +36,7 @@ class Parser {
         advance()
         return value
       } else {
-        return .Invalid("\(message), \(context(buildContext()))")
+        return .Invalid("\(message), \(buildContext())")
       }
     }
   }
@@ -49,7 +49,7 @@ class Parser {
         break
       }
     }
-    return text
+    return context(text)
   }
 
   func ignoreSpace () {
@@ -73,23 +73,23 @@ class Parser {
         advance()
       case .YamlDirective:
         if readYaml {
-          return "expected ---, \(context(buildContext()))"
+          return "expected ---, \(buildContext())"
         }
         readYaml = true
         advance()
         if !accept(.Space) {
-          return "expected space, \(context(buildContext()))"
+          return "expected space, \(buildContext())"
         }
         let version = advance().match
         if version != "1.1" && version != "1.2" {
-          return "invalid yaml version, \(context(buildContext()))"
+          return "invalid yaml version, \(buildContext())"
         }
       case .DocStart:
         advance()
         return nil
       default:
         if readYaml {
-          return "expected ---, \(context(buildContext()))"
+          return "expected ---, \(buildContext())"
         } else {
           return nil
         }
@@ -188,13 +188,13 @@ class Parser {
     case .Alias:
       let m = advance().match
       let name = m.substringFromIndex(m.startIndex.successor())
-      return aliases[name] ?? .Invalid("unknown alias \(name), \(context(buildContext()))")
+      return aliases[name] ?? .Invalid("unknown alias \(name), \(buildContext())")
 
     case .End:
       return .Null
 
     default:
-      return .Invalid("unexpected type \(peek().type), \(context(buildContext()))")
+      return .Invalid("unexpected type \(peek().type), \(buildContext())")
 
     }
   }
@@ -242,7 +242,7 @@ class Parser {
       ignoreSpace()
       let k = parseString()
       if map[k] != nil && map[k].isValid {
-        return .Invalid("duplicate key \(k), \(context(buildContext()))")
+        return .Invalid("duplicate key \(k), \(buildContext())")
       }
       map[k] = nil
       map = expect(.Colon, "expected colon", map)
@@ -260,7 +260,7 @@ class Parser {
         advance()
         k = parse()
         if map[k] != nil && map[k].isValid {
-          return .Invalid("duplicate key \(k), \(context(buildContext()))")
+          return .Invalid("duplicate key \(k), \(buildContext())")
         }
         ignoreSpace()
         if peek().type != .Colon {
@@ -271,7 +271,7 @@ class Parser {
         k = parseString()
       }
       if map[k] != nil && map[k].isValid {
-        return .Invalid("duplicate key \(k), \(context(buildContext()))")
+        return .Invalid("duplicate key \(k), \(buildContext())")
       }
       ignoreSpace()
       map = expect(.Colon, "expected colon", map)
@@ -302,7 +302,7 @@ class Parser {
       let m = unwrapQuotedString(normalizeBreaks(advance().match))
       return .String(unescapeSingleQuotes(foldFlow(m)))
     default:
-      return .Invalid("expected string, \(context(buildContext()))")
+      return .Invalid("expected string, \(buildContext())")
     }
   }
 
@@ -357,7 +357,7 @@ class Parser {
     }
     let token = advance()
     if token.type != .String {
-      return .Invalid("expected scalar block, \(context(buildContext()))")
+      return .Invalid("expected scalar block, \(buildContext())")
     }
     var block = normalizeBreaks(token.match)
     var foundIndent = 0
@@ -367,12 +367,12 @@ class Parser {
       let invalidPattern = /"^( {0,\(foundIndent)}\\n)* {\(foundIndent + 1),}"
       if block ~ invalidPattern {
         return .Invalid(
-            "leading all-space line must not have to many spaces, \(context(buildContext()))")
+            "leading all-space line must not have to many spaces, \(buildContext())")
       }
     }
     if indent > 0 && foundIndent < indent {
       return .Invalid(
-          "less indented block scalar than the indicated level, \(context(buildContext()))")
+          "less indented block scalar than the indicated level, \(buildContext())")
     } else if indent == 0 {
       indent = foundIndent
     }
