@@ -65,7 +65,6 @@ enum Yaml {
   case String(String)
   case Array([Yaml])
   case Dictionary([Yaml: Yaml])
-  case Invalid(String)
 }
 ```
 
@@ -76,23 +75,23 @@ enum Yaml {
 ### Yaml.load
 
 ```swift
-Yaml.load (String) -> Yaml
+Yaml.load (String) -> Result<Yaml>
 ```
 
-Takes a string of a YAML document and returns a `Yaml` enum value.
+Takes a string of a YAML document and returns a `Result` of `Yaml` enum value.
 
 ```swift
-let value = Yaml.load("a: 1\nb: 2")
+let value = Yaml.load("a: 1\nb: 2").value!
 println(value["a"])  // Int(1)
 println(value["b"])  // Int(2)
 println(value["c"])  // Null
 ```
 
-If the input document is invalid or contains more than one YAML document, a `Yaml.Invalid(error)` is returned.
+If the input document is invalid or contains more than one YAML document, an error is returned.
 
 ```swift
-let value = Yaml.load("a\nb: 2")
-println(value)  // Invalid(expected end, near "b: 2")
+let value = Yaml.load("a\nb: 2").error!
+println(value)  // expected end, near "b: 2"
 ```
 
 
@@ -102,18 +101,18 @@ println(value)  // Invalid(expected end, near "b: 2")
 ### Yaml.loadMultiple
 
 ```swift
-Yaml.loadMultiple (String) -> Yaml
+Yaml.loadMultiple (String) -> Result<[Yaml]>
 ```
 
-Takes a string of one or more YAML documents and returns a `Yaml` enum value. If the string contains more than one document, a `Yaml.Array([Yaml])` value is returned. Otherwise, a value representing that single document is returned, which may also be a `Yaml.Array([Yaml])`.
+Takes a string of one or more YAML documents and returns a `Result` of `[Yaml]`.
 
 ```swift
-let value = Yaml.loadMultiple("---\na: 1\nb: 2\n---\na: 3\nb: 4")
+let value = Yaml.loadMultiple("---\na: 1\nb: 2\n---\na: 3\nb: 4").value!
 println(value[0]["a"])  // Int(1)
 println(value[1]["a"])  // Int(3)
 ```
 
-If an error is encountered in any of the documents, a `Yaml.Invalid(error)` is returned.
+If an error is encountered in any of the documents, an error is returned.
 
 
 
@@ -294,25 +293,6 @@ let value = Yaml.load("- Swift: true\n- Objective C: false")
 println(value.count)  // Optional(2)
 println(value[0].count)  // Optional(1)
 println(value[0]["Swift"].count)  // nil
-```
-
-
-
-
-
-### Yaml#isValid
-
-```swift
-value.isValid -> Bool
-```
-
-Returns a `Bool` value. If the value is a `Yaml.Invalid` value, `false` is returned. Otherwise `true` is returned.
-
-```swift
-let value1 = Yaml.load("a: 1")
-println(value1.isValid)  // true
-let value2 = Yaml.load("a: 1\n 2")
-println(value2.isValid)  // false
 ```
 
 

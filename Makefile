@@ -1,5 +1,5 @@
 module-name = Yaml
-sources = Tokenizer.swift Parser.swift Regex.swift Yaml.swift
+sources = Operators.swift Result.swift Regex.swift Tokenizer.swift Parser.swift Yaml.swift
 sdk = $$(xcrun --show-sdk-path --sdk macosx)
 flags =
 

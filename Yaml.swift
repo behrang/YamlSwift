@@ -6,7 +6,6 @@ public enum Yaml {
   case String(Swift.String)
   case Array([Yaml])
   case Dictionary([Yaml: Yaml])
-  case Invalid(Swift.String)
 }
 
 extension Yaml: NilLiteralConvertible {
@@ -85,8 +84,6 @@ extension Yaml: Printable {
       return "Array(\(s))"
     case .Dictionary(let m):
       return "Dictionary(\(m))"
-    case .Invalid(let e):
-      return "Invalid(\(e))"
     }
   }
 }
@@ -98,58 +95,36 @@ extension Yaml: Hashable {
 }
 
 extension Yaml {
-  public static func debug (text: Swift.String) {
-    let result = tokenize(text)
-    if let error = result.error {
-      println("Error: " + error)
-    } else {
-      println("======")
-      println(result.tokens)
-      let parser = Parser(result.tokens ?? [])
-      if let error = parser.parseHeader() {
-        println("Header error: " + error)
-      } else {
-        var value = parser.parse()
-        parser.ignoreDocEnd()
-        value = parser.expect(.End, "expected end", value)
-        println("-----")
-        println(value)
-        println(".....")
-      }
-    }
+  public static func load (text: Swift.String) -> Result<Yaml> {
+    return tokenize(text) >>=- parseDoc
   }
 
-  public static func load (text: Swift.String) -> Yaml {
-    let result = tokenize(text)
-    if let error = result.error {
-      return .Invalid(error)
-    }
-    let parser = Parser(result.tokens ?? [])
-    if let error = parser.parseHeader() {
-      return .Invalid(error)
-    }
-    let value = parser.parse()
-    parser.ignoreDocEnd()
-    return parser.expect(.End, "expected end", value)
+  public static func loadMultiple (text: Swift.String) -> Result<[Yaml]> {
+    return tokenize(text) >>=- parseDocs
   }
 
-  public static func loadMultiple (text: Swift.String) -> Yaml {
+  public static func debug (text: Swift.String) -> Result<Yaml> {
     let result = tokenize(text)
+        >>- { tokens in println("\n====== Tokens:\n\(tokens)"); return tokens }
+        >>=- parseDoc
+        >>- { value -> Yaml in println("------ Doc:\n\(value)"); return value }
     if let error = result.error {
-      return .Invalid(error)
+      println("~~~~~~\n\(error)")
     }
-    let parser = Parser(result.tokens ?? [])
-    var docs: Yaml = []
-    var i = 0
-    while parser.peek().type != .End && docs.isValid {
-      if let error = parser.parseHeader() {
-        return .Invalid(error)
-      }
-      docs[i] = parser.parse()
-      i += 1
-      parser.ignoreDocEnd()
+    return result
+  }
+
+  public static func debugMultiple (text: Swift.String) -> Result<[Yaml]> {
+    let result = tokenize(text)
+        >>- { tokens in println("\n====== Tokens:\n\(tokens)"); return tokens }
+        >>=- parseDocs
+        >>- { values -> [Yaml] in values.map {
+              v in println("------ Doc:\n\(v)")
+            }; return values }
+    if let error = result.error {
+      println("~~~~~~\n\(error)")
     }
-    return docs
+    return result
   }
 }
 
@@ -157,9 +132,6 @@ extension Yaml {
   public subscript(index: Swift.Int) -> Yaml {
     get {
       assert(index >= 0)
-      if !self.isValid {
-        return self
-      }
       switch self {
       case .Array(let array):
         if index >= array.startIndex && index < array.endIndex {
@@ -173,19 +145,11 @@ extension Yaml {
     }
     set {
       assert(index >= 0)
-      if !self.isValid {
-        return
-      }
-      if !newValue.isValid {
-        self = newValue
-        return
-      }
       switch self {
       case .Array(var array):
-        array.reserveCapacity(index + 1)
-        while array.count <= index {
-          array.append(.Null)
-        }
+        let emptyCount = max(0, index + 1 - array.count)
+        let empty = [Yaml](count: emptyCount, repeatedValue: .Null)
+        array.extend(empty)
         array[index] = newValue
         self = .Array(array)
       default:
@@ -198,12 +162,6 @@ extension Yaml {
 
   public subscript(key: Yaml) -> Yaml {
     get {
-      if !self.isValid {
-        return self
-      }
-      if !key.isValid {
-        return key
-      }
       switch self {
       case .Dictionary(let dictionary):
         return dictionary[key] ?? .Null
@@ -212,17 +170,6 @@ extension Yaml {
       }
     }
     set {
-      if !self.isValid {
-        return
-      }
-      if !key.isValid {
-        self = key
-        return
-      }
-      if !newValue.isValid {
-        self = newValue
-        return
-      }
       switch self {
       case .Dictionary(var dictionary):
         dictionary[key] = newValue
@@ -309,15 +256,6 @@ extension Yaml {
       return nil
     }
   }
-
-  public var isValid: Swift.Bool {
-    switch self {
-    case .Invalid:
-      return false
-    default:
-      return true
-    }
-  }
 }
 
 public func == (lhs: Yaml, rhs: Yaml) -> Bool {
@@ -392,15 +330,6 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
     default:
       return false
     }
-
-  case .Invalid(let lv):
-    switch rhs {
-    case .Invalid(let rv):
-      return lv == rv
-    default:
-      return false
-    }
-
   }
 }
 
@@ -416,6 +345,6 @@ public prefix func - (value: Yaml) -> Yaml {
   case .Double(let v):
     return .Double(-v)
   default:
-    return .Invalid("`-` operator may only be used on .Int or .Double Yaml values")
+    fatalError("`-` operator may only be used on .Int or .Double Yaml values")
   }
 }
