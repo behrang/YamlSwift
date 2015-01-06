@@ -158,13 +158,13 @@ func parse (context: Context) -> Result<ContextValue> {
     return lift((advance(context), v))
 
   case .IntOct:
-    let m = peekMatch(context) |> replace(/"0o", "")
+    let m = peekMatch(context) |> replace(regex("0o"), "")
     // will throw runtime error if overflows
     let v = Yaml.Int(parseInt(m, radix: 8))
     return lift((advance(context), v))
 
   case .IntHex:
-    let m = peekMatch(context) |> replace(/"0x", "")
+    let m = peekMatch(context) |> replace(regex("0x"), "")
     // will throw runtime error if overflows
     let v = Yaml.Int(parseInt(m, radix: 16))
     return lift((advance(context), v))
@@ -422,7 +422,7 @@ func parseString (context: Context) -> Result<ContextValue> {
 
   case .String:
     let m = normalizeBreaks(peekMatch(context))
-    let folded = m |> replace(/"^[ \\t\\n]+|[ \\t\\n]+$", "") |> foldFlow
+    let folded = m |> replace(regex("^[ \\t\\n]+|[ \\t\\n]+$"), "") |> foldFlow
     return lift((advance(context), .String(folded)))
 
   case .StringDQ:
@@ -441,26 +441,27 @@ func parseString (context: Context) -> Result<ContextValue> {
 func parseBlockMapOrString (context: Context) -> Result<ContextValue> {
   let match = peekMatch(context)
   // should spaces before colon be ignored?
-  return context.tokens[1].type != .Colon || match ~ /"\n"
+  return context.tokens[1].type != .Colon || matches(match, regex("\n"))
       ? parseString(context)
       : parseBlockMap(context)
 }
 
 func foldBlock (block: String) -> String {
-  let (body, trail) = block |> splitTrail(/"\\n*$")
+  let (body, trail) = block |> splitTrail(regex("\\n*$"))
   return (body
-      |> replace("m"/"^([^ \\t\\n].*)\\n(?=[^ \\t\\n])", "$1 ")
-      |> replace("m"/"^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])", "$1$2")
+      |> replace(regex("^([^ \\t\\n].*)\\n(?=[^ \\t\\n])", options: "m"), "$1 ")
+      |> replace(
+            regex("^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])", options: "m"), "$1$2")
       ) + trail
 }
 
 func foldFlow (flow: String) -> String {
-  let (lead, rest) = flow |> splitLead(/"^[ \\t]+")
-  let (body, trail) = rest |> splitTrail(/"[ \\t]+$")
+  let (lead, rest) = flow |> splitLead(regex("^[ \\t]+"))
+  let (body, trail) = rest |> splitTrail(regex("[ \\t]+$"))
   let folded = body
-      |> replace("m"/"^[ \\t]+|[ \\t]+$|\\\\\\n", "")
-      |> replace(/"(^|.)\\n(?=.|$)", "$1 ")
-      |> replace(/"(.)\\n(\\n+)", "$1$2")
+      |> replace(regex("^[ \\t]+|[ \\t]+$|\\\\\\n", options: "m"), "")
+      |> replace(regex("(^|.)\\n(?=.|$)"), "$1 ")
+      |> replace(regex("(.)\\n(\\n+)"), "$1$2")
   return lead + folded + trail
 }
 
@@ -468,32 +469,33 @@ func parseLiteral (context: Context) -> Result<ContextValue> {
   let literal = peekMatch(context)
   let blockContext = advance(context)
   let chomps = ["-": -1, "+": 1]
-  let chomp = chomps[literal |> replace(/"[^-+]", "")] ?? 0
-  let indent = parseInt(literal |> replace(/"[^1-9]", ""), radix: 10)
-  let headerPattern = /"^(\\||>)([1-9][-+]|[-+]?[1-9]?)( |$)"
+  let chomp = chomps[literal |> replace(regex("[^-+]"), "")] ?? 0
+  let indent = parseInt(literal |> replace(regex("[^1-9]"), ""), radix: 10)
+  let headerPattern = regex("^(\\||>)([1-9][-+]|[-+]?[1-9]?)( |$)")
   let error0 = "invalid chomp or indent header"
-  let c = guard(error(error0)(context: context))(check: literal ~ headerPattern)
+  let c = guard(error(error0)(context: context))(
+        check: matches(literal, headerPattern))
       >>| lift(blockContext)
       >>=- expect(TokenType.String, "expected scalar block")
   let block = peekMatch(blockContext)
       |> normalizeBreaks
   let (lead, _) = block
-      |> splitLead(/"^( *\\n)* {1,}(?! |\\n|$)")
+      |> splitLead(regex("^( *\\n)* {1,}(?! |\\n|$)"))
   let foundIndent = lead
-      |> replace(/"^( *\\n)*", "")
+      |> replace(regex("^( *\\n)*"), "")
       |> countElements
   let effectiveIndent = indent > 0 ? indent : foundIndent
   let invalidPattern =
-      /"^( {0,\(effectiveIndent)}\\n)* {\(effectiveIndent + 1),}\\n"
-  let check1 = block ~ invalidPattern
+      regex("^( {0,\(effectiveIndent)}\\n)* {\(effectiveIndent + 1),}\\n")
+  let check1 = matches(block, invalidPattern)
   let check2 = indent > 0 && foundIndent < indent
   let trimmed = block
-      |> replace(/"^ {0,\(effectiveIndent)}", "")
-      |> replace(/"\\n {0,\(effectiveIndent)}", "\n")
+      |> replace(regex("^ {0,\(effectiveIndent)}"), "")
+      |> replace(regex("\\n {0,\(effectiveIndent)}"), "\n")
       |> (chomp == -1
-          ? replace(/"(\\n *)*$", "")
+          ? replace(regex("(\\n *)*$"), "")
           : chomp == 0
-          ? replace(/"(?=[^ ])(\\n *)*$", "\n")
+          ? replace(regex("(?=[^ ])(\\n *)*$"), "\n")
           : { s in s }
       )
   let error1 = "leading all-space line must not have too many spaces"
@@ -506,7 +508,7 @@ func parseLiteral (context: Context) -> Result<ContextValue> {
 }
 
 func parseInt (string: String, #radix: Int) -> Int {
-  let (sign, str) = splitLead(/"^[-+]")(string: string)
+  let (sign, str) = splitLead(regex("^[-+]"))(string: string)
   let multiplier = (sign == "-" ? -1 : 1)
   let ints = radix == 60
       ? toSexInts(str)
@@ -533,7 +535,7 @@ func toInts (string: String) -> [Int] {
 }
 
 func normalizeBreaks (s: String) -> String {
-  return replace(/"\\r\\n|\\r", "\n")(string: s)
+  return replace(regex("\\r\\n|\\r"), "\n")(string: s)
 }
 
 func unwrapQuotedString (s: String) -> String {
@@ -541,18 +543,18 @@ func unwrapQuotedString (s: String) -> String {
 }
 
 func unescapeSingleQuotes (s: String) -> String {
-  return replace(/"''", "'")(string: s)
+  return replace(regex("''"), "'")(string: s)
 }
 
 func unescapeDoubleQuotes (input: String) -> String {
   return input
-    |> replace(/"\\\\([0abtnvfre \"\\/N_LP])")
+    |> replace(regex("\\\\([0abtnvfre \"\\/N_LP])"))
         { $ in escapeCharacters[$[1]] ?? "" }
-    |> replace(/"\\\\x([0-9A-Fa-f]{2})")
+    |> replace(regex("\\\\x([0-9A-Fa-f]{2})"))
         { $ in String(UnicodeScalar(parseInt($[1], radix: 16))) }
-    |> replace(/"\\\\u([0-9A-Fa-f]{4})")
+    |> replace(regex("\\\\u([0-9A-Fa-f]{4})"))
         { $ in String(UnicodeScalar(parseInt($[1], radix: 16))) }
-    |> replace(/"\\\\U([0-9A-Fa-f]{8})")
+    |> replace(regex("\\\\U([0-9A-Fa-f]{8})"))
         { $ in String(UnicodeScalar(parseInt($[1], radix: 16))) }
 }
 

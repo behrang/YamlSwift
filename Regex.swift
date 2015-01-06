@@ -2,39 +2,7 @@ import Foundation
 
 
 
-prefix operator / {}
-
-prefix func / (pattern: String) -> NSRegularExpression! {
-  return NSRegularExpression(pattern: pattern, options: nil, error: nil)
-}
-
-
-
-infix operator / { precedence 136 }
-
-func / (options: String, pattern: String) -> NSRegularExpression! {
-  if options ~ /"[^ixsm]" {
-    return nil
-  }
-  let opts = reduce(options, NSRegularExpressionOptions()) {
-    acc, opt in
-    acc | (regexOptions[opt] ?? NSRegularExpressionOptions())
-  }
-  return NSRegularExpression(pattern: pattern, options: opts, error: nil)
-}
-
-let regexOptions: [Character: NSRegularExpressionOptions] = [
-  "i": .CaseInsensitive,
-  "x": .AllowCommentsAndWhitespace,
-  "s": .DotMatchesLineSeparators,
-  "m": .AnchorsMatchLines
-]
-
-
-
-infix operator ~< { precedence 135 }
-
-func ~< (string: String, regex: NSRegularExpression) -> Range<String.Index>? {
+func matchRange (string: String, regex: NSRegularExpression) -> Range<String.Index>? {
   let sr = NSRange(location: 0, length: countElements(string))
   let range = regex.rangeOfFirstMatchInString(string, options: nil, range: sr)
   if range.location != NSNotFound && range.length != 0 {
@@ -46,21 +14,34 @@ func ~< (string: String, regex: NSRegularExpression) -> Range<String.Index>? {
   }
 }
 
-func ~< (regex: NSRegularExpression, string: String) -> Range<String.Index>? {
-  return string ~< regex
+
+
+func matches (string: String, regex: NSRegularExpression) -> Bool {
+  return matchRange(string, regex) != nil
 }
 
 
 
-infix operator ~ { precedence 130 }
-
-func ~ (string: String, regex: NSRegularExpression) -> Bool {
-  return string ~< regex != nil
+func regex (pattern: String, options: String = "") -> NSRegularExpression! {
+  if matches(options, invalidOptionsPattern) {
+    return nil
+  }
+  let opts = reduce(options, NSRegularExpressionOptions()) {
+    acc, opt in
+    acc | (regexOptions[opt] ?? NSRegularExpressionOptions())
+  }
+  return NSRegularExpression(pattern: pattern, options: opts, error: nil)
 }
 
-func ~ (regex: NSRegularExpression, string: String) -> Bool {
-  return string ~ regex
-}
+let invalidOptionsPattern =
+        NSRegularExpression(pattern: "[^ixsm]", options: nil, error: nil)!
+
+let regexOptions: [Character: NSRegularExpressionOptions] = [
+  "i": .CaseInsensitive,
+  "x": .AllowCommentsAndWhitespace,
+  "s": .DotMatchesLineSeparators,
+  "m": .AnchorsMatchLines
+]
 
 
 
@@ -99,7 +80,7 @@ func replace (regex: NSRegularExpression, block: [String] -> String)
 
 func splitLead (regex: NSRegularExpression) (string: String)
     -> (String, String) {
-  switch string ~< regex {
+  switch matchRange(string, regex) {
   case .None: return ("", string)
   case .Some(let range):
     return (string.substringToIndex(range.endIndex),
@@ -109,7 +90,7 @@ func splitLead (regex: NSRegularExpression) (string: String)
 
 func splitTrail (regex: NSRegularExpression) (string: String)
     -> (String, String) {
-  switch string ~< regex {
+  switch matchRange(string, regex) {
   case .None: return (string, "")
   case .Some(let range):
     return (string.substringToIndex(range.startIndex),
