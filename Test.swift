@@ -349,6 +349,10 @@ func aliases () {
   assert(Yaml.load("x: *a").error != nil)
 }
 
+func unicodeSurrogates() {
+  assert(Yaml.load("x: Dog‼🐶\ny: 𝒂𝑡").value! == ["x": "Dog‼🐶", "y": "𝒂𝑡"])
+}
+
 func example0 () {
   var value = Yaml.load(
     "- just: write some\n" +
@@ -836,6 +840,8 @@ func test () {
   directives()
   reserves()
   aliases()
+
+  unicodeSurrogates()
 
   examples()
 
