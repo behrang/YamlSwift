@@ -18,6 +18,14 @@ make
 
 Then there will be a `build/libyaml.dylib` and `build/Yaml.swiftmodule` which you can add to your project.
 
+To use in Xcode, you have to add these two files to your project:
+
+1. Go to `Build Settings` and in the section `Swift Compiler - Search Paths` set the `Import Paths` to the directory containing `Yaml.swiftmodule` (for example: `/yaml.swift/build/`).
+
+2. Then Go to `Build Phases`, and in the section `Link Binary With Libraries` add the file `build/libyaml.dylib`. Then in the `Copy Files` section, set `Destination` to `Executables`, clear `Subpath`, uncheck `Copy only when installing` and then again add `libyaml.dylib`.
+
+Then you should be able to use `import Yaml` and `Yaml.load("")`.
+
 To create a release optimized library, use this command:
 
 ```sh
