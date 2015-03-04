@@ -322,7 +322,7 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
     switch rhs {
     case .Dictionary(let rv) where lv.count == rv.count:
       for (k, v) in lv {
-        if rv[k] == nil || rv[k]? != v {
+        if rv[k] == nil || rv[k] != v {
           return false
         }
       }

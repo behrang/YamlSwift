@@ -1,7 +1,7 @@
 import Foundation
 
 func matchRange (string: String, regex: NSRegularExpression) -> NSRange {
-  let sr = NSMakeRange(0, string.utf16Count)
+  let sr = NSMakeRange(0, count(string.utf16))
   return regex.rangeOfFirstMatchInString(string, options: nil, range: sr)
 }
 
@@ -33,16 +33,16 @@ let regexOptions: [Character: NSRegularExpressionOptions] = [
 func replace (regex: NSRegularExpression, template: String) (string: String)
     -> String {
   var s = NSMutableString(string: string)
-  let range = NSMakeRange(0, string.utf16Count)
+  let range = NSMakeRange(0, count(string.utf16))
   regex.replaceMatchesInString(s, options: nil, range: range,
       withTemplate: template)
-  return s
+  return s as String
 }
 
 func replace (regex: NSRegularExpression, block: [String] -> String)
     (string: String) -> String {
   var s = NSMutableString(string: string)
-  let range = NSMakeRange(0, string.utf16Count)
+  let range = NSMakeRange(0, count(string.utf16))
   var offset = 0
   regex.enumerateMatchesInString(string, options: nil, range: range) {
     result, _, _ in
@@ -54,10 +54,10 @@ func replace (regex: NSRegularExpression, block: [String] -> String)
     }
     let replacement = block(captures)
     let offR = NSMakeRange(result.range.location + offset, result.range.length)
-    offset += countElements(replacement) - result.range.length
+    offset += count(replacement) - result.range.length
     s.replaceCharactersInRange(offR, withString: replacement)
   }
-  return s
+  return s as String
 }
 
 func splitLead (regex: NSRegularExpression) (string: String)

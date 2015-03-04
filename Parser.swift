@@ -100,7 +100,7 @@ func error (message: String) (context: Context) -> String {
 }
 
 func recreateText (string: String, context: Context) -> String {
-  if countElements(string) >= 50 || peekType(context) == .End {
+  if count(string) >= 50 || peekType(context) == .End {
     return string
   }
   return recreateText(string + peekMatch(context), advance(context))
@@ -152,7 +152,7 @@ func parse (context: Context) -> Result<ContextValue> {
     return lift((advance(context), false))
 
   case .Int:
-    let m = peekMatch(context) as NSString
+    let m = peekMatch(context)
     // will throw runtime error if overflows
     let v = Yaml.Int(parseInt(m, radix: 10))
     return lift((advance(context), v))
@@ -483,7 +483,7 @@ func parseLiteral (context: Context) -> Result<ContextValue> {
       |> splitLead(regex("^( *\\n)* {1,}(?! |\\n|$)"))
   let foundIndent = lead
       |> replace(regex("^( *\\n)*"), "")
-      |> countElements
+      |> count
   let effectiveIndent = indent > 0 ? indent : foundIndent
   let invalidPattern =
       regex("^( {0,\(effectiveIndent)}\\n)* {\(effectiveIndent + 1),}\\n")
@@ -526,9 +526,9 @@ func toInts (string: String) -> [Int] {
   return map(string.unicodeScalars) {
     c in
     switch c {
-    case "0"..."9": return c.value - UnicodeScalar("0").value
-    case "a"..."z": return c.value - UnicodeScalar("a").value + 10
-    case "A"..."Z": return c.value - UnicodeScalar("A").value + 10
+    case "0"..."9": return Int(c.value) - Int(UnicodeScalar("0").value)
+    case "a"..."z": return Int(c.value) - Int(UnicodeScalar("a").value) + 10
+    case "A"..."Z": return Int(c.value) - Int(UnicodeScalar("A").value) + 10
     default: fatalError("invalid digit \(c)")
     }
   }

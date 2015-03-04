@@ -131,7 +131,7 @@ func tokenize (var text: String) -> Result<[TokenMatch]> {
           let match = text |> substringWithRange(range)
           let lastIndent = indents.last ?? 0
           let rest = match.substringFromIndex(match.startIndex.successor())
-          let spaces = countElements(rest)
+          let spaces = count(rest)
           let nestedBlockSequence =
                 matches(text |> substringFromIndex(rangeEnd), dashPattern)
           if spaces == lastIndent {
@@ -161,7 +161,7 @@ func tokenize (var text: String) -> Result<[TokenMatch]> {
         case .Dash, .QuestionMark:
           let match = text |> substringWithRange(range)
           let index = match.startIndex.successor()
-          let indent = countElements(match)
+          let indent = count(match)
           indents.append((indents.last ?? 0) + indent)
           matchList.append(
               TokenMatch(tokenPattern.type, match.substringToIndex(index)))
