@@ -13,26 +13,20 @@ Load [YAML](http://yaml.org) and [JSON](http://json.org) documents using [Swift]
 Currently, you have to build it manually. Download and then run this command:
 
 ```sh
-make
+make CONFIG=release
 ```
 
-Then there will be a `build/libyaml.dylib` and `build/Yaml.swiftmodule` which you can add to your project.
+`Yaml.framework` will be created in `build/macosx/release` which you can add to your project.
 
-To use in Xcode, you have to add these two files to your project:
+To add to an Xcode project:
 
-1. Go to `Build Settings` and in the section `Swift Compiler - Search Paths` set the `Import Paths` to the directory containing `Yaml.swiftmodule` (for example: `/yaml.swift/build/`).
+1. On your application targets' "General" tab, in the "Embedded Binaries" section, drag and drop the framework from the `build/macosx/release` folder.
 
-2. Then Go to `Build Phases`, and in the section `Link Binary With Libraries` add the file `build/libyaml.dylib`. Then in the `Copy Files` section, set `Destination` to `Executables`, clear `Subpath`, uncheck `Copy only when installing` and then again add `libyaml.dylib`.
+2. On the `Build Settings` tab, in the "Swift Compiler - Search Paths" section, add the framework to `Import Paths`.
 
 Then you should be able to use `import Yaml` and `Yaml.load("")`.
 
-To create a release optimized library, use this command:
-
-```sh
-make clean release
-```
-
-To run tests, run this command:
+To run tests:
 
 ```sh
 make test
