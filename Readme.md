@@ -10,27 +10,7 @@ Load [YAML](http://yaml.org) and [JSON](http://json.org) documents using [Swift]
 
 ## Install
 
-Currently, you have to build it manually. Download and then run this command:
-
-```sh
-make CONFIG=release
-```
-
-`Yaml.framework` will be created in `build/macosx/release` which you can add to your project.
-
-To add to an Xcode project:
-
-1. On your application targets' "General" tab, in the "Embedded Binaries" section, drag and drop the framework from the `build/macosx/release` folder.
-
-2. On the `Build Settings` tab, in the "Swift Compiler - Search Paths" section, add the framework to `Import Paths`.
-
-Then you should be able to use `import Yaml` and `Yaml.load("")`.
-
-To run tests:
-
-```sh
-make test
-```
+Use [Carthage](https://github.com/Carthage/Carthage) to build and install.
 
 
 
