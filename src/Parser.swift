@@ -28,7 +28,7 @@ func parseDoc (tokens: [TokenMatch]) -> Result<Yaml> {
   return cv
       >>- getContext
       >>- ignoreDocEnd
-      >>=- expect(TokenType.End, "expected end")
+      >>=- expect(TokenType.End, message: "expected end")
       >>| v
 }
 
@@ -67,14 +67,14 @@ func advance (context: Context) -> Context {
 }
 
 func ignoreSpace (context: Context) -> Context {
-  if !contains([.Comment, .Space, .NewLine], peekType(context)) {
+  if ![.Comment, .Space, .NewLine].contains(peekType(context)) {
     return context
   }
   return ignoreSpace(advance(context))
 }
 
 func ignoreDocEnd (context: Context) -> Context {
-  if !contains([.Comment, .Space, .NewLine, .DocEnd], peekType(context)) {
+  if ![.Comment, .Space, .NewLine, .DocEnd].contains(peekType(context)) {
     return context
   }
   return ignoreDocEnd(advance(context))
@@ -83,27 +83,27 @@ func ignoreDocEnd (context: Context) -> Context {
 func expect (type: TokenType, message: String) (context: Context)
     -> Result<Context> {
   let check = peekType(context) == type
-  return guard(error(message)(context: context))(check: check)
+  return `guard`(error(message)(context: context))(check: check)
       >>| lift(advance(context))
 }
 
 func expectVersion (context: Context) -> Result<Context> {
   let version = peekMatch(context)
-  let check = contains(["1.1", "1.2"], version)
-  return guard(error("invalid yaml version")(context: context))(check: check)
+  let check = ["1.1", "1.2"].contains(version)
+  return `guard`(error("invalid yaml version")(context: context))(check: check)
       >>| lift(advance(context))
 }
 
 func error (message: String) (context: Context) -> String {
-  let text = recreateText("", context) |> escapeErrorContext
+  let text = recreateText("", context: context) |> escapeErrorContext
   return "\(message), \(text)"
 }
 
 func recreateText (string: String, context: Context) -> String {
-  if count(string) >= 50 || peekType(context) == .End {
+  if string.characters.count >= 50 || peekType(context) == .End {
     return string
   }
-  return recreateText(string + peekMatch(context), advance(context))
+  return recreateText(string + peekMatch(context), context: advance(context))
 }
 
 func parseHeader (context: Context) -> Result<Context> {
@@ -120,10 +120,10 @@ func parseHeader (yamlAllowed: Bool) (context: Context) -> Result<Context> {
 
   case .YamlDirective:
     let err = "duplicate yaml directive"
-    return guard(error(err)(context: context))(check: yamlAllowed)
+    return `guard`(error(err)(context: context))(check: yamlAllowed)
         >>| lift(context)
         >>- advance
-        >>=- expect(TokenType.Space, "expected space")
+        >>=- expect(TokenType.Space, message: "expected space")
         >>=- expectVersion
         >>=- parseHeader(false)
 
@@ -131,7 +131,7 @@ func parseHeader (yamlAllowed: Bool) (context: Context) -> Result<Context> {
     return lift(advance(context))
 
   default:
-    return guard(error("expected ---")(context: context))(check: yamlAllowed)
+    return `guard`(error("expected ---")(context: context))(check: yamlAllowed)
         >>| lift(context)
   }
 }
@@ -158,13 +158,13 @@ func parse (context: Context) -> Result<ContextValue> {
     return lift((advance(context), v))
 
   case .IntOct:
-    let m = peekMatch(context) |> replace(regex("0o"), "")
+    let m = peekMatch(context) |> replace(regex("0o"), template: "")
     // will throw runtime error if overflows
     let v = Yaml.Int(parseInt(m, radix: 8))
     return lift((advance(context), v))
 
   case .IntHex:
-    let m = peekMatch(context) |> replace(regex("0x"), "")
+    let m = peekMatch(context) |> replace(regex("0x"), template: "")
     // will throw runtime error if overflows
     let v = Yaml.Int(parseInt(m, radix: 16))
     return lift((advance(context), v))
@@ -219,7 +219,7 @@ func parse (context: Context) -> Result<ContextValue> {
     let c = cv
         >>- getContext
         >>- ignoreSpace
-        >>=- expect(TokenType.Dedent, "expected dedent")
+        >>=- expect(TokenType.Dedent, message: "expected dedent")
     return createContextValue <^> c <*> v
 
   case .Anchor:
@@ -235,7 +235,7 @@ func parse (context: Context) -> Result<ContextValue> {
     let name = m.substringFromIndex(m.startIndex.successor())
     let value = context.aliases[name]
     let err = "unknown alias \(name)"
-    return guard(error(err)(context: context))(check: value != nil)
+    return `guard`(error(err)(context: context))(check: value != nil)
         >>| lift((advance(context), value ?? nil))
 
   case .End, .Dedent:
@@ -267,13 +267,13 @@ func putToMap (var map: [Yaml: Yaml]) (key: Yaml) (value: Yaml)
 func checkKeyUniqueness (acc: [Yaml: Yaml]) (context: Context, key: Yaml)
     -> Result<ContextValue> {
   let err = "duplicate key \(key)"
-  return guard(error(err)(context: context))(check: !contains(acc.keys, key))
+  return `guard`(error(err)(context: context))(check: !acc.keys.contains(key))
       >>| lift((context, key))
 }
 
 func parseFlowSeq (context: Context) -> Result<ContextValue> {
   return lift(context)
-      >>=- expect(TokenType.OpenSB, "expected [")
+      >>=- expect(TokenType.OpenSB, message: "expected [")
       >>=- parseFlowSeq([])
 }
 
@@ -283,7 +283,7 @@ func parseFlowSeq (acc: [Yaml]) (context: Context) -> Result<ContextValue> {
   }
   let cv = lift(context)
       >>- ignoreSpace
-      >>=- (acc.count == 0 ? lift : expect(TokenType.Comma, "expected comma"))
+      >>=- (acc.count == 0 ? lift : expect(TokenType.Comma, message: "expected comma"))
       >>- ignoreSpace
       >>=- parse
   let v = cv >>- getValue
@@ -296,7 +296,7 @@ func parseFlowSeq (acc: [Yaml]) (context: Context) -> Result<ContextValue> {
 
 func parseFlowMap (context: Context) -> Result<ContextValue> {
   return lift(context)
-      >>=- expect(TokenType.OpenCB, "expected {")
+      >>=- expect(TokenType.OpenCB, message: "expected {")
       >>=- parseFlowMap([:])
 }
 
@@ -307,14 +307,14 @@ func parseFlowMap (acc: [Yaml: Yaml]) (context: Context)
   }
   let ck = lift(context)
       >>- ignoreSpace
-      >>=- (acc.count == 0 ? lift : expect(TokenType.Comma, "expected comma"))
+      >>=- (acc.count == 0 ? lift : expect(TokenType.Comma, message: "expected comma"))
       >>- ignoreSpace
       >>=- parseString
       >>=- checkKeyUniqueness(acc)
   let k = ck >>- getValue
   let cv = ck
       >>- getContext
-      >>=- expect(TokenType.Colon, "expected colon")
+      >>=- expect(TokenType.Colon, message: "expected colon")
       >>=- parse
   let v = cv >>- getValue
   let c = cv
@@ -334,14 +334,14 @@ func parseBlockSeq (acc: [Yaml]) (context: Context) -> Result<ContextValue> {
   }
   let cv = lift(context)
       >>- advance
-      >>=- expect(TokenType.Indent, "expected indent after dash")
+      >>=- expect(TokenType.Indent, message: "expected indent after dash")
       >>- ignoreSpace
       >>=- parse
   let v = cv >>- getValue
   let c = cv
       >>- getContext
       >>- ignoreSpace
-      >>=- expect(TokenType.Dedent, "expected dedent after dash indent")
+      >>=- expect(TokenType.Dedent, message: "expected dedent after dash indent")
       >>- ignoreSpace
   let a = appendToArray(acc) <^> v
   return parseBlockSeq <^> a <*> c |> join
@@ -369,7 +369,7 @@ func parseBlockMap (acc: [Yaml: Yaml]) (context: Context)
 func parseQuestionMarkKeyValue (acc: [Yaml: Yaml]) (context: Context)
     -> Result<ContextValue> {
   let ck = lift(context)
-      >>=- expect(TokenType.QuestionMark, "expected ?")
+      >>=- expect(TokenType.QuestionMark, message: "expected ?")
       >>=- parse
       >>=- checkKeyUniqueness(acc)
   let k = ck >>- getValue
@@ -394,7 +394,7 @@ func parseColonValueOrNil (context: Context) -> Result<ContextValue> {
 
 func parseColonValue (context: Context) -> Result<ContextValue> {
   return lift(context)
-      >>=- expect(TokenType.Colon, "expected colon")
+      >>=- expect(TokenType.Colon, message: "expected colon")
       >>- ignoreSpace
       >>=- parse
 }
@@ -422,7 +422,7 @@ func parseString (context: Context) -> Result<ContextValue> {
 
   case .String:
     let m = normalizeBreaks(peekMatch(context))
-    let folded = m |> replace(regex("^[ \\t\\n]+|[ \\t\\n]+$"), "") |> foldFlow
+    let folded = m |> replace(regex("^[ \\t\\n]+|[ \\t\\n]+$"), template: "") |> foldFlow
     return lift((advance(context), .String(folded)))
 
   case .StringDQ:
@@ -441,7 +441,7 @@ func parseString (context: Context) -> Result<ContextValue> {
 func parseBlockMapOrString (context: Context) -> Result<ContextValue> {
   let match = peekMatch(context)
   // should spaces before colon be ignored?
-  return context.tokens[1].type != .Colon || matches(match, regex("\n"))
+  return context.tokens[1].type != .Colon || matches(match, regex: regex("\n"))
       ? parseString(context)
       : parseBlockMap(context)
 }
@@ -449,9 +449,9 @@ func parseBlockMapOrString (context: Context) -> Result<ContextValue> {
 func foldBlock (block: String) -> String {
   let (body, trail) = block |> splitTrail(regex("\\n*$"))
   return (body
-      |> replace(regex("^([^ \\t\\n].*)\\n(?=[^ \\t\\n])", options: "m"), "$1 ")
+      |> replace(regex("^([^ \\t\\n].*)\\n(?=[^ \\t\\n])", options: "m"), template: "$1 ")
       |> replace(
-            regex("^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])", options: "m"), "$1$2")
+            regex("^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])", options: "m"), template: "$1$2")
       ) + trail
 }
 
@@ -459,9 +459,9 @@ func foldFlow (flow: String) -> String {
   let (lead, rest) = flow |> splitLead(regex("^[ \\t]+"))
   let (body, trail) = rest |> splitTrail(regex("[ \\t]+$"))
   let folded = body
-      |> replace(regex("^[ \\t]+|[ \\t]+$|\\\\\\n", options: "m"), "")
-      |> replace(regex("(^|.)\\n(?=.|$)"), "$1 ")
-      |> replace(regex("(.)\\n(\\n+)"), "$1$2")
+      |> replace(regex("^[ \\t]+|[ \\t]+$|\\\\\\n", options: "m"), template: "")
+      |> replace(regex("(^|.)\\n(?=.|$)"), template: "$1 ")
+      |> replace(regex("(.)\\n(\\n+)"), template: "$1$2")
   return lead + folded + trail
 }
 
@@ -469,61 +469,61 @@ func parseLiteral (context: Context) -> Result<ContextValue> {
   let literal = peekMatch(context)
   let blockContext = advance(context)
   let chomps = ["-": -1, "+": 1]
-  let chomp = chomps[literal |> replace(regex("[^-+]"), "")] ?? 0
-  let indent = parseInt(literal |> replace(regex("[^1-9]"), ""), radix: 10)
+  let chomp = chomps[literal |> replace(regex("[^-+]"), template: "")] ?? 0
+  let indent = parseInt(literal |> replace(regex("[^1-9]"), template: ""), radix: 10)
   let headerPattern = regex("^(\\||>)([1-9][-+]|[-+]?[1-9]?)( |$)")
   let error0 = "invalid chomp or indent header"
-  let c = guard(error(error0)(context: context))(
-        check: matches(literal, headerPattern))
+  let c = `guard`(error(error0)(context: context))(
+        check: matches(literal, regex: headerPattern))
       >>| lift(blockContext)
-      >>=- expect(TokenType.String, "expected scalar block")
+      >>=- expect(TokenType.String, message: "expected scalar block")
   let block = peekMatch(blockContext)
       |> normalizeBreaks
   let (lead, _) = block
       |> splitLead(regex("^( *\\n)* {1,}(?! |\\n|$)"))
   let foundIndent = lead
-      |> replace(regex("^( *\\n)*"), "")
+      |> replace(regex("^( *\\n)*"), template: "")
       |> count
   let effectiveIndent = indent > 0 ? indent : foundIndent
   let invalidPattern =
       regex("^( {0,\(effectiveIndent)}\\n)* {\(effectiveIndent + 1),}\\n")
-  let check1 = matches(block, invalidPattern)
+  let check1 = matches(block, regex: invalidPattern)
   let check2 = indent > 0 && foundIndent < indent
   let trimmed = block
-      |> replace(regex("^ {0,\(effectiveIndent)}"), "")
-      |> replace(regex("\\n {0,\(effectiveIndent)}"), "\n")
+      |> replace(regex("^ {0,\(effectiveIndent)}"), template: "")
+      |> replace(regex("\\n {0,\(effectiveIndent)}"), template: "\n")
       |> (chomp == -1
-          ? replace(regex("(\\n *)*$"), "")
+          ? replace(regex("(\\n *)*$"), template: "")
           : chomp == 0
-          ? replace(regex("(?=[^ ])(\\n *)*$"), "\n")
+          ? replace(regex("(?=[^ ])(\\n *)*$"), template: "\n")
           : { s in s }
       )
   let error1 = "leading all-space line must not have too many spaces"
   let error2 = "less indented block scalar than the indicated level"
   return c
-      >>| guard(error(error1)(context: blockContext))(check: !check1)
-      >>| guard(error(error2)(context: blockContext))(check: !check2)
+      >>| `guard`(error(error1)(context: blockContext))(check: !check1)
+      >>| `guard`(error(error2)(context: blockContext))(check: !check2)
       >>| c
       >>- { context in (context, .String(trimmed))}
 }
 
-func parseInt (string: String, #radix: Int) -> Int {
+func parseInt (string: String, radix: Int) -> Int {
   let (sign, str) = splitLead(regex("^[-+]"))(string: string)
   let multiplier = (sign == "-" ? -1 : 1)
   let ints = radix == 60
       ? toSexInts(str)
       : toInts(str)
-  return multiplier * reduce(ints, 0, { acc, i in acc * radix + i })
+  return multiplier * ints.reduce(0, combine: { acc, i in acc * radix + i })
 }
 
 func toSexInts (string: String) -> [Int] {
   return string.componentsSeparatedByString(":").map {
-    c in c.toInt() ?? 0
+    c in Int(c) ?? 0
   }
 }
 
 func toInts (string: String) -> [Int] {
-  return map(string.unicodeScalars) {
+  return string.unicodeScalars.map {
     c in
     switch c {
     case "0"..."9": return Int(c.value) - Int(UnicodeScalar("0").value)
@@ -535,7 +535,7 @@ func toInts (string: String) -> [Int] {
 }
 
 func normalizeBreaks (s: String) -> String {
-  return replace(regex("\\r\\n|\\r"), "\n")(string: s)
+  return replace(regex("\\r\\n|\\r"), template: "\n")(string: s)
 }
 
 func unwrapQuotedString (s: String) -> String {
@@ -543,7 +543,7 @@ func unwrapQuotedString (s: String) -> String {
 }
 
 func unescapeSingleQuotes (s: String) -> String {
-  return replace(regex("''"), "'")(string: s)
+  return replace(regex("''"), template: "'")(string: s)
 }
 
 func unescapeDoubleQuotes (input: String) -> String {

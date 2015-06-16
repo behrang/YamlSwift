@@ -72,7 +72,7 @@ func join <T> (x: Result<Result<T>>) -> Result<T> {
   return x >>=- { i in i }
 }
 
-func guard (@autoclosure error: () -> String) (check: Bool) -> Result<()> {
+func `guard` (@autoclosure error: () -> String) (check: Bool) -> Result<()> {
   return check ? lift(()) : .Error(error())
 }
 
