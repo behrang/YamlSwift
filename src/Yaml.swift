@@ -67,7 +67,7 @@ extension Yaml: DictionaryLiteralConvertible {
   }
 }
 
-extension Yaml: Printable {
+extension Yaml: CustomStringConvertible {
   public var description: Swift.String {
     switch self {
     case .Null:
@@ -105,24 +105,24 @@ extension Yaml {
 
   public static func debug (text: Swift.String) -> Result<Yaml> {
     let result = tokenize(text)
-        >>- { tokens in println("\n====== Tokens:\n\(tokens)"); return tokens }
+        >>- { tokens in print("\n====== Tokens:\n\(tokens)"); return tokens }
         >>=- parseDoc
-        >>- { value -> Yaml in println("------ Doc:\n\(value)"); return value }
+        >>- { value -> Yaml in print("------ Doc:\n\(value)"); return value }
     if let error = result.error {
-      println("~~~~~~\n\(error)")
+      print("~~~~~~\n\(error)")
     }
     return result
   }
 
   public static func debugMultiple (text: Swift.String) -> Result<[Yaml]> {
     let result = tokenize(text)
-        >>- { tokens in println("\n====== Tokens:\n\(tokens)"); return tokens }
+        >>- { tokens in print("\n====== Tokens:\n\(tokens)"); return tokens }
         >>=- parseDocs
         >>- { values -> [Yaml] in values.map {
-              v in println("------ Doc:\n\(v)")
+              v in print("------ Doc:\n\(v)")
             }; return values }
     if let error = result.error {
-      println("~~~~~~\n\(error)")
+      print("~~~~~~\n\(error)")
     }
     return result
   }

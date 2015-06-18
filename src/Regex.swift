@@ -1,27 +1,31 @@
 import Foundation
 
 func matchRange (string: String, regex: NSRegularExpression) -> NSRange {
-  let sr = NSMakeRange(0, count(string.utf16))
-  return regex.rangeOfFirstMatchInString(string, options: nil, range: sr)
+  let sr = NSMakeRange(0, string.utf16.count)
+  return regex.rangeOfFirstMatchInString(string, options: [], range: sr)
 }
 
 func matches (string: String, regex: NSRegularExpression) -> Bool {
-  return matchRange(string, regex).location != NSNotFound
+  return matchRange(string, regex: regex).location != NSNotFound
 }
 
 func regex (pattern: String, options: String = "") -> NSRegularExpression! {
-  if matches(options, invalidOptionsPattern) {
+  if matches(options, regex: invalidOptionsPattern) {
     return nil
   }
-  let opts = reduce(options, NSRegularExpressionOptions()) {
-    acc, opt in
-    acc | (regexOptions[opt] ?? NSRegularExpressionOptions())
+
+  let opts = options.characters.reduce(NSRegularExpressionOptions()) { (acc, opt) -> NSRegularExpressionOptions in
+    return NSRegularExpressionOptions(rawValue:acc.rawValue | (regexOptions[opt] ?? NSRegularExpressionOptions()).rawValue)
   }
-  return NSRegularExpression(pattern: pattern, options: opts, error: nil)
+  do {
+    return try NSRegularExpression(pattern: pattern, options: opts)
+  } catch _ {
+    return nil
+  }
 }
 
 let invalidOptionsPattern =
-        NSRegularExpression(pattern: "[^ixsm]", options: nil, error: nil)!
+        try! NSRegularExpression(pattern: "[^ixsm]", options: [])
 
 let regexOptions: [Character: NSRegularExpressionOptions] = [
   "i": .CaseInsensitive,
@@ -32,9 +36,9 @@ let regexOptions: [Character: NSRegularExpressionOptions] = [
 
 func replace (regex: NSRegularExpression, template: String) (string: String)
     -> String {
-  var s = NSMutableString(string: string)
-  let range = NSMakeRange(0, count(string.utf16))
-  regex.replaceMatchesInString(s, options: nil, range: range,
+  let s = NSMutableString(string: string)
+  let range = NSMakeRange(0, string.utf16.count)
+  regex.replaceMatchesInString(s, options: [], range: range,
       withTemplate: template)
   return s as String
 }
@@ -42,27 +46,29 @@ func replace (regex: NSRegularExpression, template: String) (string: String)
 func replace (regex: NSRegularExpression, block: [String] -> String)
     (string: String) -> String {
   var s = NSMutableString(string: string)
-  let range = NSMakeRange(0, count(string.utf16))
+  let range = NSMakeRange(0, string.utf16.count)
   var offset = 0
-  regex.enumerateMatchesInString(string, options: nil, range: range) {
+  regex.enumerateMatchesInString(string, options: [], range: range) {
     result, _, _ in
-    var captures = [String](count: result.numberOfRanges, repeatedValue: "")
-    for i in 0..<result.numberOfRanges {
-      if let r = result.rangeAtIndex(i).toRange() {
-        captures[i] = (string as NSString).substringWithRange(NSRange(r))
-      }
+    if let result = result {
+        var captures = [String](count: result.numberOfRanges, repeatedValue: "")
+        for i in 0..<result.numberOfRanges {
+          if let r = result.rangeAtIndex(i).toRange() {
+            captures[i] = (string as NSString).substringWithRange(NSRange(r))
+          }
+        }
+        let replacement = block(captures)
+        let offR = NSMakeRange(result.range.location + offset, result.range.length)
+        offset += replacement.characters.count - result.range.length
+        s.replaceCharactersInRange(offR, withString: replacement)
     }
-    let replacement = block(captures)
-    let offR = NSMakeRange(result.range.location + offset, result.range.length)
-    offset += count(replacement) - result.range.length
-    s.replaceCharactersInRange(offR, withString: replacement)
   }
   return s as String
 }
 
 func splitLead (regex: NSRegularExpression) (string: String)
     -> (String, String) {
-  let r = matchRange(string, regex)
+  let r = matchRange(string, regex: regex)
   if r.location == NSNotFound {
     return ("", string)
   } else {
@@ -74,7 +80,7 @@ func splitLead (regex: NSRegularExpression) (string: String)
 
 func splitTrail (regex: NSRegularExpression) (string: String)
     -> (String, String) {
-  let r = matchRange(string, regex)
+  let r = matchRange(string, regex: regex)
   if r.location == NSNotFound {
     return (string, "")
   } else {
