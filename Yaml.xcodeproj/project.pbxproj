@@ -9,14 +9,20 @@
 /* Begin PBXBuildFile section */
 		8E1D76271B258FEE0022C013 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E1D76261B258FEE0022C013 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8E1D762D1B258FEE0022C013 /* Yaml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E1D76211B258FEE0022C013 /* Yaml.framework */; };
-		8E1D76471B2591330022C013 /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1D763D1B2591330022C013 /* Operators.swift */; };
-		8E1D76481B2591330022C013 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1D763E1B2591330022C013 /* Parser.swift */; };
-		8E1D76491B2591330022C013 /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1D763F1B2591330022C013 /* Regex.swift */; };
-		8E1D764A1B2591330022C013 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1D76401B2591330022C013 /* Result.swift */; };
-		8E1D764B1B2591330022C013 /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1D76411B2591330022C013 /* Tokenizer.swift */; };
-		8E1D764C1B2591330022C013 /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1D76421B2591330022C013 /* Yaml.swift */; };
-		8ECA6D731B25919A0053D0FC /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1D76441B2591330022C013 /* ExampleTests.swift */; };
-		8ECA6D741B25919A0053D0FC /* YamlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1D76451B2591330022C013 /* YamlTests.swift */; };
+		F32DF2411B7304620011046A /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23B1B7304620011046A /* Operators.swift */; };
+		F32DF2421B7304620011046A /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23B1B7304620011046A /* Operators.swift */; };
+		F32DF2431B7304620011046A /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23C1B7304620011046A /* Parser.swift */; };
+		F32DF2441B7304620011046A /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23C1B7304620011046A /* Parser.swift */; };
+		F32DF2451B7304620011046A /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23D1B7304620011046A /* Regex.swift */; };
+		F32DF2461B7304620011046A /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23D1B7304620011046A /* Regex.swift */; };
+		F32DF2471B7304620011046A /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23E1B7304620011046A /* Result.swift */; };
+		F32DF2481B7304620011046A /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23E1B7304620011046A /* Result.swift */; };
+		F32DF2491B7304620011046A /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23F1B7304620011046A /* Tokenizer.swift */; };
+		F32DF24A1B7304620011046A /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23F1B7304620011046A /* Tokenizer.swift */; };
+		F32DF24B1B7304620011046A /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
+		F32DF24C1B7304620011046A /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
+		F32DF2501B7304750011046A /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
+		F32DF2521B7304750011046A /* YamlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24E1B7304750011046A /* YamlTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,14 +42,14 @@
 		8E1D762C1B258FEE0022C013 /* YamlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YamlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E1D76321B258FEE0022C013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8E1D763B1B2591330022C013 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
-		8E1D763D1B2591330022C013 /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
-		8E1D763E1B2591330022C013 /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
-		8E1D763F1B2591330022C013 /* Regex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
-		8E1D76401B2591330022C013 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
-		8E1D76411B2591330022C013 /* Tokenizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tokenizer.swift; sourceTree = "<group>"; };
-		8E1D76421B2591330022C013 /* Yaml.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Yaml.swift; sourceTree = "<group>"; };
-		8E1D76441B2591330022C013 /* ExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleTests.swift; sourceTree = "<group>"; };
-		8E1D76451B2591330022C013 /* YamlTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YamlTests.swift; sourceTree = "<group>"; };
+		F32DF23B1B7304620011046A /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
+		F32DF23C1B7304620011046A /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
+		F32DF23D1B7304620011046A /* Regex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
+		F32DF23E1B7304620011046A /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
+		F32DF23F1B7304620011046A /* Tokenizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tokenizer.swift; sourceTree = "<group>"; };
+		F32DF2401B7304620011046A /* Yaml.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Yaml.swift; sourceTree = "<group>"; };
+		F32DF24D1B7304750011046A /* ExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleTests.swift; sourceTree = "<group>"; };
+		F32DF24E1B7304750011046A /* YamlTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YamlTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +84,12 @@
 			isa = PBXGroup;
 			children = (
 				8E1D76261B258FEE0022C013 /* Yaml.h */,
+				F32DF23B1B7304620011046A /* Operators.swift */,
+				F32DF23C1B7304620011046A /* Parser.swift */,
+				F32DF23D1B7304620011046A /* Regex.swift */,
+				F32DF23E1B7304620011046A /* Result.swift */,
+				F32DF23F1B7304620011046A /* Tokenizer.swift */,
+				F32DF2401B7304620011046A /* Yaml.swift */,
 				8E1D76241B258FEE0022C013 /* Supporting Files */,
 			);
 			path = Yaml;
@@ -94,6 +106,8 @@
 		8E1D76301B258FEE0022C013 /* YamlTests */ = {
 			isa = PBXGroup;
 			children = (
+				F32DF24D1B7304750011046A /* ExampleTests.swift */,
+				F32DF24E1B7304750011046A /* YamlTests.swift */,
 				8E1D76311B258FEE0022C013 /* Supporting Files */,
 			);
 			path = YamlTests;
@@ -107,34 +121,10 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		8E1D763C1B2591330022C013 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				8E1D763D1B2591330022C013 /* Operators.swift */,
-				8E1D763E1B2591330022C013 /* Parser.swift */,
-				8E1D763F1B2591330022C013 /* Regex.swift */,
-				8E1D76401B2591330022C013 /* Result.swift */,
-				8E1D76411B2591330022C013 /* Tokenizer.swift */,
-				8E1D76421B2591330022C013 /* Yaml.swift */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		8E1D76431B2591330022C013 /* test */ = {
-			isa = PBXGroup;
-			children = (
-				8E1D76441B2591330022C013 /* ExampleTests.swift */,
-				8E1D76451B2591330022C013 /* YamlTests.swift */,
-			);
-			path = test;
-			sourceTree = "<group>";
-		};
 		8EF254191B258FB4001BCEBE = {
 			isa = PBXGroup;
 			children = (
 				8E1D763B1B2591330022C013 /* Readme.md */,
-				8E1D763C1B2591330022C013 /* src */,
-				8E1D76431B2591330022C013 /* test */,
 				8E1D76231B258FEE0022C013 /* Yaml */,
 				8E1D76301B258FEE0022C013 /* YamlTests */,
 				8E1D76221B258FEE0022C013 /* Products */,
@@ -248,12 +238,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8E1D764B1B2591330022C013 /* Tokenizer.swift in Sources */,
-				8E1D764A1B2591330022C013 /* Result.swift in Sources */,
-				8E1D76491B2591330022C013 /* Regex.swift in Sources */,
-				8E1D76471B2591330022C013 /* Operators.swift in Sources */,
-				8E1D76481B2591330022C013 /* Parser.swift in Sources */,
-				8E1D764C1B2591330022C013 /* Yaml.swift in Sources */,
+				F32DF2431B7304620011046A /* Parser.swift in Sources */,
+				F32DF2491B7304620011046A /* Tokenizer.swift in Sources */,
+				F32DF24B1B7304620011046A /* Yaml.swift in Sources */,
+				F32DF2411B7304620011046A /* Operators.swift in Sources */,
+				F32DF2471B7304620011046A /* Result.swift in Sources */,
+				F32DF2451B7304620011046A /* Regex.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,8 +251,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8ECA6D731B25919A0053D0FC /* ExampleTests.swift in Sources */,
-				8ECA6D741B25919A0053D0FC /* YamlTests.swift in Sources */,
+				F32DF2521B7304750011046A /* YamlTests.swift in Sources */,
+				F32DF2441B7304620011046A /* Parser.swift in Sources */,
+				F32DF24A1B7304620011046A /* Tokenizer.swift in Sources */,
+				F32DF24C1B7304620011046A /* Yaml.swift in Sources */,
+				F32DF2421B7304620011046A /* Operators.swift in Sources */,
+				F32DF2481B7304620011046A /* Result.swift in Sources */,
+				F32DF2461B7304620011046A /* Regex.swift in Sources */,
+				F32DF2501B7304750011046A /* ExampleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -430,6 +426,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
