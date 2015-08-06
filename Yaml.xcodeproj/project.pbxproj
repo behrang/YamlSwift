@@ -36,6 +36,7 @@
 		F32DF2791B7305630011046A /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23F1B7304620011046A /* Tokenizer.swift */; };
 		F32DF27A1B7305630011046A /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
 		F32DF27B1B7305700011046A /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
+		F36137A91B730CD0009B4BE6 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E1D76261B258FEE0022C013 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -183,6 +184,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F36137A91B730CD0009B4BE6 /* Yaml.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,7 +270,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0630;
+				LastUpgradeCheck = 0700;
 				TargetAttributes = {
 					8E1D76201B258FEE0022C013 = {
 						CreatedOnToolsVersion = 6.3.2;
@@ -609,6 +611,8 @@
 		8EF2541E1B258FB4001BCEBE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};
