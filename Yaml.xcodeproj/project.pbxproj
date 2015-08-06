@@ -37,6 +37,8 @@
 		F32DF27A1B7305630011046A /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
 		F32DF27B1B7305700011046A /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
 		F36137A91B730CD0009B4BE6 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E1D76261B258FEE0022C013 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F3894BCC1B7312E000286880 /* YamlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3894BCB1B7312E000286880 /* YamlTests.swift */; };
+		F3894BCD1B7312E000286880 /* YamlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3894BCB1B7312E000286880 /* YamlTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +74,7 @@
 		F32DF24D1B7304750011046A /* ExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleTests.swift; sourceTree = "<group>"; };
 		F32DF2581B73054C0011046A /* Yaml.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Yaml.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F32DF2611B73054C0011046A /* YamlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YamlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F3894BCB1B7312E000286880 /* YamlTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YamlTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				F32DF24D1B7304750011046A /* ExampleTests.swift */,
+				F3894BCB1B7312E000286880 /* YamlTests.swift */,
 				8E1D76311B258FEE0022C013 /* Supporting Files */,
 			);
 			path = YamlTests;
@@ -355,6 +359,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F3894BCC1B7312E000286880 /* YamlTests.swift in Sources */,
 				F32DF2441B7304620011046A /* Parser.swift in Sources */,
 				F32DF24A1B7304620011046A /* Tokenizer.swift in Sources */,
 				F32DF24C1B7304620011046A /* Yaml.swift in Sources */,
@@ -382,6 +387,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F3894BCD1B7312E000286880 /* YamlTests.swift in Sources */,
 				F32DF2791B7305630011046A /* Tokenizer.swift in Sources */,
 				F32DF2781B7305630011046A /* Result.swift in Sources */,
 				F32DF2771B7305630011046A /* Regex.swift in Sources */,
