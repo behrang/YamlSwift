@@ -2,11 +2,11 @@
 //  Yaml.h
 //  Yaml
 //
-//  Created by Behrang Noruzi Niya on 3/18/1394 AP.
+//  Created by Gregory Higley on 8/5/15.
 //
 //
 
-#import <Cocoa/Cocoa.h>
+#import <UIKit/UIKit.h>
 
 //! Project version number for Yaml.
 FOUNDATION_EXPORT double YamlVersionNumber;

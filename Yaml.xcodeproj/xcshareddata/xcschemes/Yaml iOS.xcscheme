@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0630"
+   LastUpgradeVersion = "0700"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,41 +14,27 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8E1D76201B258FEE0022C013"
+               BlueprintIdentifier = "F32DF2571B73054C0011046A"
                BuildableName = "Yaml.framework"
-               BlueprintName = "Yaml"
-               ReferencedContainer = "container:Yaml.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8E1D762B1B258FEE0022C013"
-               BuildableName = "YamlTests.xctest"
-               BlueprintName = "YamlTests"
+               BlueprintName = "Yaml iOS"
                ReferencedContainer = "container:Yaml.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Debug">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8E1D762B1B258FEE0022C013"
+               BlueprintIdentifier = "F32DF2601B73054C0011046A"
                BuildableName = "YamlTests.xctest"
-               BlueprintName = "YamlTests"
+               BlueprintName = "YamlTests iOS"
                ReferencedContainer = "container:Yaml.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -56,28 +42,31 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "8E1D76201B258FEE0022C013"
+            BlueprintIdentifier = "F32DF2571B73054C0011046A"
             BuildableName = "Yaml.framework"
-            BlueprintName = "Yaml"
+            BlueprintName = "Yaml iOS"
             ReferencedContainer = "container:Yaml.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
+      <AdditionalOptions>
+      </AdditionalOptions>
    </TestAction>
    <LaunchAction
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Debug"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "8E1D76201B258FEE0022C013"
+            BlueprintIdentifier = "F32DF2571B73054C0011046A"
             BuildableName = "Yaml.framework"
-            BlueprintName = "Yaml"
+            BlueprintName = "Yaml iOS"
             ReferencedContainer = "container:Yaml.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -85,17 +74,17 @@
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
+      buildConfiguration = "Release"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "8E1D76201B258FEE0022C013"
+            BlueprintIdentifier = "F32DF2571B73054C0011046A"
             BuildableName = "Yaml.framework"
-            BlueprintName = "Yaml"
+            BlueprintName = "Yaml iOS"
             ReferencedContainer = "container:Yaml.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
