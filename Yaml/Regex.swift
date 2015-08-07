@@ -45,7 +45,7 @@ func replace (regex: NSRegularExpression, template: String) (string: String)
 
 func replace (regex: NSRegularExpression, block: [String] -> String)
     (string: String) -> String {
-  var s = NSMutableString(string: string)
+  let s = NSMutableString(string: string)
   let range = NSMakeRange(0, string.utf16.count)
   var offset = 0
   regex.enumerateMatchesInString(string, options: [], range: range) {
