@@ -1,8 +1,8 @@
-# Yaml.swift
+# YamlSwift
 
 Load [YAML](http://yaml.org) and [JSON](http://json.org) documents using [Swift](http://www.apple.com/swift/).
 
-`Yaml.swift` parses a string of YAML document(s) (or a JSON document) and returns a `Yaml` enum value representing that string.
+`YamlSwift` parses a string of YAML document(s) (or a JSON document) and returns a `Yaml` enum value representing that string.
 
 
 
