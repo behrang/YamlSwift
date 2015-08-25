@@ -118,7 +118,7 @@ extension Yaml {
     let result = tokenize(text)
         >>- { tokens in print("\n====== Tokens:\n\(tokens)"); return tokens }
         >>=- parseDocs
-        >>- { values -> [Yaml] in values.map {
+        >>- { values -> [Yaml] in values.forEach {
               v in print("------ Doc:\n\(v)")
             }; return values }
     if let error = result.error {
@@ -149,7 +149,7 @@ extension Yaml {
       case .Array(var array):
         let emptyCount = max(0, index + 1 - array.count)
         let empty = [Yaml](count: emptyCount, repeatedValue: .Null)
-        array.extend(empty)
+        array.appendContentsOf(empty)
         array[index] = newValue
         self = .Array(array)
       default:
