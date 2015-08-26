@@ -12,7 +12,8 @@ Load [YAML](http://yaml.org) and [JSON](http://json.org) documents using [Swift]
 
 Use [Carthage](https://github.com/Carthage/Carthage) to build and install.
 
-
+Or use [CocoaPods](https://cocoapods.org/) :
+Add `pod 'YamlSwift', :git => 'https://github.com/behrang/YamlSwift.git` to your `Podfile` and run `pod install`.
 
 
 
