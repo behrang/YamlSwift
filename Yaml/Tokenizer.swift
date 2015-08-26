@@ -107,7 +107,7 @@ let tokenPatterns: [TokenPattern] = [
 ]
 
 func escapeErrorContext (text: String) -> String {
-  let endIndex = advance(text.startIndex, 50, text.endIndex)
+  let endIndex = text.startIndex.advancedBy(50, limit: text.endIndex)
   let escaped = text.substringToIndex(endIndex)
       |> replace(regex("\\r"), template: "\\\\r")
       |> replace(regex("\\n"), template: "\\\\n")
