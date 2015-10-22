@@ -451,7 +451,7 @@ class ExampleTests: XCTestCase {
   
   func testPerformanceExample() {
     self.measureBlock() {
-      Yaml.load(exampleYaml)
+      Yaml.load(self.exampleYaml)
     }
   }
   
