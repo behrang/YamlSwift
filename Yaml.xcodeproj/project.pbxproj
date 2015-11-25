@@ -10,17 +10,11 @@
 		8E1D76271B258FEE0022C013 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E1D76261B258FEE0022C013 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8E1D762D1B258FEE0022C013 /* Yaml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E1D76211B258FEE0022C013 /* Yaml.framework */; };
 		F32DF2411B7304620011046A /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23B1B7304620011046A /* Operators.swift */; };
-		F32DF2421B7304620011046A /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23B1B7304620011046A /* Operators.swift */; };
 		F32DF2431B7304620011046A /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23C1B7304620011046A /* Parser.swift */; };
-		F32DF2441B7304620011046A /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23C1B7304620011046A /* Parser.swift */; };
 		F32DF2451B7304620011046A /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23D1B7304620011046A /* Regex.swift */; };
-		F32DF2461B7304620011046A /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23D1B7304620011046A /* Regex.swift */; };
 		F32DF2471B7304620011046A /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23E1B7304620011046A /* Result.swift */; };
-		F32DF2481B7304620011046A /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23E1B7304620011046A /* Result.swift */; };
 		F32DF2491B7304620011046A /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23F1B7304620011046A /* Tokenizer.swift */; };
-		F32DF24A1B7304620011046A /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23F1B7304620011046A /* Tokenizer.swift */; };
 		F32DF24B1B7304620011046A /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
-		F32DF24C1B7304620011046A /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
 		F32DF2501B7304750011046A /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
 		F32DF2621B73054D0011046A /* Yaml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F32DF2581B73054C0011046A /* Yaml.framework */; };
 		F32DF26F1B7305630011046A /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23B1B7304620011046A /* Operators.swift */; };
@@ -29,12 +23,6 @@
 		F32DF2721B7305630011046A /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23E1B7304620011046A /* Result.swift */; };
 		F32DF2731B7305630011046A /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23F1B7304620011046A /* Tokenizer.swift */; };
 		F32DF2741B7305630011046A /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
-		F32DF2751B7305630011046A /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23B1B7304620011046A /* Operators.swift */; };
-		F32DF2761B7305630011046A /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23C1B7304620011046A /* Parser.swift */; };
-		F32DF2771B7305630011046A /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23D1B7304620011046A /* Regex.swift */; };
-		F32DF2781B7305630011046A /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23E1B7304620011046A /* Result.swift */; };
-		F32DF2791B7305630011046A /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23F1B7304620011046A /* Tokenizer.swift */; };
-		F32DF27A1B7305630011046A /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
 		F32DF27B1B7305700011046A /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
 		F36137A91B730CD0009B4BE6 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E1D76261B258FEE0022C013 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F3894BCC1B7312E000286880 /* YamlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3894BCB1B7312E000286880 /* YamlTests.swift */; };
@@ -360,12 +348,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F3894BCC1B7312E000286880 /* YamlTests.swift in Sources */,
-				F32DF2441B7304620011046A /* Parser.swift in Sources */,
-				F32DF24A1B7304620011046A /* Tokenizer.swift in Sources */,
-				F32DF24C1B7304620011046A /* Yaml.swift in Sources */,
-				F32DF2421B7304620011046A /* Operators.swift in Sources */,
-				F32DF2481B7304620011046A /* Result.swift in Sources */,
-				F32DF2461B7304620011046A /* Regex.swift in Sources */,
 				F32DF2501B7304750011046A /* ExampleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -388,12 +370,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F3894BCD1B7312E000286880 /* YamlTests.swift in Sources */,
-				F32DF2791B7305630011046A /* Tokenizer.swift in Sources */,
-				F32DF2781B7305630011046A /* Result.swift in Sources */,
-				F32DF2771B7305630011046A /* Regex.swift in Sources */,
-				F32DF2751B7305630011046A /* Operators.swift in Sources */,
-				F32DF2761B7305630011046A /* Parser.swift in Sources */,
-				F32DF27A1B7305630011046A /* Yaml.swift in Sources */,
 				F32DF27B1B7305700011046A /* ExampleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
