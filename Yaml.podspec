@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.name         = "Yaml"
-  s.version      = "1.3"
+  s.version      = "1.3.1"
   s.summary      = "Load YAML and JSON documents using Swift"
   s.description  = <<-DESC
                 YamlSwift parses a string of YAML document(s) (or a JSON document)
