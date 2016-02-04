@@ -264,16 +264,16 @@ func addAlias (name: String) -> Yaml -> Context -> Context {
   }
 }
 
-func appendToArray (var array: [Yaml]) -> Yaml -> [Yaml] {
+func appendToArray (array: [Yaml]) -> Yaml -> [Yaml] {
   return { value in
-    array.append(value)
-    return array
+    return array + [value]
   }
 }
 
-func putToMap (var map: [Yaml: Yaml]) -> Yaml -> Yaml -> [Yaml: Yaml] {
+func putToMap (map: [Yaml: Yaml]) -> Yaml -> Yaml -> [Yaml: Yaml] {
   return { key in
     return { value in
+      var map = map
       map[key] = value
       return map
     }

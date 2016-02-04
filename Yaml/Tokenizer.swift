@@ -115,7 +115,8 @@ func escapeErrorContext (text: String) -> String {
   return "near \"\(escaped)\""
 }
 
-func tokenize (var text: String) -> Result<[TokenMatch]> {
+func tokenize (text: String) -> Result<[TokenMatch]> {
+  var text = text
   var matchList: [TokenMatch] = []
   var indents = [0]
   var insideFlow = 0

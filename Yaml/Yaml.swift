@@ -146,12 +146,13 @@ extension Yaml {
     set {
       assert(index >= 0)
       switch self {
-      case .Array(var array):
+      case .Array(let array):
         let emptyCount = max(0, index + 1 - array.count)
         let empty = [Yaml](count: emptyCount, repeatedValue: .Null)
-        array.appendContentsOf(empty)
-        array[index] = newValue
-        self = .Array(array)
+        var new = array
+        new.appendContentsOf(empty)
+        new[index] = newValue
+        self = .Array(new)
       default:
         var array = [Yaml](count: index + 1, repeatedValue: .Null)
         array[index] = newValue
@@ -171,9 +172,10 @@ extension Yaml {
     }
     set {
       switch self {
-      case .Dictionary(var dictionary):
-        dictionary[key] = newValue
-        self = .Dictionary(dictionary)
+      case .Dictionary(let dictionary):
+        var new = dictionary
+        new[key] = newValue
+        self = .Dictionary(new)
       default:
         var dictionary = [Yaml: Yaml]()
         dictionary[key] = newValue
