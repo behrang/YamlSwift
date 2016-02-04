@@ -34,70 +34,84 @@ let regexOptions: [Character: NSRegularExpressionOptions] = [
   "m": .AnchorsMatchLines
 ]
 
-func replace (regex: NSRegularExpression, template: String) (string: String)
+func replace (regex: NSRegularExpression, template: String) -> String
     -> String {
-  let s = NSMutableString(string: string)
-  let range = NSMakeRange(0, string.utf16.count)
-  regex.replaceMatchesInString(s, options: [], range: range,
-      withTemplate: template)
-  return s as String
+      return { string in
+        let s = NSMutableString(string: string)
+        let range = NSMakeRange(0, string.utf16.count)
+        regex.replaceMatchesInString(s, options: [], range: range,
+            withTemplate: template)
+        return s as String
+      }
 }
 
 func replace (regex: NSRegularExpression, block: [String] -> String)
-    (string: String) -> String {
-  let s = NSMutableString(string: string)
-  let range = NSMakeRange(0, string.utf16.count)
-  var offset = 0
-  regex.enumerateMatchesInString(string, options: [], range: range) {
-    result, _, _ in
-    if let result = result {
-        var captures = [String](count: result.numberOfRanges, repeatedValue: "")
-        for i in 0..<result.numberOfRanges {
-          if let r = result.rangeAtIndex(i).toRange() {
-            captures[i] = (string as NSString).substringWithRange(NSRange(r))
+    -> String -> String {
+      return { string in
+        let s = NSMutableString(string: string)
+        let range = NSMakeRange(0, string.utf16.count)
+        var offset = 0
+        regex.enumerateMatchesInString(string, options: [], range: range) {
+          result, _, _ in
+          if let result = result {
+              var captures = [String](count: result.numberOfRanges, repeatedValue: "")
+              for i in 0..<result.numberOfRanges {
+                if let r = result.rangeAtIndex(i).toRange() {
+                  captures[i] = (string as NSString).substringWithRange(NSRange(r))
+                }
+              }
+              let replacement = block(captures)
+              let offR = NSMakeRange(result.range.location + offset, result.range.length)
+              offset += replacement.characters.count - result.range.length
+              s.replaceCharactersInRange(offR, withString: replacement)
           }
         }
-        let replacement = block(captures)
-        let offR = NSMakeRange(result.range.location + offset, result.range.length)
-        offset += replacement.characters.count - result.range.length
-        s.replaceCharactersInRange(offR, withString: replacement)
-    }
-  }
-  return s as String
+        return s as String
+      }
 }
 
-func splitLead (regex: NSRegularExpression) (string: String)
+func splitLead (regex: NSRegularExpression) -> String
     -> (String, String) {
-  let r = matchRange(string, regex: regex)
-  if r.location == NSNotFound {
-    return ("", string)
-  } else {
-    let s = string as NSString
-    let i = r.location + r.length
-    return (s.substringToIndex(i), s.substringFromIndex(i))
-  }
+      return { string in
+        let r = matchRange(string, regex: regex)
+        if r.location == NSNotFound {
+          return ("", string)
+        } else {
+          let s = string as NSString
+          let i = r.location + r.length
+          return (s.substringToIndex(i), s.substringFromIndex(i))
+        }
+      }
 }
 
-func splitTrail (regex: NSRegularExpression) (string: String)
+func splitTrail (regex: NSRegularExpression) -> String
     -> (String, String) {
-  let r = matchRange(string, regex: regex)
-  if r.location == NSNotFound {
-    return (string, "")
-  } else {
-    let s = string as NSString
-    let i = r.location
-    return (s.substringToIndex(i), s.substringFromIndex(i))
+      return { string in
+        let r = matchRange(string, regex: regex)
+        if r.location == NSNotFound {
+          return (string, "")
+        } else {
+          let s = string as NSString
+          let i = r.location
+          return (s.substringToIndex(i), s.substringFromIndex(i))
+        }
+      }
+}
+
+func substringWithRange (range: NSRange) -> String -> String {
+  return { string in
+    return (string as NSString).substringWithRange(range)
   }
 }
 
-func substringWithRange (range: NSRange) (string: String) -> String {
-  return (string as NSString).substringWithRange(range)
+func substringFromIndex (index: Int) -> String -> String {
+  return { string in
+    return (string as NSString).substringFromIndex(index)
+  }
 }
 
-func substringFromIndex (index: Int) (string: String) -> String {
-  return (string as NSString).substringFromIndex(index)
-}
-
-func substringToIndex (index: Int) (string: String) -> String {
-  return (string as NSString).substringToIndex(index)
+func substringToIndex (index: Int) -> String -> String {
+  return { string in
+    return (string as NSString).substringToIndex(index)
+  }
 }

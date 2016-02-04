@@ -225,7 +225,7 @@ func tokenize (var text: String) -> Result<[TokenMatch]> {
             }
             let s = text |> substringWithRange(range)
             block += "\n" +
-                replace(regex("^\(bBreak)[ \\t]*|[ \\t]+$"), template: "")(string: s)
+                replace(regex("^\(bBreak)[ \\t]*|[ \\t]+$"), template: "")(s)
             text = text |> substringFromIndex(range.location + range.length)
           }
           matchList.append(TokenMatch(.String, block))

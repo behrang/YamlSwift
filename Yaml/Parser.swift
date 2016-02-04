@@ -11,8 +11,8 @@ struct Context {
 }
 
 typealias ContextValue = (context: Context, value: Yaml)
-func createContextValue (context: Context) (value: Yaml) -> ContextValue {
-  return (context, value)
+func createContextValue (context: Context) -> Yaml -> ContextValue {
+  return { value in (context, value) }
 }
 func getContext (cv: ContextValue) -> Context {
   return cv.context
@@ -33,23 +33,25 @@ func parseDoc (tokens: [TokenMatch]) -> Result<Yaml> {
 }
 
 func parseDocs (tokens: [TokenMatch]) -> Result<[Yaml]> {
-  return parseDocs([])(context: Context(tokens))
+  return parseDocs([])(Context(tokens))
 }
 
-func parseDocs (acc: [Yaml]) (context: Context) -> Result<[Yaml]> {
-  if peekType(context) == .End {
-    return lift(acc)
+func parseDocs (acc: [Yaml]) -> Context -> Result<[Yaml]> {
+  return { context in
+    if peekType(context) == .End {
+      return lift(acc)
+    }
+    let cv = lift(context)
+        >>=- parseHeader
+        >>=- parse
+    let v = cv
+        >>- getValue
+    let c = cv
+        >>- getContext
+        >>- ignoreDocEnd
+    let a = appendToArray(acc) <^> v
+    return parseDocs <^> a <*> c |> join
   }
-  let cv = lift(context)
-      >>=- parseHeader
-      >>=- parse
-  let v = cv
-      >>- getValue
-  let c = cv
-      >>- getContext
-      >>- ignoreDocEnd
-  let a = appendToArray(acc) <^> v
-  return parseDocs <^> a <*> c |> join
 }
 
 func peekType (context: Context) -> TokenType {
@@ -80,23 +82,26 @@ func ignoreDocEnd (context: Context) -> Context {
   return ignoreDocEnd(advance(context))
 }
 
-func expect (type: TokenType, message: String) (context: Context)
-    -> Result<Context> {
-  let check = peekType(context) == type
-  return `guard`(error(message)(context: context))(check: check)
-      >>| lift(advance(context))
+func expect (type: TokenType, message: String) -> Context -> Result<Context> {
+  return { context in
+    let check = peekType(context) == type
+    return `guard`(error(message)(context), check: check)
+        >>| lift(advance(context))
+  }
 }
 
 func expectVersion (context: Context) -> Result<Context> {
   let version = peekMatch(context)
   let check = ["1.1", "1.2"].contains(version)
-  return `guard`(error("invalid yaml version")(context: context))(check: check)
+  return `guard`(error("invalid yaml version")(context), check: check)
       >>| lift(advance(context))
 }
 
-func error (message: String) (context: Context) -> String {
-  let text = recreateText("", context: context) |> escapeErrorContext
-  return "\(message), \(text)"
+func error (message: String) -> Context -> String {
+  return { context in
+    let text = recreateText("", context: context) |> escapeErrorContext
+    return "\(message), \(text)"
+  }
 }
 
 func recreateText (string: String, context: Context) -> String {
@@ -107,32 +112,34 @@ func recreateText (string: String, context: Context) -> String {
 }
 
 func parseHeader (context: Context) -> Result<Context> {
-  return parseHeader(true)(context: Context(context.tokens, [:]))
+  return parseHeader(true)(Context(context.tokens, [:]))
 }
 
-func parseHeader (yamlAllowed: Bool) (context: Context) -> Result<Context> {
-  switch peekType(context) {
+func parseHeader (yamlAllowed: Bool) -> Context -> Result<Context> {
+  return { context in
+    switch peekType(context) {
 
-  case .Comment, .Space, .NewLine:
-    return lift(context)
-        >>- advance
-        >>=- parseHeader(yamlAllowed)
+    case .Comment, .Space, .NewLine:
+      return lift(context)
+          >>- advance
+          >>=- parseHeader(yamlAllowed)
 
-  case .YamlDirective:
-    let err = "duplicate yaml directive"
-    return `guard`(error(err)(context: context))(check: yamlAllowed)
-        >>| lift(context)
-        >>- advance
-        >>=- expect(TokenType.Space, message: "expected space")
-        >>=- expectVersion
-        >>=- parseHeader(false)
+    case .YamlDirective:
+      let err = "duplicate yaml directive"
+      return `guard`(error(err)(context), check: yamlAllowed)
+          >>| lift(context)
+          >>- advance
+          >>=- expect(TokenType.Space, message: "expected space")
+          >>=- expectVersion
+          >>=- parseHeader(false)
 
-  case .DocStart:
-    return lift(advance(context))
+    case .DocStart:
+      return lift(advance(context))
 
-  default:
-    return `guard`(error("expected ---")(context: context))(check: yamlAllowed)
-        >>| lift(context)
+    default:
+      return `guard`(error("expected ---")(context), check: yamlAllowed)
+          >>| lift(context)
+    }
   }
 }
 
@@ -235,40 +242,51 @@ func parse (context: Context) -> Result<ContextValue> {
     let name = m.substringFromIndex(m.startIndex.successor())
     let value = context.aliases[name]
     let err = "unknown alias \(name)"
-    return `guard`(error(err)(context: context))(check: value != nil)
+    return `guard`(error(err)(context), check: value != nil)
         >>| lift((advance(context), value ?? nil))
 
   case .End, .Dedent:
     return lift((context, nil))
 
   default:
-    return fail(error("unexpected type \(peekType(context))")(context: context))
+    return fail(error("unexpected type \(peekType(context))")(context))
 
   }
 }
 
-func addAlias (name: String) (value: Yaml) (context: Context) -> Context {
-  var aliases = context.aliases
-  aliases[name] = value
-  return Context(context.tokens, aliases)
+func addAlias (name: String) -> Yaml -> Context -> Context {
+  return { value in
+    return { context in
+      var aliases = context.aliases
+      aliases[name] = value
+      return Context(context.tokens, aliases)
+    }
+  }
 }
 
-func appendToArray (var array: [Yaml]) (value: Yaml) -> [Yaml] {
-  array.append(value)
-  return array
+func appendToArray (var array: [Yaml]) -> Yaml -> [Yaml] {
+  return { value in
+    array.append(value)
+    return array
+  }
 }
 
-func putToMap (var map: [Yaml: Yaml]) (key: Yaml) (value: Yaml)
-    -> [Yaml: Yaml] {
-  map[key] = value
-  return map
+func putToMap (var map: [Yaml: Yaml]) -> Yaml -> Yaml -> [Yaml: Yaml] {
+  return { key in
+    return { value in
+      map[key] = value
+      return map
+    }
+  }
 }
 
-func checkKeyUniqueness (acc: [Yaml: Yaml]) (context: Context, key: Yaml)
+func checkKeyUniqueness (acc: [Yaml: Yaml]) -> (context: Context, key: Yaml)
     -> Result<ContextValue> {
-  let err = "duplicate key \(key)"
-  return `guard`(error(err)(context: context))(check: !acc.keys.contains(key))
-      >>| lift((context, key))
+      return { (context, key) in
+        let err = "duplicate key \(key)"
+        return `guard`(error(err)(context), check: !acc.keys.contains(key))
+            >>| lift((context, key))
+      }
 }
 
 func parseFlowSeq (context: Context) -> Result<ContextValue> {
@@ -277,21 +295,23 @@ func parseFlowSeq (context: Context) -> Result<ContextValue> {
       >>=- parseFlowSeq([])
 }
 
-func parseFlowSeq (acc: [Yaml]) (context: Context) -> Result<ContextValue> {
-  if peekType(context) == .CloseSB {
-    return lift((advance(context), .Array(acc)))
+func parseFlowSeq (acc: [Yaml]) -> Context -> Result<ContextValue> {
+  return { context in
+    if peekType(context) == .CloseSB {
+      return lift((advance(context), .Array(acc)))
+    }
+    let cv = lift(context)
+        >>- ignoreSpace
+        >>=- (acc.count == 0 ? lift : expect(TokenType.Comma, message: "expected comma"))
+        >>- ignoreSpace
+        >>=- parse
+    let v = cv >>- getValue
+    let c = cv
+        >>- getContext
+        >>- ignoreSpace
+    let a = appendToArray(acc) <^> v
+    return parseFlowSeq <^> a <*> c |> join
   }
-  let cv = lift(context)
-      >>- ignoreSpace
-      >>=- (acc.count == 0 ? lift : expect(TokenType.Comma, message: "expected comma"))
-      >>- ignoreSpace
-      >>=- parse
-  let v = cv >>- getValue
-  let c = cv
-      >>- getContext
-      >>- ignoreSpace
-  let a = appendToArray(acc) <^> v
-  return parseFlowSeq <^> a <*> c |> join
 }
 
 func parseFlowMap (context: Context) -> Result<ContextValue> {
@@ -300,89 +320,94 @@ func parseFlowMap (context: Context) -> Result<ContextValue> {
       >>=- parseFlowMap([:])
 }
 
-func parseFlowMap (acc: [Yaml: Yaml]) (context: Context)
-    -> Result<ContextValue> {
-  if peekType(context) == .CloseCB {
-    return lift((advance(context), .Dictionary(acc)))
+func parseFlowMap (acc: [Yaml: Yaml]) -> Context -> Result<ContextValue> {
+  return { context in
+    if peekType(context) == .CloseCB {
+      return lift((advance(context), .Dictionary(acc)))
+    }
+    let ck = lift(context)
+        >>- ignoreSpace
+        >>=- (acc.count == 0 ? lift : expect(TokenType.Comma, message: "expected comma"))
+        >>- ignoreSpace
+        >>=- parseString
+        >>=- checkKeyUniqueness(acc)
+    let k = ck >>- getValue
+    let cv = ck
+        >>- getContext
+        >>=- expect(TokenType.Colon, message: "expected colon")
+        >>=- parse
+    let v = cv >>- getValue
+    let c = cv
+        >>- getContext
+        >>- ignoreSpace
+    let a = putToMap(acc) <^> k <*> v
+    return parseFlowMap <^> a <*> c |> join
   }
-  let ck = lift(context)
-      >>- ignoreSpace
-      >>=- (acc.count == 0 ? lift : expect(TokenType.Comma, message: "expected comma"))
-      >>- ignoreSpace
-      >>=- parseString
-      >>=- checkKeyUniqueness(acc)
-  let k = ck >>- getValue
-  let cv = ck
-      >>- getContext
-      >>=- expect(TokenType.Colon, message: "expected colon")
-      >>=- parse
-  let v = cv >>- getValue
-  let c = cv
-      >>- getContext
-      >>- ignoreSpace
-  let a = putToMap(acc) <^> k <*> v
-  return parseFlowMap <^> a <*> c |> join
 }
 
 func parseBlockSeq (context: Context) -> Result<ContextValue> {
-  return parseBlockSeq([])(context: context)
+  return parseBlockSeq([])(context)
 }
 
-func parseBlockSeq (acc: [Yaml]) (context: Context) -> Result<ContextValue> {
-  if peekType(context) != .Dash {
-    return lift((context, .Array(acc)))
+func parseBlockSeq (acc: [Yaml]) -> Context -> Result<ContextValue> {
+  return { context in
+    if peekType(context) != .Dash {
+      return lift((context, .Array(acc)))
+    }
+    let cv = lift(context)
+        >>- advance
+        >>=- expect(TokenType.Indent, message: "expected indent after dash")
+        >>- ignoreSpace
+        >>=- parse
+    let v = cv >>- getValue
+    let c = cv
+        >>- getContext
+        >>- ignoreSpace
+        >>=- expect(TokenType.Dedent, message: "expected dedent after dash indent")
+        >>- ignoreSpace
+    let a = appendToArray(acc) <^> v
+    return parseBlockSeq <^> a <*> c |> join
   }
-  let cv = lift(context)
-      >>- advance
-      >>=- expect(TokenType.Indent, message: "expected indent after dash")
-      >>- ignoreSpace
-      >>=- parse
-  let v = cv >>- getValue
-  let c = cv
-      >>- getContext
-      >>- ignoreSpace
-      >>=- expect(TokenType.Dedent, message: "expected dedent after dash indent")
-      >>- ignoreSpace
-  let a = appendToArray(acc) <^> v
-  return parseBlockSeq <^> a <*> c |> join
 }
 
 func parseBlockMap (context: Context) -> Result<ContextValue> {
-  return parseBlockMap([:])(context: context)
+  return parseBlockMap([:])(context)
 }
 
-func parseBlockMap (acc: [Yaml: Yaml]) (context: Context)
-    -> Result<ContextValue> {
-  switch peekType(context) {
+func parseBlockMap (acc: [Yaml: Yaml]) -> Context -> Result<ContextValue> {
+  return { context in
+    switch peekType(context) {
 
-  case .QuestionMark:
-    return parseQuestionMarkKeyValue(acc)(context: context)
+    case .QuestionMark:
+      return parseQuestionMarkKeyValue(acc)(context)
 
-  case .String, .StringDQ, .StringSQ:
-    return parseStringKeyValue(acc)(context: context)
+    case .String, .StringDQ, .StringSQ:
+      return parseStringKeyValue(acc)(context)
 
-  default:
-    return lift((context, .Dictionary(acc)))
+    default:
+      return lift((context, .Dictionary(acc)))
+    }
   }
 }
 
-func parseQuestionMarkKeyValue (acc: [Yaml: Yaml]) (context: Context)
-    -> Result<ContextValue> {
-  let ck = lift(context)
-      >>=- expect(TokenType.QuestionMark, message: "expected ?")
-      >>=- parse
-      >>=- checkKeyUniqueness(acc)
-  let k = ck >>- getValue
-  let cv = ck
-      >>- getContext
-      >>- ignoreSpace
-      >>=- parseColonValueOrNil
-  let v = cv >>- getValue
-  let c = cv
-      >>- getContext
-      >>- ignoreSpace
-  let a = putToMap(acc) <^> k <*> v
-  return parseBlockMap <^> a <*> c |> join
+func parseQuestionMarkKeyValue (acc: [Yaml: Yaml]) -> Context -> Result<ContextValue> {
+  return { context in
+    let ck = lift(context)
+        >>=- expect(TokenType.QuestionMark, message: "expected ?")
+        >>=- parse
+        >>=- checkKeyUniqueness(acc)
+    let k = ck >>- getValue
+    let cv = ck
+        >>- getContext
+        >>- ignoreSpace
+        >>=- parseColonValueOrNil
+    let v = cv >>- getValue
+    let c = cv
+        >>- getContext
+        >>- ignoreSpace
+    let a = putToMap(acc) <^> k <*> v
+    return parseBlockMap <^> a <*> c |> join
+  }
 }
 
 func parseColonValueOrNil (context: Context) -> Result<ContextValue> {
@@ -399,22 +424,23 @@ func parseColonValue (context: Context) -> Result<ContextValue> {
       >>=- parse
 }
 
-func parseStringKeyValue (acc: [Yaml: Yaml]) (context: Context)
-    -> Result<ContextValue> {
-  let ck = lift(context)
-      >>=- parseString
-      >>=- checkKeyUniqueness(acc)
-  let k = ck >>- getValue
-  let cv = ck
-      >>- getContext
-      >>- ignoreSpace
-      >>=- parseColonValue
-  let v = cv >>- getValue
-  let c = cv
-      >>- getContext
-      >>- ignoreSpace
-  let a = putToMap(acc) <^> k <*> v
-  return parseBlockMap <^> a <*> c |> join
+func parseStringKeyValue (acc: [Yaml: Yaml]) -> Context -> Result<ContextValue> {
+  return { context in
+    let ck = lift(context)
+        >>=- parseString
+        >>=- checkKeyUniqueness(acc)
+    let k = ck >>- getValue
+    let cv = ck
+        >>- getContext
+        >>- ignoreSpace
+        >>=- parseColonValue
+    let v = cv >>- getValue
+    let c = cv
+        >>- getContext
+        >>- ignoreSpace
+    let a = putToMap(acc) <^> k <*> v
+    return parseBlockMap <^> a <*> c |> join
+  }
 }
 
 func parseString (context: Context) -> Result<ContextValue> {
@@ -434,7 +460,7 @@ func parseString (context: Context) -> Result<ContextValue> {
     return lift((advance(context), .String(unescapeSingleQuotes(foldFlow(m)))))
 
   default:
-    return fail(error("expected string")(context: context))
+    return fail(error("expected string")(context))
   }
 }
 
@@ -473,7 +499,7 @@ func parseLiteral (context: Context) -> Result<ContextValue> {
   let indent = parseInt(literal |> replace(regex("[^1-9]"), template: ""), radix: 10)
   let headerPattern = regex("^(\\||>)([1-9][-+]|[-+]?[1-9]?)( |$)")
   let error0 = "invalid chomp or indent header"
-  let c = `guard`(error(error0)(context: context))(
+  let c = `guard`(error(error0)(context),
         check: matches(literal, regex: headerPattern))
       >>| lift(blockContext)
       >>=- expect(TokenType.String, message: "expected scalar block")
@@ -501,14 +527,14 @@ func parseLiteral (context: Context) -> Result<ContextValue> {
   let error1 = "leading all-space line must not have too many spaces"
   let error2 = "less indented block scalar than the indicated level"
   return c
-      >>| `guard`(error(error1)(context: blockContext))(check: !check1)
-      >>| `guard`(error(error2)(context: blockContext))(check: !check2)
+      >>| `guard`(error(error1)(blockContext), check: !check1)
+      >>| `guard`(error(error2)(blockContext), check: !check2)
       >>| c
       >>- { context in (context, .String(trimmed))}
 }
 
 func parseInt (string: String, radix: Int) -> Int {
-  let (sign, str) = splitLead(regex("^[-+]"))(string: string)
+  let (sign, str) = splitLead(regex("^[-+]"))(string)
   let multiplier = (sign == "-" ? -1 : 1)
   let ints = radix == 60
       ? toSexInts(str)
@@ -535,7 +561,7 @@ func toInts (string: String) -> [Int] {
 }
 
 func normalizeBreaks (s: String) -> String {
-  return replace(regex("\\r\\n|\\r"), template: "\n")(string: s)
+  return replace(regex("\\r\\n|\\r"), template: "\n")(s)
 }
 
 func unwrapQuotedString (s: String) -> String {
@@ -543,7 +569,7 @@ func unwrapQuotedString (s: String) -> String {
 }
 
 func unescapeSingleQuotes (s: String) -> String {
-  return replace(regex("''"), template: "'")(string: s)
+  return replace(regex("''"), template: "'")(s)
 }
 
 func unescapeDoubleQuotes (input: String) -> String {
