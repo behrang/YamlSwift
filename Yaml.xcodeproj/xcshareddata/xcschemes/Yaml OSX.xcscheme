@@ -29,8 +29,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8E1D762B1B258FEE0022C013"
-               BuildableName = "YamlTests.xctest"
-               BlueprintName = "YamlTests OSX"
+               BuildableName = "Tests.xctest"
+               BlueprintName = "Tests OSX"
                ReferencedContainer = "container:Yaml.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,8 +47,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8E1D762B1B258FEE0022C013"
-               BuildableName = "YamlTests.xctest"
-               BlueprintName = "YamlTests OSX"
+               BuildableName = "Tests.xctest"
+               BlueprintName = "Tests OSX"
                ReferencedContainer = "container:Yaml.xcodeproj">
             </BuildableReference>
          </TestableReference>
