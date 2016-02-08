@@ -50,7 +50,7 @@
 		8E1D76211B258FEE0022C013 /* Yaml.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Yaml.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E1D76251B258FEE0022C013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8E1D76261B258FEE0022C013 /* Yaml.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Yaml.h; sourceTree = "<group>"; };
-		8E1D762C1B258FEE0022C013 /* YamlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YamlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E1D762C1B258FEE0022C013 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E1D76321B258FEE0022C013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8E1D763B1B2591330022C013 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		F32DF23B1B7304620011046A /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
@@ -61,7 +61,7 @@
 		F32DF2401B7304620011046A /* Yaml.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Yaml.swift; sourceTree = "<group>"; };
 		F32DF24D1B7304750011046A /* ExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleTests.swift; sourceTree = "<group>"; };
 		F32DF2581B73054C0011046A /* Yaml.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Yaml.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F32DF2611B73054C0011046A /* YamlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YamlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F32DF2611B73054C0011046A /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F3894BCB1B7312E000286880 /* YamlTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YamlTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,9 +103,9 @@
 			isa = PBXGroup;
 			children = (
 				8E1D76211B258FEE0022C013 /* Yaml.framework */,
-				8E1D762C1B258FEE0022C013 /* YamlTests.xctest */,
+				8E1D762C1B258FEE0022C013 /* Tests.xctest */,
 				F32DF2581B73054C0011046A /* Yaml.framework */,
-				F32DF2611B73054C0011046A /* YamlTests.xctest */,
+				F32DF2611B73054C0011046A /* Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -133,14 +133,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		8E1D76301B258FEE0022C013 /* YamlTests */ = {
+		8E1D76301B258FEE0022C013 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 				F32DF24D1B7304750011046A /* ExampleTests.swift */,
 				F3894BCB1B7312E000286880 /* YamlTests.swift */,
 				8E1D76311B258FEE0022C013 /* Supporting Files */,
 			);
-			path = YamlTests;
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		8E1D76311B258FEE0022C013 /* Supporting Files */ = {
@@ -156,7 +156,7 @@
 			children = (
 				8E1D763B1B2591330022C013 /* Readme.md */,
 				8E1D76231B258FEE0022C013 /* Yaml */,
-				8E1D76301B258FEE0022C013 /* YamlTests */,
+				8E1D76301B258FEE0022C013 /* Tests */,
 				8E1D76221B258FEE0022C013 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -201,9 +201,9 @@
 			productReference = 8E1D76211B258FEE0022C013 /* Yaml.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		8E1D762B1B258FEE0022C013 /* YamlTests OSX */ = {
+		8E1D762B1B258FEE0022C013 /* Tests OSX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8E1D763A1B258FEE0022C013 /* Build configuration list for PBXNativeTarget "YamlTests OSX" */;
+			buildConfigurationList = 8E1D763A1B258FEE0022C013 /* Build configuration list for PBXNativeTarget "Tests OSX" */;
 			buildPhases = (
 				8E1D76281B258FEE0022C013 /* Sources */,
 				8E1D76291B258FEE0022C013 /* Frameworks */,
@@ -214,9 +214,9 @@
 			dependencies = (
 				8E1D762F1B258FEE0022C013 /* PBXTargetDependency */,
 			);
-			name = "YamlTests OSX";
-			productName = YamlTests;
-			productReference = 8E1D762C1B258FEE0022C013 /* YamlTests.xctest */;
+			name = "Tests OSX";
+			productName = Tests;
+			productReference = 8E1D762C1B258FEE0022C013 /* Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		F32DF2571B73054C0011046A /* Yaml iOS */ = {
@@ -237,9 +237,9 @@
 			productReference = F32DF2581B73054C0011046A /* Yaml.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		F32DF2601B73054C0011046A /* YamlTests iOS */ = {
+		F32DF2601B73054C0011046A /* Tests iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F32DF26C1B73054D0011046A /* Build configuration list for PBXNativeTarget "YamlTests iOS" */;
+			buildConfigurationList = F32DF26C1B73054D0011046A /* Build configuration list for PBXNativeTarget "Tests iOS" */;
 			buildPhases = (
 				F32DF25D1B73054C0011046A /* Sources */,
 				F32DF25E1B73054C0011046A /* Frameworks */,
@@ -250,9 +250,9 @@
 			dependencies = (
 				F32DF2641B73054D0011046A /* PBXTargetDependency */,
 			);
-			name = "YamlTests iOS";
-			productName = YamlTests;
-			productReference = F32DF2611B73054C0011046A /* YamlTests.xctest */;
+			name = "Tests iOS";
+			productName = Tests;
+			productReference = F32DF2611B73054C0011046A /* Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -291,9 +291,9 @@
 			projectRoot = "";
 			targets = (
 				8E1D76201B258FEE0022C013 /* Yaml OSX */,
-				8E1D762B1B258FEE0022C013 /* YamlTests OSX */,
+				8E1D762B1B258FEE0022C013 /* Tests OSX */,
 				F32DF2571B73054C0011046A /* Yaml iOS */,
-				F32DF2601B73054C0011046A /* YamlTests iOS */,
+				F32DF2601B73054C0011046A /* Tests iOS */,
 			);
 		};
 /* End PBXProject section */
@@ -536,12 +536,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = YamlTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = YamlTests;
+				PRODUCT_NAME = Tests;
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -581,11 +581,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = YamlTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = YamlTests;
+				PRODUCT_NAME = Tests;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -749,13 +749,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = YamlTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.prosumma.YamlTests;
-				PRODUCT_NAME = YamlTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.prosumma.Tests;
+				PRODUCT_NAME = Tests;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -791,12 +791,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = YamlTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.prosumma.YamlTests;
-				PRODUCT_NAME = YamlTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.prosumma.Tests;
+				PRODUCT_NAME = Tests;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -814,7 +814,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8E1D763A1B258FEE0022C013 /* Build configuration list for PBXNativeTarget "YamlTests OSX" */ = {
+		8E1D763A1B258FEE0022C013 /* Build configuration list for PBXNativeTarget "Tests OSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8E1D76371B258FEE0022C013 /* Debug */,
@@ -841,7 +841,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F32DF26C1B73054D0011046A /* Build configuration list for PBXNativeTarget "YamlTests iOS" */ = {
+		F32DF26C1B73054D0011046A /* Build configuration list for PBXNativeTarget "Tests iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F32DF26D1B73054D0011046A /* Debug */,
