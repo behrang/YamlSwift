@@ -8,5 +8,10 @@ func count<T:CollectionType>(collection: T) -> T.Index.Distance {
 }
 
 func count(string: String) -> String.Index.Distance {
-    return string.characters.count
+    return string.count
+}
+extension String {
+  var count : String.Index.Distance {
+    return self.characters.count
+  }
 }
