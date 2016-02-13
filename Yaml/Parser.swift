@@ -165,13 +165,13 @@ func parse (context: Context) -> Result<ContextValue> {
     return lift((advance(context), v))
 
   case .IntOct:
-    let m = peekMatch(context) |> replace(regex("0o"), template: "")
+    let m = peekMatch(context).replace("0o", with: "")
     // will throw runtime error if overflows
     let v = Yaml.Int(parseInt(m, radix: 8))
     return lift((advance(context), v))
 
   case .IntHex:
-    let m = peekMatch(context) |> replace(regex("0x"), template: "")
+    let m = peekMatch(context).replace("0x", with: "")
     // will throw runtime error if overflows
     let v = Yaml.Int(parseInt(m, radix: 16))
     return lift((advance(context), v))
@@ -448,7 +448,7 @@ func parseString (context: Context) -> Result<ContextValue> {
 
   case .String:
     let m = normalizeBreaks(peekMatch(context))
-    let folded = m |> replace(regex("^[ \\t\\n]+|[ \\t\\n]+$"), template: "") |> foldFlow
+    let folded = m.replace("^[ \\t\\n]+|[ \\t\\n]+$", with: "") |> foldFlow
     return lift((advance(context), .String(folded)))
 
   case .StringDQ:
@@ -474,20 +474,19 @@ func parseBlockMapOrString (context: Context) -> Result<ContextValue> {
 
 func foldBlock (block: String) -> String {
   let (body, trail) = block |> splitTrail(regex("\\n*$"))
-  return (body
-      |> replace(regex("^([^ \\t\\n].*)\\n(?=[^ \\t\\n])", options: "m"), template: "$1 ")
-      |> replace(
-            regex("^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])", options: "m"), template: "$1$2")
-      ) + trail
+  return body
+      .replace("^([^ \\t\\n].*)\\n(?=[^ \\t\\n])", with: "$1 ")
+      .replace( "^([^ \\t\\n].*)\\n(\\n+)(?![ \\t])", with: "$1$2")
+      + trail
 }
 
 func foldFlow (flow: String) -> String {
   let (lead, rest) = flow |> splitLead(regex("^[ \\t]+"))
   let (body, trail) = rest |> splitTrail(regex("[ \\t]+$"))
   let folded = body
-      |> replace(regex("^[ \\t]+|[ \\t]+$|\\\\\\n", options: "m"), template: "")
-      |> replace(regex("(^|.)\\n(?=.|$)"), template: "$1 ")
-      |> replace(regex("(.)\\n(\\n+)"), template: "$1$2")
+      .replace("^[ \\t]+|[ \\t]+$|\\\\\\n", with: "")
+      .replace("(^|.)\\n(?=.|$)", with: "$1 ")
+      .replace("(.)\\n(\\n+)", with: "$1$2")
   return lead + folded + trail
 }
 
@@ -495,8 +494,8 @@ func parseLiteral (context: Context) -> Result<ContextValue> {
   let literal = peekMatch(context)
   let blockContext = advance(context)
   let chomps = ["-": -1, "+": 1]
-  let chomp = chomps[literal |> replace(regex("[^-+]"), template: "")] ?? 0
-  let indent = parseInt(literal |> replace(regex("[^1-9]"), template: ""), radix: 10)
+  let chomp = chomps[literal.replace("[^-+]", with: "")] ?? 0
+  let indent = parseInt(literal.replace("[^1-9]", with: ""), radix: 10)
   let headerPattern = regex("^(\\||>)([1-9][-+]|[-+]?[1-9]?)( |$)")
   let error0 = "invalid chomp or indent header"
   let c = `guard`(error(error0)(context),
@@ -507,23 +506,26 @@ func parseLiteral (context: Context) -> Result<ContextValue> {
       |> normalizeBreaks
   let (lead, _) = block
       |> splitLead(regex("^( *\\n)* {1,}(?! |\\n|$)"))
-  let foundIndent = lead
-      |> replace(regex("^( *\\n)*"), template: "")
-      |> count
+  let foundIndent = lead.replace("^( *\\n)*", with: "").count
   let effectiveIndent = indent > 0 ? indent : foundIndent
   let invalidPattern =
       regex("^( {0,\(effectiveIndent)}\\n)* {\(effectiveIndent + 1),}\\n")
   let check1 = matches(block, regex: invalidPattern)
   let check2 = indent > 0 && foundIndent < indent
-  let trimmed = block
-      |> replace(regex("^ {0,\(effectiveIndent)}"), template: "")
-      |> replace(regex("\\n {0,\(effectiveIndent)}"), template: "\n")
-      |> (chomp == -1
-          ? replace(regex("(\\n *)*$"), template: "")
-          : chomp == 0
-          ? replace(regex("(?=[^ ])(\\n *)*$"), template: "\n")
-          : { s in s }
+  let trimmed =  {
+    chomp == -1
+      ? $0.replace("(\\n *)*$", with: "")
+      : (
+        chomp == 0
+        ? $0.replace("(?=[^ ])(\\n *)*$", with: "\n")
+        : $0
       )
+    }(
+      block
+        .replace("^ {0,\(effectiveIndent)}"  , with: "")
+        .replace("\\n {0,\(effectiveIndent)}", with: "\n")
+    )
+
   let error1 = "leading all-space line must not have too many spaces"
   let error2 = "less indented block scalar than the indicated level"
   return c
@@ -561,7 +563,7 @@ func toInts (string: String) -> [Int] {
 }
 
 func normalizeBreaks (s: String) -> String {
-  return replace(regex("\\r\\n|\\r"), template: "\n")(s)
+  return s.replace("\\r\\n|\\r", with: "\n")
 }
 
 func unwrapQuotedString (s: String) -> String {
@@ -569,7 +571,7 @@ func unwrapQuotedString (s: String) -> String {
 }
 
 func unescapeSingleQuotes (s: String) -> String {
-  return replace(regex("''"), template: "'")(s)
+  return s.replace("''", with: "'")
 }
 
 func unescapeDoubleQuotes (input: String) -> String {

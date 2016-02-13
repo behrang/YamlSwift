@@ -34,17 +34,6 @@ let regexOptions: [Character: NSRegularExpressionOptions] = [
   "m": .AnchorsMatchLines
 ]
 
-func replace (regex: NSRegularExpression, template: String) -> String
-    -> String {
-      return { string in
-        let s = NSMutableString(string: string)
-        let range = NSMakeRange(0, string.utf16.count)
-        regex.replaceMatchesInString(s, options: [], range: range,
-            withTemplate: template)
-        return s as String
-      }
-}
-
 extension String {
   func replace (expression: String, with: String) -> String {
     var split = self.componentsSeparatedByString(expression)
