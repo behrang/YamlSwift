@@ -36,7 +36,7 @@ let regexOptions: [Character: NSRegularExpressionOptions] = [
 
 extension String {
   func replace (expression: String, with: String) -> String {
-    var split = self.componentsSeparatedByString(expression)
+    let split = self.componentsSeparatedByString(expression)
     var newString = split[0]
     for i in 1...(split.count-1) {
       newString += with + split[i]
