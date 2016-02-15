@@ -36,12 +36,13 @@ let regexOptions: [Character: NSRegularExpressionOptions] = [
 
 extension String {
   func replace (expression: String, with: String) -> String {
-    let split = self.componentsSeparatedByString(expression)
-    var newString = split[0]
-    for i in 1...(split.count-1) {
-      newString += with + split[i]
+    return self
+      .componentsSeparatedByString(expression)
+      .reduce("") {
+        $1 == ""
+        ? $0 + $1
+        : $0 + with + $1
     }
-    return newString
   }
 }
 
