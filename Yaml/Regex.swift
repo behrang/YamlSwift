@@ -38,11 +38,7 @@ extension String {
   func replace (expression: String, with: String) -> String {
     return self
       .componentsSeparatedByString(expression)
-      .reduce("") {
-        $1 == ""
-        ? $0 + $1
-        : $0 + with + $1
-    }
+      .joinWithSeparator(with)
   }
 }
 
