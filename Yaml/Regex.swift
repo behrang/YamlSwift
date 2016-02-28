@@ -100,15 +100,11 @@ func substringWithRange (range: NSRange) -> String -> String {
     return (string as NSString).substringWithRange(range)
   }
 }
-
-func substringFromIndex (index: Int) -> String -> String {
-  return { string in
-    return (string as NSString).substringFromIndex(index)
+extension String {
+  subscript(toIndex index:String.Index) -> String {
+    return self[self.startIndex...index]
   }
-}
-
-func substringToIndex (index: Int) -> String -> String {
-  return { string in
-    return (string as NSString).substringToIndex(index)
+  subscript(fromIndex index:String.Index) -> String {
+    return self[index...self.endIndex.predecessor()]
   }
 }
