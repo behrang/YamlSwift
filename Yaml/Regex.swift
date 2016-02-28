@@ -74,8 +74,8 @@ func splitLead (regex: NSRegularExpression) -> String
         if r.location == NSNotFound {
           return ("", string)
         } else {
-          let s = string as NSString
-          let i = r.location + r.length
+          let s = string
+          let i = string.startIndex.advancedBy(r.location + r.length)
           return (s.substringToIndex(i), s.substringFromIndex(i))
         }
       }
