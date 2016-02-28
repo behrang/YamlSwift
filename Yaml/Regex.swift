@@ -95,11 +95,6 @@ func splitTrail (regex: NSRegularExpression) -> String
       }
 }
 
-func substringWithRange (range: NSRange) -> String -> String {
-  return { string in
-    return (string as NSString).substringWithRange(range)
-  }
-}
 extension String {
   subscript(toIndex index:String.Index) -> String {
     return self[self.startIndex...index]
