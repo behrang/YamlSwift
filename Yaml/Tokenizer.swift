@@ -215,8 +215,8 @@ func tokenize (text: String) -> Result<[TokenMatch]> {
           let indent = (indents.last ?? 0)
           let blockPattern = regex(("^\(bBreak)( *| {\(indent),}" +
               "\(plainOutPattern))(?=\(bBreak)|$)"))
-          var block = text
-                |> substringWithRange(range)
+          var block = (text
+                |> substringWithRange(range))
                 .replace("^[ \\t]+|[ \\t]+$", with: "")
           text = text |> substringFromIndex(rangeEnd)
           while true {
@@ -233,8 +233,8 @@ func tokenize (text: String) -> Result<[TokenMatch]> {
           continue next
 
         case .StringFI:
-          let match = text
-                |> substringWithRange(range)
+          let match = (text
+                |> substringWithRange(range))
                 .replace("^[ \\t]|[ \\t]$", with: "")
           matchList.append(TokenMatch(.String, match))
 
