@@ -64,16 +64,16 @@ Takes a string of a YAML document and returns a `Result` of `Yaml` enum value.
 
 ```swift
 let value = Yaml.load("a: 1\nb: 2").value!
-println(value["a"])  // Int(1)
-println(value["b"])  // Int(2)
-println(value["c"])  // Null
+print(value["a"])  // Int(1)
+print(value["b"])  // Int(2)
+print(value["c"])  // Null
 ```
 
 If the input document is invalid or contains more than one YAML document, an error is returned.
 
 ```swift
 let value = Yaml.load("a\nb: 2").error!
-println(value)  // expected end, near "b: 2"
+print(value)  // expected end, near "b: 2"
 ```
 
 
@@ -90,8 +90,8 @@ Takes a string of one or more YAML documents and returns a `Result` of `[Yaml]`.
 
 ```swift
 let value = Yaml.loadMultiple("---\na: 1\nb: 2\n---\na: 3\nb: 4").value!
-println(value[0]["a"])  // Int(1)
-println(value[1]["a"])  // Int(3)
+print(value[0]["a"])  // Int(1)
+print(value[1]["a"])  // Int(3)
 ```
 
 If an error is encountered in any of the documents, an error is returned.
@@ -111,11 +111,11 @@ If used on a `Yaml.Array` value, it will return the value at the specified index
 
 ```swift
 var value = Yaml.load("- Behrang\n- Maryam")
-println(value[0])  // String(Behrang)
-println(value[1])  // String(Maryam)
-println(value[2])  // Null
+print(value[0])  // String(Behrang)
+print(value[1])  // String(Maryam)
+print(value[2])  // Null
 value[2] = "Radin"
-println(value[2])  // String(Radin)
+print(value[2])  // String(Radin)
 ```
 
 
@@ -135,14 +135,14 @@ Since `Yaml` is a literal convertible type, you can pass simple values to this m
 
 ```swift
 var value = Yaml.load("first name: Behrang\nlast name: Noruzi Niya")
-println(value["first name"])  // String(Behrang)
-println(value["last name"])  // String(Noruzi Niya)
-println(value["age"])  // Null
+print(value["first name"])  // String(Behrang)
+print(value["last name"])  // String(Noruzi Niya)
+print(value["age"])  // Null
 value["first name"] = "Radin"
 value["age"] = 1
-println(value["first name"])  // String(Radin)
-println(value["last name"])  // String(Noruzi Niya)
-println(value["age"])  // Int(1)
+print(value["first name"])  // String(Radin)
+print(value["last name"])  // String(Noruzi Niya)
+print(value["age"])  // Int(1)
 ```
 
 
@@ -159,9 +159,9 @@ Returns an `Optional<Bool>` value. If the value is a `Yaml.Bool` value, the wrap
 
 ```swift
 let value = Yaml.load("animate: true\nshow tip: false\nusage: 25")
-println(value["animate"].bool)  // Optional(true)
-println(value["show tip"].bool)  // Optional(false)
-println(value["usage"].bool)  // nil
+print(value["animate"].bool)  // Optional(true)
+print(value["show tip"].bool)  // Optional(false)
+print(value["usage"].bool)  // nil
 ```
 
 
@@ -178,9 +178,9 @@ Returns an `Optional<Int>` value. If the value is a `Yaml.Int` value, the wrappe
 
 ```swift
 let value = Yaml.load("a: 1\nb: 2.0\nc: 2.5")
-println(value["a"].int)  // Optional(1)
-println(value["b"].int)  // Optional(2)
-println(value["c"].int)  // nil
+print(value["a"].int)  // Optional(1)
+print(value["b"].int)  // Optional(2)
+print(value["c"].int)  // nil
 ```
 
 
@@ -197,10 +197,10 @@ Returns an `Optional<Double>` value. If the value is a `Yaml.Double` value, the 
 
 ```swift
 let value = Yaml.load("a: 1\nb: 2.0\nc: 2.5\nd: true")
-println(value["a"].double)  // Optional(1.0)
-println(value["b"].double)  // Optional(2.0)
-println(value["c"].double)  // Optional(2.5)
-println(value["d"].double)  // nil
+print(value["a"].double)  // Optional(1.0)
+print(value["b"].double)  // Optional(2.0)
+print(value["c"].double)  // Optional(2.5)
+print(value["d"].double)  // nil
 ```
 
 
@@ -217,9 +217,9 @@ Returns an `Optional<String>` value. If the value is a `Yaml.String` value, the 
 
 ```swift
 let value = Yaml.load("first name: Behrang\nlast name: Noruzi Niya\nage: 33")
-println(value["first name"].string)  // Optional("Behrang")
-println(value["last name"].string)  // Optional("Noruzi Niya")
-println(value["age"].string)  // nil
+print(value["first name"].string)  // Optional("Behrang")
+print(value["last name"].string)  // Optional("Noruzi Niya")
+print(value["age"].string)  // nil
 ```
 
 
@@ -236,8 +236,8 @@ Returns an `Optional<Array<Yaml>>` value. If the value is a `Yaml.Array` value, 
 
 ```swift
 let value = Yaml.load("languages:\n - Swift: true\n - Objective C: false")
-println(value.array)  // nil
-println(value["languages"].array)  // Optional([Dictionary([String(Swift): Bool(true)]), Dictionary([String(Objective C): Bool(false)])])
+print(value.array)  // nil
+print(value["languages"].array)  // Optional([Dictionary([String(Swift): Bool(true)]), Dictionary([String(Objective C): Bool(false)])])
 ```
 
 
@@ -254,8 +254,8 @@ Returns an `Optional<Dictionary<Yaml, Yaml>>` value. If the value is a `Yaml.Dic
 
 ```swift
 let value = Yaml.load("- Swift: true\n- Objective C: false")
-println(value.dictionary)  // nil
-println(value[0].dictionary)  // Optional([String(Swift): Bool(true)])
+print(value.dictionary)  // nil
+print(value[0].dictionary)  // Optional([String(Swift): Bool(true)])
 ```
 
 
@@ -272,9 +272,9 @@ Returns an `Optional<Int>` value. If the value is either a `Yaml.Array` or a `Ya
 
 ```swift
 let value = Yaml.load("- Swift: true\n- Objective C: false")
-println(value.count)  // Optional(2)
-println(value[0].count)  // Optional(1)
-println(value[0]["Swift"].count)  // nil
+print(value.count)  // Optional(2)
+print(value[0].count)  // Optional(1)
+print(value[0]["Swift"].count)  // nil
 ```
 
 
