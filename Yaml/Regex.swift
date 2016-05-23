@@ -34,15 +34,12 @@ let regexOptions: [Character: NSRegularExpressionOptions] = [
   "m": .AnchorsMatchLines
 ]
 
-func replace (regex: NSRegularExpression, template: String) -> String
-    -> String {
-      return { string in
-        let s = NSMutableString(string: string)
-        let range = NSMakeRange(0, string.utf16.count)
-        regex.replaceMatchesInString(s, options: [], range: range,
-            withTemplate: template)
-        return s as String
-      }
+extension String {
+  func replace (expression: String, with: String) -> String {
+    return self
+      .componentsSeparatedByString(expression)
+      .joinWithSeparator(with)
+  }
 }
 
 func replace (regex: NSRegularExpression, block: [String] -> String)
@@ -77,8 +74,8 @@ func splitLead (regex: NSRegularExpression) -> String
         if r.location == NSNotFound {
           return ("", string)
         } else {
-          let s = string as NSString
-          let i = r.location + r.length
+          let s = string
+          let i = string.startIndex.advancedBy(r.location + r.length)
           return (s.substringToIndex(i), s.substringFromIndex(i))
         }
       }
@@ -98,20 +95,11 @@ func splitTrail (regex: NSRegularExpression) -> String
       }
 }
 
-func substringWithRange (range: NSRange) -> String -> String {
-  return { string in
-    return (string as NSString).substringWithRange(range)
+extension String {
+  subscript(toIndex index:String.Index) -> String {
+    return self[self.startIndex...index]
   }
-}
-
-func substringFromIndex (index: Int) -> String -> String {
-  return { string in
-    return (string as NSString).substringFromIndex(index)
-  }
-}
-
-func substringToIndex (index: Int) -> String -> String {
-  return { string in
-    return (string as NSString).substringToIndex(index)
+  subscript(fromIndex index:String.Index) -> String {
+    return self[index...self.endIndex.predecessor()]
   }
 }

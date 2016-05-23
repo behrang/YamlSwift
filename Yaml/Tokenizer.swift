@@ -109,9 +109,9 @@ let tokenPatterns: [TokenPattern] = [
 func escapeErrorContext (text: String) -> String {
   let endIndex = text.startIndex.advancedBy(50, limit: text.endIndex)
   let escaped = text.substringToIndex(endIndex)
-      |> replace(regex("\\r"), template: "\\\\r")
-      |> replace(regex("\\n"), template: "\\\\n")
-      |> replace(regex("\""), template: "\\\\\"")
+      .replace("\\r", with: "\\\\r")
+      .replace("\\n", with: "\\\\n")
+      .replace("\"" , with: "\\\\\"")
   return "near \"\(escaped)\""
 }
 
@@ -200,9 +200,9 @@ func tokenize (text: String) -> Result<[TokenMatch]> {
           let (lead, rest) = text |> splitLead(blockPattern)
           text = rest
           let block = (lead
-              |> replace(regex("^\(bBreak)"), template: "")
-              |> replace(regex("^ {0,\(lastIndent)}"), template: "")
-              |> replace(regex("\(bBreak) {0,\(lastIndent)}"), template: "\n")
+              .replace("^\(bBreak)", with: "")
+              .replace("^ {0,\(lastIndent)}", with: "")
+              .replace("\(bBreak) {0,\(lastIndent)}", with: "\n")
             ) + (matches(text, regex: regex("^\(bBreak)")) && lead.endIndex > lead.startIndex
               ? "\n" : "")
           matchList.append(TokenMatch(.String, block))
@@ -215,9 +215,9 @@ func tokenize (text: String) -> Result<[TokenMatch]> {
           let indent = (indents.last ?? 0)
           let blockPattern = regex(("^\(bBreak)( *| {\(indent),}" +
               "\(plainOutPattern))(?=\(bBreak)|$)"))
-          var block = text
-                |> substringWithRange(range)
-                |> replace(regex("^[ \\t]+|[ \\t]+$"), template: "")
+          var block = (text
+                |> substringWithRange(range))
+                .replace("^[ \\t]+|[ \\t]+$", with: "")
           text = text |> substringFromIndex(rangeEnd)
           while true {
             let range = matchRange(text, regex: blockPattern)
@@ -226,16 +226,16 @@ func tokenize (text: String) -> Result<[TokenMatch]> {
             }
             let s = text |> substringWithRange(range)
             block += "\n" +
-                replace(regex("^\(bBreak)[ \\t]*|[ \\t]+$"), template: "")(s)
+                s.replace("^\(bBreak)[ \\t]*|[ \\t]+$", with: "")
             text = text |> substringFromIndex(range.location + range.length)
           }
           matchList.append(TokenMatch(.String, block))
           continue next
 
         case .StringFI:
-          let match = text
-                |> substringWithRange(range)
-                |> replace(regex("^[ \\t]|[ \\t]$"), template: "")
+          let match = (text
+                |> substringWithRange(range))
+                .replace("^[ \\t]|[ \\t]$", with: "")
           matchList.append(TokenMatch(.String, match))
 
         case .Reserved:
