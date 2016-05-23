@@ -11,11 +11,12 @@
             buildForRunning = "YES"
             buildForProfiling = "YES"
             buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
+            buildForAnalyzing = "YES"
+            hideIssues = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8313C4281C8DC2CB00DEF215"
-               BuildableName = "Yaml tvOS.framework"
+               BuildableName = "Yaml.framework"
                BlueprintName = "Yaml tvOS"
                ReferencedContainer = "container:Yaml.xcodeproj">
             </BuildableReference>
@@ -43,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8313C4281C8DC2CB00DEF215"
-            BuildableName = "Yaml tvOS.framework"
+            BuildableName = "Yaml.framework"
             BlueprintName = "Yaml tvOS"
             ReferencedContainer = "container:Yaml.xcodeproj">
          </BuildableReference>
@@ -65,7 +66,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8313C4281C8DC2CB00DEF215"
-            BuildableName = "Yaml tvOS.framework"
+            BuildableName = "Yaml.framework"
             BlueprintName = "Yaml tvOS"
             ReferencedContainer = "container:Yaml.xcodeproj">
          </BuildableReference>
@@ -83,7 +84,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8313C4281C8DC2CB00DEF215"
-            BuildableName = "Yaml tvOS.framework"
+            BuildableName = "Yaml.framework"
             BlueprintName = "Yaml tvOS"
             ReferencedContainer = "container:Yaml.xcodeproj">
          </BuildableReference>
