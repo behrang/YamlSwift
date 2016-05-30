@@ -1,6 +1,6 @@
 import Foundation
 
-enum TokenType: Swift.String, CustomStringConvertible {
+enum TokenType: Swift.String {
   case YamlDirective = "%YAML"
   case DocStart = "doc-start"
   case DocEnd = "doc-end"
@@ -44,10 +44,6 @@ enum TokenType: Swift.String, CustomStringConvertible {
   case StringFO = "string-flow-out"
   case String = "string"
   case End = "end"
-
-  var description: Swift.String {
-    return self.rawValue
-  }
 }
 
 typealias TokenPattern = (type: TokenType, pattern: NSRegularExpression)
