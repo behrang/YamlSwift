@@ -191,7 +191,7 @@ func parse (context: Context) -> Result<ContextValue> {
     return lift((advance(context), .Double(Double.NaN)))
 
   case .Double:
-    let m = peekMatch(context) as NSString
+    let m = NSString(string: peekMatch(context))
     return lift((advance(context), .Double(m.doubleValue)))
 
   case .Dash:
@@ -552,9 +552,9 @@ func toInts (string: String) -> [Int] {
   return string.unicodeScalars.map {
     c in
     switch c {
-    case "0"..."9": return Int(c.value) - Int(UnicodeScalar("0").value)
-    case "a"..."z": return Int(c.value) - Int(UnicodeScalar("a").value) + 10
-    case "A"..."Z": return Int(c.value) - Int(UnicodeScalar("A").value) + 10
+    case "0"..."9": return Int(c.value) - Int(("0" as UnicodeScalar).value)
+    case "a"..."z": return Int(c.value) - Int(("a" as UnicodeScalar).value) + 10
+    case "A"..."Z": return Int(c.value) - Int(("A" as UnicodeScalar).value) + 10
     default: fatalError("invalid digit \(c)")
     }
   }

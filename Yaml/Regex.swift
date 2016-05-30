@@ -37,7 +37,7 @@ func replace (regex: NSRegularExpression, template: String) -> String
         let range = NSMakeRange(0, string.utf16.count)
         regex.replaceMatchesInString(s, options: [], range: range,
             withTemplate: template)
-        return s as String
+        return String(s)
       }
 }
 
@@ -53,7 +53,7 @@ func replace (regex: NSRegularExpression, block: [String] -> String)
               var captures = [String](count: result.numberOfRanges, repeatedValue: "")
               for i in 0..<result.numberOfRanges {
                 if let r = result.rangeAtIndex(i).toRange() {
-                  captures[i] = (string as NSString).substringWithRange(NSRange(r))
+                  captures[i] = NSString(string: string).substringWithRange(NSRange(r))
                 }
               }
               let replacement = block(captures)
@@ -62,7 +62,7 @@ func replace (regex: NSRegularExpression, block: [String] -> String)
               s.replaceCharactersInRange(offR, withString: replacement)
           }
         }
-        return s as String
+        return String(s)
       }
 }
 
@@ -73,7 +73,7 @@ func splitLead (regex: NSRegularExpression) -> String
         if r.location == NSNotFound {
           return ("", string)
         } else {
-          let s = string as NSString
+          let s = NSString(string: string)
           let i = r.location + r.length
           return (s.substringToIndex(i), s.substringFromIndex(i))
         }
@@ -87,7 +87,7 @@ func splitTrail (regex: NSRegularExpression) -> String
         if r.location == NSNotFound {
           return (string, "")
         } else {
-          let s = string as NSString
+          let s = NSString(string: string)
           let i = r.location
           return (s.substringToIndex(i), s.substringFromIndex(i))
         }
@@ -96,12 +96,12 @@ func splitTrail (regex: NSRegularExpression) -> String
 
 func substringWithRange (range: NSRange) -> String -> String {
   return { string in
-    return (string as NSString).substringWithRange(range)
+    return NSString(string: string).substringWithRange(range)
   }
 }
 
 func substringFromIndex (index: Int) -> String -> String {
   return { string in
-    return (string as NSString).substringFromIndex(index)
+    return NSString(string: string).substringFromIndex(index)
   }
 }
