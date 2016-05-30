@@ -1,6 +1,6 @@
 public enum Result<T> {
   case Error(String)
-  case Value(Box<T>)
+  case Value(T)
 
   public var error: String? {
     switch self {
@@ -12,21 +12,21 @@ public enum Result<T> {
   public var value: T? {
     switch self {
     case .Error: return nil
-    case .Value(let v): return v.value
+    case .Value(let v): return v
     }
   }
 
   public func map <U> (f: T -> U) -> Result<U> {
     switch self {
     case .Error(let e): return .Error(e)
-    case .Value(let v): return .Value(Box(f(v.value)))
+    case .Value(let v): return .Value(f(v))
     }
   }
 
   public func flatMap <U> (f: T -> Result<U>) -> Result<U> {
     switch self {
     case .Error(let e): return .Error(e)
-    case .Value(let v): return f(v.value)
+    case .Value(let v): return f(v)
     }
   }
 }
@@ -36,7 +36,7 @@ func <*> <T, U> (f: Result<T -> U>, x: Result<T>) -> Result<U> {
   switch (x, f) {
   case (.Error(let e), _): return .Error(e)
   case (.Value, .Error(let e)): return .Error(e)
-  case (.Value(let x), .Value(let f)): return .Value(Box(f.value(x.value)))
+  case (.Value(let x), .Value(let f)): return .Value(f(x))
   }
 }
 
@@ -61,7 +61,7 @@ func >>| <T, U> (x: Result<T>, y: Result<U>) -> Result<U> {
 }
 
 func lift <V> (v: V) -> Result<V> {
-  return .Value(Box(v))
+  return .Value(v)
 }
 
 func fail <T> (e: String) -> Result<T> {
@@ -74,17 +74,4 @@ func join <T> (x: Result<Result<T>>) -> Result<T> {
 
 func `guard` (@autoclosure error: () -> String, check: Bool) -> Result<()> {
   return check ? lift(()) : .Error(error())
-}
-
-// Required for boxing for now.
-public class Box<T> {
-  let _value: () -> T
-
-  init(_ value: T) {
-    _value = { value }
-  }
-
-  var value: T {
-    return _value()
-  }
 }
