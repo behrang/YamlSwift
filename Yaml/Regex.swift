@@ -17,11 +17,7 @@ func regex (pattern: String, options: String = "") -> NSRegularExpression! {
   let opts = options.characters.reduce(NSRegularExpressionOptions()) { (acc, opt) -> NSRegularExpressionOptions in
     return NSRegularExpressionOptions(rawValue:acc.rawValue | (regexOptions[opt] ?? NSRegularExpressionOptions()).rawValue)
   }
-  do {
-    return try NSRegularExpression(pattern: pattern, options: opts)
-  } catch _ {
-    return nil
-  }
+  return try? NSRegularExpression(pattern: pattern, options: opts)
 }
 
 let invalidOptionsPattern =
@@ -107,11 +103,5 @@ func substringWithRange (range: NSRange) -> String -> String {
 func substringFromIndex (index: Int) -> String -> String {
   return { string in
     return (string as NSString).substringFromIndex(index)
-  }
-}
-
-func substringToIndex (index: Int) -> String -> String {
-  return { string in
-    return (string as NSString).substringToIndex(index)
   }
 }
