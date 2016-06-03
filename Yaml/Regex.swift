@@ -35,9 +35,13 @@ func replace (_ regex: NSRegularExpression, template: String) -> (String)
       return { string in
         let s = NSMutableString(string: string)
         let range = NSMakeRange(0, string.utf16.count)
-        regex.replaceMatches(in: s, options: [], range: range,
-            withTemplate: template)
+        _ = regex.replaceMatches(in: s, options: [], range: range,
+                                 withTemplate: template)
+#if os(Linux)
+        return String(s)
+#else
         return s as String
+#endif
       }
 }
 
@@ -62,7 +66,11 @@ func replace (_ regex: NSRegularExpression, block: ([String]) -> String)
               s.replaceCharacters(in: offR, with: replacement)
           }
         }
+#if os(Linux)
+        return String(s)
+#else
         return s as String
+#endif
       }
 }
 
