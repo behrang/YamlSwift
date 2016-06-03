@@ -357,3 +357,27 @@ class YamlTests: XCTestCase {
   }
   
 }
+
+#if os(Linux)
+
+extension YamlTests {
+  static var allTests: [(String, (YamlTests) -> () throws -> Void)] {
+    return [
+      ("testNull", testNull),
+      ("testBool", testBool),
+      ("testInt", testInt),
+      ("testDouble", testDouble),
+      ("testString", testString),
+      ("testFlowSeq", testFlowSeq),
+      ("testBlockSeq", testBlockSeq),
+      ("testFlowMap", testFlowMap),
+      ("testBlockMap", testBlockMap),
+      ("testDirectives", testDirectives),
+      ("testReserves", testReserves),
+      ("testAliases", testAliases),
+      ("testUnicodeSurrogates", testUnicodeSurrogates),
+    ]
+  }
+}
+
+#endif
