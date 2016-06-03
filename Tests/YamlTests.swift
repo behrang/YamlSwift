@@ -105,7 +105,7 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load("-.inf # comment").value!.double == -Double.infinity)
     XCTAssert(Yaml.load("-.inf -.inf").value! == "-.inf -.inf")
     
-    XCTAssert(Yaml.load(".nan").value! != .Double(Double.NaN))
+    XCTAssert(Yaml.load(".nan").value! != .Double(Double.nan))
     XCTAssert(Yaml.load(".nan").value!.double!.isNaN)
     XCTAssert(Yaml.load(".NaN").value!.double!.isNaN)
     XCTAssert(Yaml.load(".NAN").value!.double!.isNaN)
@@ -273,7 +273,7 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load("[true, [false, true]]").value! == [true, [false, true]])
     XCTAssert(Yaml.load("[true, true  ,false,  false  ,  false]").value! ==
       [true, true, false, false, false])
-    XCTAssert(Yaml.load("[true, .NaN]").value! != [true, .Double(Double.NaN)])
+    XCTAssert(Yaml.load("[true, .NaN]").value! != [true, .Double(Double.nan)])
     XCTAssert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, 0, 123, -456" +
       ", 0o74, 0xFf, 1.23, -4.5]").value! ==
       [nil, nil, true, false,

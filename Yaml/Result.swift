@@ -16,14 +16,14 @@ public enum Result<T> {
     }
   }
 
-  public func map <U> (f: T -> U) -> Result<U> {
+  public func map <U> (f: (T) -> U) -> Result<U> {
     switch self {
     case .Error(let e): return .Error(e)
     case .Value(let v): return .Value(f(v))
     }
   }
 
-  public func flatMap <U> (f: T -> Result<U>) -> Result<U> {
+  public func flatMap <U> (f: (T) -> Result<U>) -> Result<U> {
     switch self {
     case .Error(let e): return .Error(e)
     case .Value(let v): return f(v)
@@ -32,7 +32,7 @@ public enum Result<T> {
 }
 
 infix operator <*> { associativity left }
-func <*> <T, U> (f: Result<T -> U>, x: Result<T>) -> Result<U> {
+func <*> <T, U> (f: Result<(T) -> U>, x: Result<T>) -> Result<U> {
   switch (x, f) {
   case (.Error(let e), _): return .Error(e)
   case (.Value, .Error(let e)): return .Error(e)
@@ -41,18 +41,18 @@ func <*> <T, U> (f: Result<T -> U>, x: Result<T>) -> Result<U> {
 }
 
 infix operator <^> { associativity left }
-func <^> <T, U> (f: T -> U, x: Result<T>) -> Result<U> {
-  return x.map(f)
+func <^> <T, U> (f: (T) -> U, x: Result<T>) -> Result<U> {
+  return x.map(f: f)
 }
 
 infix operator >>- { associativity left }
-func >>- <T, U> (x: Result<T>, f: T -> U) -> Result<U> {
-  return x.map(f)
+func >>- <T, U> (x: Result<T>, f: (T) -> U) -> Result<U> {
+  return x.map(f: f)
 }
 
 infix operator >>=- { associativity left }
-func >>=- <T, U> (x: Result<T>, f: T -> Result<U>) -> Result<U> {
-  return x.flatMap(f)
+func >>=- <T, U> (x: Result<T>, f: (T) -> Result<U>) -> Result<U> {
+  return x.flatMap(f: f)
 }
 
 infix operator >>| { associativity left }
@@ -60,18 +60,18 @@ func >>| <T, U> (x: Result<T>, y: Result<U>) -> Result<U> {
   return x.flatMap { _ in y }
 }
 
-func lift <V> (v: V) -> Result<V> {
+func lift <V> (_ v: V) -> Result<V> {
   return .Value(v)
 }
 
-func fail <T> (e: String) -> Result<T> {
+func fail <T> (_ e: String) -> Result<T> {
   return .Error(e)
 }
 
-func join <T> (x: Result<Result<T>>) -> Result<T> {
+func join <T> (_ x: Result<Result<T>>) -> Result<T> {
   return x >>=- { i in i }
 }
 
-func `guard` (@autoclosure error: () -> String, check: Bool) -> Result<()> {
+func `guard` (_ error: @autoclosure() -> String, check: Bool) -> Result<()> {
   return check ? lift(()) : .Error(error())
 }

@@ -90,15 +90,15 @@ extension Yaml: Hashable {
 }
 
 extension Yaml {
-  public static func load (text: Swift.String) -> Result<Yaml> {
+  public static func load (_ text: Swift.String) -> Result<Yaml> {
     return tokenize(text) >>=- parseDoc
   }
 
-  public static func loadMultiple (text: Swift.String) -> Result<[Yaml]> {
+  public static func loadMultiple (_ text: Swift.String) -> Result<[Yaml]> {
     return tokenize(text) >>=- parseDocs
   }
 
-  public static func debug (text: Swift.String) -> Result<Yaml> {
+  public static func debug (_ text: Swift.String) -> Result<Yaml> {
     let result = tokenize(text)
         >>- { tokens in print("\n====== Tokens:\n\(tokens)"); return tokens }
         >>=- parseDoc
@@ -109,7 +109,7 @@ extension Yaml {
     return result
   }
 
-  public static func debugMultiple (text: Swift.String) -> Result<[Yaml]> {
+  public static func debugMultiple (_ text: Swift.String) -> Result<[Yaml]> {
     let result = tokenize(text)
         >>- { tokens in print("\n====== Tokens:\n\(tokens)"); return tokens }
         >>=- parseDocs
@@ -143,13 +143,13 @@ extension Yaml {
       switch self {
       case .Array(let array):
         let emptyCount = max(0, index + 1 - array.count)
-        let empty = [Yaml](count: emptyCount, repeatedValue: .Null)
+        let empty = [Yaml](repeating: .Null, count: emptyCount)
         var new = array
-        new.appendContentsOf(empty)
+        new.append(contentsOf: empty)
         new[index] = newValue
         self = .Array(new)
       default:
-        var array = [Yaml](count: index + 1, repeatedValue: .Null)
+        var array = [Yaml](repeating: .Null, count: index + 1)
         array[index] = newValue
         self = .Array(array)
       }

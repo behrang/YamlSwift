@@ -71,7 +71,7 @@ let tokenPatterns: [TokenPattern] = [
   (.Comment, regex("^#.*|^\(bBreak) *(#.*)?(?=\(bBreak)|$)")),
   (.Space, regex("^ +")),
   (.NewLine, regex("^\(bBreak) *")),
-  (.Dash, dashPattern),
+  (.Dash, dashPattern!),
   (.Null, regex("^(null|Null|NULL|~)\(finish)")),
   (.True, regex("^(true|True|TRUE)\(finish)")),
   (.False, regex("^(false|False|FALSE)\(finish)")),
@@ -102,16 +102,16 @@ let tokenPatterns: [TokenPattern] = [
   (.StringFI, regex("^\(plainInPattern)")),
 ]
 
-func escapeErrorContext (text: String) -> String {
-  let endIndex = text.startIndex.advancedBy(50, limit: text.endIndex)
-  let escaped = text.substringToIndex(endIndex)
+func escapeErrorContext (_ text: String) -> String {
+  let endIndex = text.index(text.startIndex, offsetBy: 50, limitedBy: text.endIndex) ?? text.endIndex
+  let escaped = text.substring(to: endIndex)
       |> replace(regex("\\r"), template: "\\\\r")
       |> replace(regex("\\n"), template: "\\\\n")
       |> replace(regex("\""), template: "\\\\\"")
   return "near \"\(escaped)\""
 }
 
-func tokenize (text: String) -> Result<[TokenMatch]> {
+func tokenize (_ text: String) -> Result<[TokenMatch]> {
   var text = text
   var matchList: [TokenMatch] = []
   var indents = [0]
@@ -127,10 +127,10 @@ func tokenize (text: String) -> Result<[TokenMatch]> {
         case .NewLine:
           let match = text |> substringWithRange(range)
           let lastIndent = indents.last ?? 0
-          let rest = match.substringFromIndex(match.startIndex.successor())
+          let rest = match.substring(from: match.index(after: match.startIndex))
           let spaces = rest.characters.count
           let nestedBlockSequence =
-                matches(text |> substringFromIndex(rangeEnd), regex: dashPattern)
+                matches(text |> substringFromIndex(rangeEnd), regex: dashPattern!)
           if spaces == lastIndent {
             matchList.append(TokenMatch(.NewLine, match))
           } else if spaces > lastIndent {
@@ -157,12 +157,12 @@ func tokenize (text: String) -> Result<[TokenMatch]> {
 
         case .Dash, .QuestionMark:
           let match = text |> substringWithRange(range)
-          let index = match.startIndex.successor()
+          let index = match.index(after: match.startIndex)
           let indent = match.characters.count
           indents.append((indents.last ?? 0) + indent)
           matchList.append(
-              TokenMatch(tokenPattern.type, match.substringToIndex(index)))
-          matchList.append(TokenMatch(.Indent, match.substringFromIndex(index)))
+            TokenMatch(tokenPattern.type, match.substring(to: index)))
+          matchList.append(TokenMatch(.Indent, match.substring(from: index)))
 
         case .ColonFO:
           if insideFlow > 0 {
@@ -193,7 +193,7 @@ func tokenize (text: String) -> Result<[TokenMatch]> {
           let minIndent = 1 + lastIndent
           let blockPattern = regex(("^(\(bBreak) *)*(\(bBreak)" +
               "( {\(minIndent),})[^ ].*(\(bBreak)( *|\\3.*))*)(?=\(bBreak)|$)"))
-          let (lead, rest) = text |> splitLead(blockPattern)
+          let (lead, rest) = text |> splitLead(blockPattern!)
           text = rest
           let block = (lead
               |> replace(regex("^\(bBreak)"), template: "")
@@ -216,7 +216,7 @@ func tokenize (text: String) -> Result<[TokenMatch]> {
                 |> replace(regex("^[ \\t]+|[ \\t]+$"), template: "")
           text = text |> substringFromIndex(rangeEnd)
           while true {
-            let range = matchRange(text, regex: blockPattern)
+            let range = matchRange(text, regex: blockPattern!)
             if range.location == NSNotFound {
               break
             }
