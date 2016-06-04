@@ -129,7 +129,7 @@ extension Yaml {
       assert(index >= 0)
       switch self {
       case .Array(let array):
-        if index >= array.startIndex && index < array.endIndex {
+        if array.indices.contains(index) {
           return array[index]
         } else {
           return .Null
