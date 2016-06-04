@@ -48,12 +48,7 @@ extension Yaml: StringLiteralConvertible {
 
 extension Yaml: ArrayLiteralConvertible {
   public init(arrayLiteral elements: Yaml...) {
-    var array = [Yaml]()
-    array.reserveCapacity(elements.count)
-    for element in elements {
-      array.append(element)
-    }
-    self = .Array(array)
+    self = .Array(elements)
   }
 }
 
