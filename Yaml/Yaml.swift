@@ -280,10 +280,6 @@ public func == (lhs: Yaml, rhs: Yaml) -> Bool {
   }
 }
 
-public func != (lhs: Yaml, rhs: Yaml) -> Bool {
-  return !(lhs == rhs)
-}
-
 // unary `-` operator
 public prefix func - (value: Yaml) -> Yaml {
   switch value {
