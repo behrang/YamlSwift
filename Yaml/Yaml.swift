@@ -256,77 +256,27 @@ extension Yaml {
 }
 
 public func == (lhs: Yaml, rhs: Yaml) -> Bool {
-  switch lhs {
-
-  case .Null:
-    switch rhs {
-    case .Null:
-      return true
-    default:
-      return false
-    }
-
-  case .Bool(let lv):
-    switch rhs {
-    case .Bool(let rv):
-      return lv == rv
-    default:
-      return false
-    }
-
-  case .Int(let lv):
-    switch rhs {
-    case .Int(let rv):
-      return lv == rv
-    case .Double(let rv):
-      return Double(lv) == rv
-    default:
-      return false
-    }
-
-  case .Double(let lv):
-    switch rhs {
-    case .Double(let rv):
-      return lv == rv
-    case .Int(let rv):
-      return lv == Double(rv)
-    default:
-      return false
-    }
-
-  case .String(let lv):
-    switch rhs {
-    case .String(let rv):
-      return lv == rv
-    default:
-      return false
-    }
-
-  case .Array(let lv):
-    switch rhs {
-    case .Array(let rv) where lv.count == rv.count:
-      for i in 0..<lv.count {
-        if lv[i] != rv[i] {
-          return false
-        }
-      }
-      return true
-    default:
-      return false
-    }
-
-  case .Dictionary(let lv):
-    switch rhs {
-    case .Dictionary(let rv) where lv.count == rv.count:
-      for (k, v) in lv {
-        if rv[k] == nil || rv[k] != v {
-          return false
-        }
-      }
-      return true
-    default:
-      return false
-    }
+  switch (lhs, rhs) {
+  case (.Null, .Null):
+    return true
+  case (.Bool(let lv), .Bool(let rv)):
+    return lv == rv
+  case (.Int(let lv), .Int(let rv)):
+    return lv == rv
+  case (.Int(let lv), .Double(let rv)):
+    return Double(lv) == rv
+  case (.Double(let lv), .Double(let rv)):
+    return lv == rv
+  case (.Double(let lv), .Int(let rv)):
+    return lv == Double(rv)
+  case (.String(let lv), .String(let rv)):
+    return lv == rv
+  case (.Array(let lv), .Array(let rv)):
+    return lv == rv
+  case (.Dictionary(let lv), .Dictionary(let rv)):
+    return lv == rv
+  default:
+    return false
   }
 }
 
