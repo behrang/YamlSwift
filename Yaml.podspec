@@ -27,4 +27,7 @@ Pod::Spec.new do |s|
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.source_files = "Yaml/*.swift"
 
+  # --- Target xcconfig ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '2.3' }
+
 end
