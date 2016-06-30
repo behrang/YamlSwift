@@ -1,36 +1,36 @@
 import Foundation
 
-func matchRange (_ string: String, regex: NSRegularExpression) -> NSRange {
+func matchRange (_ string: String, regex: RegularExpression) -> NSRange {
   let sr = NSMakeRange(0, string.utf16.count)
   return regex.rangeOfFirstMatch(in: string, options: [], range: sr)
 }
 
-func matches (_ string: String, regex: NSRegularExpression) -> Bool {
+func matches (_ string: String, regex: RegularExpression) -> Bool {
   return matchRange(string, regex: regex).location != NSNotFound
 }
 
-func regex (_ pattern: String, options: String = "") -> NSRegularExpression! {
+func regex (_ pattern: String, options: String = "") -> RegularExpression! {
   if matches(options, regex: invalidOptionsPattern) {
     return nil
   }
 
-  let opts = options.characters.reduce(NSRegularExpressionOptions()) { (acc, opt) -> NSRegularExpressionOptions in
-    return NSRegularExpressionOptions(rawValue:acc.rawValue | (regexOptions[opt] ?? NSRegularExpressionOptions()).rawValue)
+  let opts = options.characters.reduce(RegularExpression.Options()) { (acc, opt) -> RegularExpression.Options in
+    return RegularExpression.Options(rawValue:acc.rawValue | (regexOptions[opt] ?? RegularExpression.Options()).rawValue)
   }
-  return try? NSRegularExpression(pattern: pattern, options: opts)
+  return try? RegularExpression(pattern: pattern, options: opts)
 }
 
 let invalidOptionsPattern =
-        try! NSRegularExpression(pattern: "[^ixsm]", options: [])
+        try! RegularExpression(pattern: "[^ixsm]", options: [])
 
-let regexOptions: [Character: NSRegularExpressionOptions] = [
+let regexOptions: [Character: RegularExpression.Options] = [
   "i": .caseInsensitive,
   "x": .allowCommentsAndWhitespace,
   "s": .dotMatchesLineSeparators,
   "m": .anchorsMatchLines
 ]
 
-func replace (_ regex: NSRegularExpression, template: String) -> (String)
+func replace (_ regex: RegularExpression, template: String) -> (String)
     -> String {
       return { string in
         let s = NSMutableString(string: string)
@@ -45,7 +45,7 @@ func replace (_ regex: NSRegularExpression, template: String) -> (String)
       }
 }
 
-func replace (_ regex: NSRegularExpression, block: ([String]) -> String)
+func replace (_ regex: RegularExpression, block: ([String]) -> String)
     -> (String) -> String {
       return { string in
         let s = NSMutableString(string: string)
@@ -74,7 +74,7 @@ func replace (_ regex: NSRegularExpression, block: ([String]) -> String)
       }
 }
 
-func splitLead (_ regex: NSRegularExpression) -> (String)
+func splitLead (_ regex: RegularExpression) -> (String)
     -> (String, String) {
       return { string in
         let r = matchRange(string, regex: regex)
@@ -88,7 +88,7 @@ func splitLead (_ regex: NSRegularExpression) -> (String)
       }
 }
 
-func splitTrail (_ regex: NSRegularExpression) -> (String)
+func splitTrail (_ regex: RegularExpression) -> (String)
     -> (String, String) {
       return { string in
         let r = matchRange(string, regex: regex)

@@ -46,7 +46,7 @@ enum TokenType: Swift.String {
   case End = "end"
 }
 
-typealias TokenPattern = (type: TokenType, pattern: NSRegularExpression)
+typealias TokenPattern = (type: TokenType, pattern: RegularExpression)
 typealias TokenMatch = (type: TokenType, match: String)
 
 let bBreak = "(?:\\r\\n|\\r|\\n)"
