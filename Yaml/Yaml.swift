@@ -8,31 +8,31 @@ public enum Yaml {
   case Dictionary([Yaml: Yaml])
 }
 
-extension Yaml: NilLiteralConvertible {
+extension Yaml: ExpressibleByNilLiteral {
   public init(nilLiteral: ()) {
     self = .Null
   }
 }
 
-extension Yaml: BooleanLiteralConvertible {
+extension Yaml: ExpressibleByBooleanLiteral {
   public init(booleanLiteral: BooleanLiteralType) {
     self = .Bool(booleanLiteral)
   }
 }
 
-extension Yaml: IntegerLiteralConvertible {
+extension Yaml: ExpressibleByIntegerLiteral {
   public init(integerLiteral: IntegerLiteralType) {
     self = .Int(integerLiteral)
   }
 }
 
-extension Yaml: FloatLiteralConvertible {
+extension Yaml: ExpressibleByFloatLiteral {
   public init(floatLiteral: FloatLiteralType) {
     self = .Double(floatLiteral)
   }
 }
 
-extension Yaml: StringLiteralConvertible {
+extension Yaml: ExpressibleByStringLiteral {
   public init(stringLiteral: StringLiteralType) {
     self = .String(stringLiteral)
   }
@@ -46,13 +46,13 @@ extension Yaml: StringLiteralConvertible {
   }
 }
 
-extension Yaml: ArrayLiteralConvertible {
+extension Yaml: ExpressibleByArrayLiteral {
   public init(arrayLiteral elements: Yaml...) {
     self = .Array(elements)
   }
 }
 
-extension Yaml: DictionaryLiteralConvertible {
+extension Yaml: ExpressibleByDictionaryLiteral {
   public init(dictionaryLiteral elements: (Yaml, Yaml)...) {
     var dictionary = [Yaml: Yaml]()
     for (k, v) in elements {

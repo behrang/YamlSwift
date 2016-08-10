@@ -539,7 +539,7 @@ func parseInt (_ string: String, radix: Int) -> Int {
   let ints = radix == 60
       ? toSexInts(str)
       : toInts(str)
-  return multiplier * ints.reduce(0, combine: { acc, i in acc * radix + i })
+  return multiplier * ints.reduce(0, { acc, i in acc * radix + i })
 }
 
 func toSexInts (_ string: String) -> [Int] {
