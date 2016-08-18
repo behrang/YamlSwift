@@ -148,7 +148,7 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
             matchList.append(TokenMatch(.NewLine, match))
           } else {
             while nestedBlockSequence && spaces < (indents.last ?? 0) - 1
-                || !nestedBlockSequence && spaces < indents.last {
+                || !nestedBlockSequence && spaces < indents.last ?? 0 {
               indents.removeLast()
               matchList.append(TokenMatch(.Dedent, ""))
             }

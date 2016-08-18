@@ -280,7 +280,7 @@ func putToMap (_ map: [Yaml: Yaml]) -> (Yaml) -> (Yaml) -> [Yaml: Yaml] {
   }
 }
 
-func checkKeyUniqueness (_ acc: [Yaml: Yaml]) -> (context: Context, key: Yaml)
+func checkKeyUniqueness (_ acc: [Yaml: Yaml]) -> (_ context: Context, _ key: Yaml)
     -> Result<ContextValue> {
       return { (context, key) in
         let err = "duplicate key \(key)"
@@ -575,13 +575,13 @@ func unescapeSingleQuotes (_ s: String) -> String {
 func unescapeDoubleQuotes (_ input: String) -> String {
   return input
     |> replace(regex("\\\\([0abtnvfre \"\\/N_LP])"))
-        { $ in escapeCharacters[$[1]] ?? "" }
+        { escapeCharacters[$0[1]] ?? "" }
     |> replace(regex("\\\\x([0-9A-Fa-f]{2})"))
-        { $ in String(UnicodeScalar(parseInt($[1], radix: 16))) }
+        { String(describing: UnicodeScalar(parseInt($0[1], radix: 16))) }
     |> replace(regex("\\\\u([0-9A-Fa-f]{4})"))
-        { $ in String(UnicodeScalar(parseInt($[1], radix: 16))) }
+        { String(describing: UnicodeScalar(parseInt($0[1], radix: 16))) }
     |> replace(regex("\\\\U([0-9A-Fa-f]{8})"))
-        { $ in String(UnicodeScalar(parseInt($[1], radix: 16))) }
+        { String(describing: UnicodeScalar(parseInt($0[1], radix: 16))) }
 }
 
 let escapeCharacters = [

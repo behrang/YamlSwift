@@ -1,6 +1,6 @@
 import XCTest
 
-@testable import YamlTestSuite
+@testable import YamlTests
 
 XCTMain([
   testCase(ExampleTests.allTests),

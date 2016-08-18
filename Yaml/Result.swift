@@ -31,7 +31,12 @@ public enum Result<T> {
   }
 }
 
-infix operator <*> { associativity left }
+precedencegroup Functional {
+  associativity: left
+  higherThan: DefaultPrecedence
+}
+
+infix operator <*>: Functional
 func <*> <T, U> (f: Result<(T) -> U>, x: Result<T>) -> Result<U> {
   switch (x, f) {
   case (.Error(let e), _): return .Error(e)
@@ -40,22 +45,22 @@ func <*> <T, U> (f: Result<(T) -> U>, x: Result<T>) -> Result<U> {
   }
 }
 
-infix operator <^> { associativity left }
+infix operator <^>: Functional
 func <^> <T, U> (f: (T) -> U, x: Result<T>) -> Result<U> {
   return x.map(f: f)
 }
 
-infix operator >>- { associativity left }
+infix operator >>-: Functional
 func >>- <T, U> (x: Result<T>, f: (T) -> U) -> Result<U> {
   return x.map(f: f)
 }
 
-infix operator >>=- { associativity left }
+infix operator >>=-: Functional
 func >>=- <T, U> (x: Result<T>, f: (T) -> Result<U>) -> Result<U> {
   return x.flatMap(f: f)
 }
 
-infix operator >>| { associativity left }
+infix operator >>|: Functional
 func >>| <T, U> (x: Result<T>, y: Result<U>) -> Result<U> {
   return x.flatMap { _ in y }
 }

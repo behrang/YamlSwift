@@ -1,5 +1,9 @@
 import Foundation
 
+#if os(Linux)
+typealias NSRegularExpression = RegularExpression
+#endif
+
 func matchRange (_ string: String, regex: NSRegularExpression) -> NSRange {
   let sr = NSMakeRange(0, string.utf16.count)
   return regex.rangeOfFirstMatch(in: string, options: [], range: sr)
@@ -38,14 +42,14 @@ func replace (_ regex: NSRegularExpression, template: String) -> (String)
         _ = regex.replaceMatches(in: s, options: [], range: range,
                                  withTemplate: template)
 #if os(Linux)
-        return String(s)
+        return s.bridge()
 #else
         return s as String
 #endif
       }
 }
 
-func replace (_ regex: NSRegularExpression, block: ([String]) -> String)
+func replace (_ regex: NSRegularExpression, block: @escaping ([String]) -> String)
     -> (String) -> String {
       return { string in
         let s = NSMutableString(string: string)
@@ -56,7 +60,12 @@ func replace (_ regex: NSRegularExpression, block: ([String]) -> String)
           if let result = result {
               var captures = [String](repeating: "", count: result.numberOfRanges)
               for i in 0..<result.numberOfRanges {
-                if let r = result.rangeAt(i).toRange() {
+                #if os(Linux)
+                let rangeAt = result.range(at: i)
+                #else
+                let rangeAt = result.rangeAt(i)
+                #endif
+                if let r = rangeAt.toRange() {
                   captures[i] = NSString(string: string).substring(with: NSRange(r))
                 }
               }
@@ -67,7 +76,7 @@ func replace (_ regex: NSRegularExpression, block: ([String]) -> String)
           }
         }
 #if os(Linux)
-        return String(s)
+        return s.bridge()
 #else
         return s as String
 #endif
