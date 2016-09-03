@@ -9,13 +9,14 @@ class Chapter7: XCTestCase {
   func test_104_c_ns_alias_node () {
     left(c_ns_alias_node, "*")
     left(c_ns_alias_node, "* ")
-    right(c_ns_alias_node, "*a1 ", "*a1")
-    right(c_ns_alias_node, "*1 ", "*1")
+    right(c_ns_alias_node, "*a1 ", .alias("a1"))
+    right(c_ns_alias_node, "*1 ", .alias("1"))
   }
 
   func test_106_e_node () {
-    right(e_node, "")
-    right(e_node, "z")
+    let e: Node = .scalar("", tag_null, "")
+    right(e_node, "", e)
+    right(e_node, "z", e)
   }
 
   func test_107_nb_double_char () {
@@ -38,9 +39,9 @@ class Chapter7: XCTestCase {
 
   func test_109_c_double_quoted () {
     left(c_double_quoted(2, .block_key), "\"\n  \"")
-    right(c_double_quoted(2, .flow_out), "\"\n  \"", " ")
-    right(c_double_quoted(2, .block_key), "\"\"", "")
-    right(c_double_quoted(2, .block_key), "\" \"", " ")
+    right(c_double_quoted(2, .flow_out), "\"\n  \"", .scalar(" ", tag_string, ""))
+    right(c_double_quoted(2, .block_key), "\"\"", .scalar("", tag_string, ""))
+    right(c_double_quoted(2, .block_key), "\" \"", .scalar(" ", tag_string, ""))
   }
 
   func test_112_s_double_escaped () {
@@ -99,9 +100,9 @@ class Chapter7: XCTestCase {
 
   func test_120_c_single_quoted () {
     left(c_single_quoted(2, .block_key), "'\n  '")
-    right(c_single_quoted(2, .flow_out), "'\n  '", " ")
-    right(c_single_quoted(2, .block_key), "''", "")
-    right(c_single_quoted(2, .block_key), "' '", " ")
+    right(c_single_quoted(2, .flow_out), "'\n  '", .scalar(" ", tag_string, ""))
+    right(c_single_quoted(2, .block_key), "''", .scalar("", tag_string, ""))
+    right(c_single_quoted(2, .block_key), "' '", .scalar(" ", tag_string, ""))
   }
 
   func test_123_nb_ns_single_in_line () {
@@ -169,6 +170,29 @@ class Chapter7: XCTestCase {
     right(ns_plain_multi_line(0, .block_key),
       "1st non-empty\n\n 2nd non-empty \n\t3rd non-empty",
       "1st non-empty\n2nd non-empty 3rd non-empty")
+  }
+
+  func test_137_c_flow_sequence () {
+    let xy: Node = .sequence([
+      .scalar("x", tag_string, ""),
+      .scalar("y", tag_string, "")
+    ], tag_sequence, "")
+    let xy_non_specific: Node = .sequence([
+      .scalar("x", tag_non_specific, ""),
+      .scalar("y", tag_non_specific, "")
+    ], tag_sequence, "")
+    right(c_flow_sequence(0, .flow_out), "[x, y]", xy_non_specific)
+    right(c_flow_sequence(0, .flow_out), "['x', \"y\"]", xy)
+  }
+
+  func test_138_ns_s_flow_seq_entries () {
+    let n1: [Node] = [.scalar("x", tag_string, "")]
+    let n2: [Node] = [.scalar("x", tag_string, ""), .scalar("y", tag_string, "")]
+    right(ns_s_flow_seq_entries(2, .flow_out), "'x'", n1)
+    right(ns_s_flow_seq_entries(2, .flow_out), "'x' ", n1)
+    right(ns_s_flow_seq_entries(2, .flow_out), "'x' ,", n1)
+    right(ns_s_flow_seq_entries(2, .flow_out), "'x' , ", n1)
+    right(ns_s_flow_seq_entries(2, .flow_out), "'x' , 'y'", n2)
   }
 
 }

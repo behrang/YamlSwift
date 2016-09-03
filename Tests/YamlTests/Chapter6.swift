@@ -189,23 +189,23 @@ class Chapter6: XCTestCase {
 
   func test_096_c_ns_properties () {
     // these 2 are invalid tags but parser accepts them at first
-    right(c_ns_properties(2, .block_key), "!!!foo", ["!"])
-    right(c_ns_properties(2, .block_key), "!e!", ["!"])
+    right(c_ns_properties(2, .block_key), "!!!foo", ("!", nil))
+    right(c_ns_properties(2, .block_key), "!e!", ("!", nil))
 
     left(c_ns_properties(2, .block_key), "& ")
-    right(c_ns_properties(2, .block_key), "! ", ["!"])
-    right(c_ns_properties(2, .block_key), "!e!x ", ["!e!x"])
-    right(c_ns_properties(2, .block_key), "!foo", ["!foo"])
-    right(c_ns_properties(2, .block_key), "!<!foo>", ["!<!foo>"])
-    right(c_ns_properties(2, .block_key), "!!str", ["!!str"])
-    right(c_ns_properties(2, .block_key), "!e!tag%21", ["!e!tag!"])
-    right(c_ns_properties(2, .block_key), "!!str &a1", ["!!str", "&a1"])
-    right(c_ns_properties(2, .block_key), "&a1", ["&a1"])
-    right(c_ns_properties(2, .block_key), "&1", ["&1"])
-    right(c_ns_properties(2, .block_key), "&a1 !!str", ["&a1", "!!str"])
+    right(c_ns_properties(2, .block_key), "! ", ("!", nil))
+    right(c_ns_properties(2, .block_key), "!e!x ", ("!e!x", nil))
+    right(c_ns_properties(2, .block_key), "!foo", ("!foo", nil))
+    right(c_ns_properties(2, .block_key), "!<!foo>", ("!<!foo>", nil))
+    right(c_ns_properties(2, .block_key), "!!str", ("!!str", nil))
+    right(c_ns_properties(2, .block_key), "!e!tag%21", ("!e!tag!", nil))
+    right(c_ns_properties(2, .block_key), "!!str &a1", ("!!str", "a1"))
+    right(c_ns_properties(2, .block_key), "&a1", (nil, "a1"))
+    right(c_ns_properties(2, .block_key), "&1", (nil, "1"))
+    right(c_ns_properties(2, .block_key), "&a1 !!str", ("!!str", "a1"))
     right(c_ns_properties(2, .block_key),
       "!<tag:yaml.org,2002:str>",
-      ["!<tag:yaml.org,2002:str>"])
+      ("!<tag:yaml.org,2002:str>", nil))
   }
 
 }
