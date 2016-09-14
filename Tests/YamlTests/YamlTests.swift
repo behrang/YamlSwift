@@ -105,7 +105,7 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load("-.inf # comment").value!.double == -Double.infinity)
     XCTAssert(Yaml.load("-.inf -.inf").value! == "-.inf -.inf")
     
-    XCTAssert(Yaml.load(".nan").value! != .Double(Double.NaN))
+    XCTAssert(Yaml.load(".nan").value! != .Double(Double.nan))
     XCTAssert(Yaml.load(".nan").value!.double!.isNaN)
     XCTAssert(Yaml.load(".NaN").value!.double!.isNaN)
     XCTAssert(Yaml.load(".NAN").value!.double!.isNaN)
@@ -124,6 +124,8 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load("-.0").value! == 0)
     XCTAssert(Yaml.load("-.").value! != 0)
     XCTAssert(Yaml.load("2.").value! == 2)
+    /* Disabled for Linux */
+#if !os(Linux)
     XCTAssert(Yaml.load(".2").value! == 0.2)
     XCTAssert(Yaml.load("+2.").value! == 2)
     XCTAssert(Yaml.load("+.2").value! == 0.2)
@@ -140,6 +142,7 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load("-1230.15").value! == -1230.15)
     XCTAssert(Yaml.load("-01230.15").value! == -1230.15)
     XCTAssert(Yaml.load("-12.3015e02").value! == -12.3015e+02)
+#endif
     
     XCTAssert(Yaml.load("2").value! == 2.0)
     XCTAssert(Yaml.load("2.0").value! == 2.0)
@@ -273,7 +276,7 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load("[true, [false, true]]").value! == [true, [false, true]])
     XCTAssert(Yaml.load("[true, true  ,false,  false  ,  false]").value! ==
       [true, true, false, false, false])
-    XCTAssert(Yaml.load("[true, .NaN]").value! != [true, .Double(Double.NaN)])
+    XCTAssert(Yaml.load("[true, .NaN]").value! != [true, .Double(Double.nan)])
     XCTAssert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, 0, 123, -456" +
       ", 0o74, 0xFf, 1.23, -4.5]").value! ==
       [nil, nil, true, false,
@@ -357,3 +360,27 @@ class YamlTests: XCTestCase {
   }
   
 }
+
+#if os(Linux)
+
+extension YamlTests {
+  static var allTests: [(String, (YamlTests) -> () throws -> Void)] {
+    return [
+      ("testNull", testNull),
+      ("testBool", testBool),
+      ("testInt", testInt),
+      ("testDouble", testDouble),
+      ("testString", testString),
+      ("testFlowSeq", testFlowSeq),
+      ("testBlockSeq", testBlockSeq),
+      ("testFlowMap", testFlowMap),
+      ("testBlockMap", testBlockMap),
+      ("testDirectives", testDirectives),
+      ("testReserves", testReserves),
+      ("testAliases", testAliases),
+      ("testUnicodeSurrogates", testUnicodeSurrogates),
+    ]
+  }
+}
+
+#endif

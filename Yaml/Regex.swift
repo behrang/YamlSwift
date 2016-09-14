@@ -1,21 +1,25 @@
 import Foundation
 
-func matchRange (string: String, regex: NSRegularExpression) -> NSRange {
+#if os(Linux)
+typealias NSRegularExpression = RegularExpression
+#endif
+
+func matchRange (_ string: String, regex: NSRegularExpression) -> NSRange {
   let sr = NSMakeRange(0, string.utf16.count)
-  return regex.rangeOfFirstMatchInString(string, options: [], range: sr)
+  return regex.rangeOfFirstMatch(in: string, options: [], range: sr)
 }
 
-func matches (string: String, regex: NSRegularExpression) -> Bool {
+func matches (_ string: String, regex: NSRegularExpression) -> Bool {
   return matchRange(string, regex: regex).location != NSNotFound
 }
 
-func regex (pattern: String, options: String = "") -> NSRegularExpression! {
+func regex (_ pattern: String, options: String = "") -> NSRegularExpression! {
   if matches(options, regex: invalidOptionsPattern) {
     return nil
   }
 
-  let opts = options.characters.reduce(NSRegularExpressionOptions()) { (acc, opt) -> NSRegularExpressionOptions in
-    return NSRegularExpressionOptions(rawValue:acc.rawValue | (regexOptions[opt] ?? NSRegularExpressionOptions()).rawValue)
+  let opts = options.characters.reduce(NSRegularExpression.Options()) { (acc, opt) -> NSRegularExpression.Options in
+    return NSRegularExpression.Options(rawValue:acc.rawValue | (regexOptions[opt] ?? NSRegularExpression.Options()).rawValue)
   }
   return try? NSRegularExpression(pattern: pattern, options: opts)
 }
@@ -23,85 +27,98 @@ func regex (pattern: String, options: String = "") -> NSRegularExpression! {
 let invalidOptionsPattern =
         try! NSRegularExpression(pattern: "[^ixsm]", options: [])
 
-let regexOptions: [Character: NSRegularExpressionOptions] = [
-  "i": .CaseInsensitive,
-  "x": .AllowCommentsAndWhitespace,
-  "s": .DotMatchesLineSeparators,
-  "m": .AnchorsMatchLines
+let regexOptions: [Character: NSRegularExpression.Options] = [
+  "i": .caseInsensitive,
+  "x": .allowCommentsAndWhitespace,
+  "s": .dotMatchesLineSeparators,
+  "m": .anchorsMatchLines
 ]
 
-func replace (regex: NSRegularExpression, template: String) -> String
+func replace (_ regex: NSRegularExpression, template: String) -> (String)
     -> String {
       return { string in
         let s = NSMutableString(string: string)
         let range = NSMakeRange(0, string.utf16.count)
-        regex.replaceMatchesInString(s, options: [], range: range,
-            withTemplate: template)
+        _ = regex.replaceMatches(in: s, options: [], range: range,
+                                 withTemplate: template)
+#if os(Linux)
+        return s.bridge()
+#else
         return s as String
+#endif
       }
 }
 
-func replace (regex: NSRegularExpression, block: [String] -> String)
-    -> String -> String {
+func replace (_ regex: NSRegularExpression, block: @escaping ([String]) -> String)
+    -> (String) -> String {
       return { string in
         let s = NSMutableString(string: string)
         let range = NSMakeRange(0, string.utf16.count)
         var offset = 0
-        regex.enumerateMatchesInString(string, options: [], range: range) {
+        regex.enumerateMatches(in: string, options: [], range: range) {
           result, _, _ in
           if let result = result {
-              var captures = [String](count: result.numberOfRanges, repeatedValue: "")
+              var captures = [String](repeating: "", count: result.numberOfRanges)
               for i in 0..<result.numberOfRanges {
-                if let r = result.rangeAtIndex(i).toRange() {
-                  captures[i] = (string as NSString).substringWithRange(NSRange(r))
+                #if os(Linux)
+                let rangeAt = result.range(at: i)
+                #else
+                let rangeAt = result.rangeAt(i)
+                #endif
+                if let r = rangeAt.toRange() {
+                  captures[i] = NSString(string: string).substring(with: NSRange(r))
                 }
               }
               let replacement = block(captures)
               let offR = NSMakeRange(result.range.location + offset, result.range.length)
               offset += replacement.characters.count - result.range.length
-              s.replaceCharactersInRange(offR, withString: replacement)
+              s.replaceCharacters(in: offR, with: replacement)
           }
         }
+#if os(Linux)
+        return s.bridge()
+#else
         return s as String
+#endif
       }
 }
 
-func splitLead (regex: NSRegularExpression) -> String
+func splitLead (_ regex: NSRegularExpression) -> (String)
     -> (String, String) {
       return { string in
         let r = matchRange(string, regex: regex)
         if r.location == NSNotFound {
           return ("", string)
         } else {
-          let s = string as NSString
+          let s = NSString(string: string)
           let i = r.location + r.length
-          return (s.substringToIndex(i), s.substringFromIndex(i))
+          return (s.substring(to: i), s.substring(from: i))
         }
       }
 }
 
-func splitTrail (regex: NSRegularExpression) -> String
+func splitTrail (_ regex: NSRegularExpression) -> (String)
     -> (String, String) {
       return { string in
         let r = matchRange(string, regex: regex)
         if r.location == NSNotFound {
           return (string, "")
         } else {
-          let s = string as NSString
+          let s = NSString(string: string)
           let i = r.location
-          return (s.substringToIndex(i), s.substringFromIndex(i))
+          return (s.substring(to: i), s.substring(from: i))
         }
       }
 }
 
-func substringWithRange (range: NSRange) -> String -> String {
+func substringWithRange (_ range: NSRange) -> (String) -> String {
   return { string in
-    return (string as NSString).substringWithRange(range)
+    return NSString(string: string).substring(with: range)
   }
 }
 
-func substringFromIndex (index: Int) -> String -> String {
+func substringFromIndex (_ index: Int) -> (String) -> String {
   return { string in
-    return (string as NSString).substringFromIndex(index)
+    return NSString(string: string).substring(from: index)
   }
 }
