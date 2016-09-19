@@ -42,7 +42,7 @@ func replace (_ regex: NSRegularExpression, template: String) -> (String)
         _ = regex.replaceMatches(in: s, options: [], range: range,
                                  withTemplate: template)
 #if os(Linux)
-        return s.bridge()
+        return s._bridgeToSwift()
 #else
         return s as String
 #endif
@@ -76,7 +76,7 @@ func replace (_ regex: NSRegularExpression, block: @escaping ([String]) -> Strin
           }
         }
 #if os(Linux)
-        return s.bridge()
+        return s._bridgeToSwift()
 #else
         return s as String
 #endif
