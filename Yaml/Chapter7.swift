@@ -359,8 +359,8 @@ func in_flow (_ c: Context) -> Context {
 func c_flow_sequence (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
   return {(
     char("[")
-    >>> optional(s_separate(n, c))
-    >>> option([], ns_s_flow_seq_entries(n, in_flow(c)))
+    >>> optional(attempt(s_separate(n, c)))
+    >>> option([], attempt(ns_s_flow_seq_entries(n, in_flow(c))))
     <<< char("]")
     >>- { entries in create(.sequence(entries, tag_sequence, "")) }
   )()}
@@ -370,11 +370,11 @@ func c_flow_sequence (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
 func ns_s_flow_seq_entries (_ n: Int, _ c: Context) -> YamlParserClosure<[Node]> {
   return {(
     ns_flow_seq_entry(n, c) >>- { entry in
-      optional(s_separate(n, c))
-      >>> option([], char(",")
-        >>> optional(s_separate(n, c))
-        >>> option([], ns_s_flow_seq_entries(n, c))
-      ) >>- { entries in create(prepend(entry, entries)) }
+      optional(attempt(s_separate(n, c)))
+      >>> option([], attempt(char(",")
+        >>> optional(attempt(s_separate(n, c)))
+        >>> option([], attempt(ns_s_flow_seq_entries(n, c)))
+      )) >>- { entries in create(prepend(entry, entries)) }
     }
   )()}
 }
@@ -388,8 +388,8 @@ func ns_flow_seq_entry (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
 func c_flow_mapping (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
   return {(
     char("{")
-    >>> optional(s_separate(n, c))
-    >>> option([:], ns_s_flow_map_entries(n, in_flow(c)))
+    >>> optional(attempt(s_separate(n, c)))
+    >>> option([:], attempt(ns_s_flow_map_entries(n, in_flow(c))))
     <<< char("}")
     >>- { entries in create(.mapping(entries, tag_mapping, "")) }
   )()}
@@ -399,11 +399,11 @@ func c_flow_mapping (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
 func ns_s_flow_map_entries (_ n: Int, _ c: Context) -> YamlParserClosure<[Node: Node]> {
   return {(
     ns_flow_map_entry(n, c) >>- { entry in
-      optional(s_separate(n, c))
-      >>> option([:], char(",")
-        >>> optional(s_separate(n, c))
-        >>> option([:], ns_s_flow_map_entries(n, c))
-      ) >>- { entries in create(put(entry, entries)) }
+      optional(attempt(s_separate(n, c)))
+      >>> option([:], attempt(char(",")
+        >>> optional(attempt(s_separate(n, c)))
+        >>> option([:], attempt(ns_s_flow_map_entries(n, c)))
+      )) >>- { entries in create(put(entry, entries)) }
     }
   )()}
 }
@@ -444,7 +444,7 @@ func ns_flow_map_implicit_entry (_ n: Int, _ c: Context) -> YamlParserClosure<(N
 func ns_flow_map_yaml_key_entry (_ n: Int, _ c: Context) -> YamlParserClosure<(Node, Node)> {
   return {(
     ns_flow_yaml_node(n, c) >>- { key in
-      ( optional(s_separate(n, c))
+      ( optional(attempt(s_separate(n, c)))
         >>> attempt(c_ns_flow_map_separate_value(n, c))
         <|> e_node
       ) >>- { value in
@@ -481,7 +481,7 @@ func c_ns_flow_map_separate_value (_ n: Int, _ c: Context) -> YamlParserClosure<
 func c_ns_flow_map_json_key_entry (_ n: Int, _ c: Context) -> YamlParserClosure<(Node, Node)> {
   return {(
     c_flow_json_node(n, c) >>- { key in
-      ( attempt(optional(s_separate(n, c)) >>> c_ns_flow_map_adjacent_value(n, c))
+      ( attempt(optional(attempt(s_separate(n, c))) >>> c_ns_flow_map_adjacent_value(n, c))
         <|> e_node
       ) >>- { value in
         create((key, value))
@@ -495,7 +495,7 @@ func c_ns_flow_map_adjacent_value (_ n: Int, _ c: Context) -> YamlParserClosure<
   return {(
     char(":")
     >>> (
-      attempt(optional(s_separate(n, c)) >>> ns_flow_node(n, c))
+      attempt(optional(attempt(s_separate(n, c))) >>> ns_flow_node(n, c))
       <|> e_node
     ) >>- { value in create(value) }
   )()}
@@ -547,12 +547,12 @@ func c_ns_flow_pair_json_key_entry (_ n: Int, _ c: Context) -> YamlParserClosure
 
 // [154]
 func ns_s_implicit_yaml_key (_ c: Context) -> YamlParserClosure<Node> {
-  return {( ns_flow_yaml_node(-1, c) <<< optional(s_separate_in_line) )()}
+  return {( ns_flow_yaml_node(-1, c) <<< optional(attempt(s_separate_in_line)) )()}
 }
 
 // [155]
 func c_s_implicit_json_key (_ c: Context) -> YamlParserClosure<Node> {
-  return {( c_flow_json_node(-1, c) <<< optional(s_separate_in_line) )()}
+  return {( c_flow_json_node(-1, c) <<< optional(attempt(s_separate_in_line)) )()}
 }
 
 // [156]
@@ -608,9 +608,12 @@ func at_most_1024 (_ n: Int) -> (Node) -> YamlParserClosure<Node> {
 // [160]
 func c_flow_json_node (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
   return {(
-    option((nil, nil), c_ns_properties(n, c) <<< s_separate(n, c)) >>- { properties in
+    option((nil, nil), attempt(c_ns_properties(n, c) <<< s_separate(n, c))) >>- { properties in
       c_flow_json_content(n, c) >>- { node in
-        let tag = Tag.lookup(properties.tag ?? "")
+        var tag = node.tag
+        if let newTag = properties.tag {
+          tag = Tag.lookup(newTag)
+        }
         let anchor = properties.anchor ?? ""
         switch node {
         case .scalar(let c, _, _): return create(.scalar(c, tag, anchor))

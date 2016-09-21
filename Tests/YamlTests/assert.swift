@@ -62,6 +62,17 @@ func right (_ p: YamlParserClosure<(String, [String])>, _ input: String,
   }
 }
 
+func right (_ p: YamlParserClosure<(indent: Int, chomp: Chomp)>, _ input: String,
+  _ exp: (indent: Int, chomp: Chomp),
+  file: StaticString = #file, line: UInt = #line)
+{
+  switch parse(p, YamlState(), "", input.characters) {
+  case let .left(err): XCTFail(err.description, file: file, line: line)
+  case let .right(n, t):
+    XCTAssertTrue(exp.0 == n && exp.1 == t, file: file, line: line)
+  }
+}
+
 func right (_ p: YamlParserClosure<()>, _ input: String,
   file: StaticString = #file, line: UInt = #line)
 {

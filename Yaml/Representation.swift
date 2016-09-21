@@ -22,7 +22,13 @@ struct Tag: Equatable {
   }
 
   static func lookup (_ pre: String) -> Tag {
-    return Tag(pre, .scalar)
+    switch pre {
+    case "!!null": return tag_null
+    case "!!str": return tag_string
+    case "!!seq": return tag_sequence
+    case "!!map": return tag_mapping
+    default: return Tag(pre, .scalar)
+    }
   }
 }
 

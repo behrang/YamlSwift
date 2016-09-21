@@ -55,7 +55,7 @@ func s_block_line_prefix (_ n: Int) -> YamlParserClosure<()> {
 
 // [69]
 func s_flow_line_prefix (_ n: Int) -> YamlParserClosure<()> {
-  return {( s_indent(n) >>> optional(s_separate_in_line) )()}
+  return {( s_indent(n) >>> optional(attempt(s_separate_in_line)) )()}
 }
 
 // [70]
@@ -85,7 +85,7 @@ func b_l_folded (_ n: Int, _ c: Context) -> YamlParserClosure<String> {
 // [74]
 func s_flow_folded (_ n: Int) -> YamlParserClosure<String> {
   return {(
-    optional(s_separate_in_line)
+    optional(attempt(s_separate_in_line))
     >>> b_l_folded(n , .flow_in) <<< s_flow_line_prefix(n)
   )()}
 }
@@ -102,14 +102,14 @@ func b_comment () -> YamlParser<()> {
 
 // [77]
 func s_b_comment () -> YamlParser<()> {
-  return ( optional(s_separate_in_line >>> optional(c_nb_comment_text))
+  return ( optional(attempt(s_separate_in_line >>> optional(attempt(c_nb_comment_text))))
     >>> b_comment
   )()
 }
 
 // [78]
 func l_comment () -> YamlParser<()> {
-  return ( s_separate_in_line >>> optional(c_nb_comment_text) >>> b_comment )()
+  return ( s_separate_in_line >>> optional(attempt(c_nb_comment_text)) >>> b_comment )()
 }
 
 // [79]

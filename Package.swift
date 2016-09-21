@@ -6,6 +6,6 @@ let package = Package(
     Target(name: "Yaml"),
   ],
   dependencies: [
-    .Package(url: "https://github.com/behrang/SwiftParsec.git", majorVersion: 2)
+    .Package(url: "git@github.com:behrang/SwiftParsec.git", majorVersion: 2)
   ]
 )
