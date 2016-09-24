@@ -1,6 +1,18 @@
 import Parsec
 import Foundation
 
+func start_of_line () -> YamlParser<()> {
+  return (
+    getPosition >>- { pos in
+      if pos.column == 1 {
+        return create(())
+      } else {
+        return fail("not start of line")
+      }
+    }
+  )()
+}
+
 // [63]
 func s_indent (_ n: Int) -> YamlParserClosure<()> {
   return {( count(n, s_space) >>> create(()) )()}
@@ -34,7 +46,7 @@ func s_indent_less_equal (_ n: Int) -> YamlParserClosure<()> {
 
 // [66]
 func s_separate_in_line () -> YamlParser<()> {
-  return ( many1(s_white) >>> create(()) )() // todo: what about 'start of line'?
+  return ( many1(s_white) >>> create(()) <|> start_of_line )()
 }
 
 // [67]
@@ -109,13 +121,22 @@ func s_b_comment () -> YamlParser<()> {
 
 // [78]
 func l_comment () -> YamlParser<()> {
-  return ( s_separate_in_line >>> optional(attempt(c_nb_comment_text)) >>> b_comment )()
+  return (
+    optionMaybe(eof <<< start_of_line) >>- { end in
+      if end != nil {
+        return fail("no more comment lines")
+      } else {
+        return s_separate_in_line >>> optional(attempt(c_nb_comment_text)) >>> b_comment
+      }
+    }
+  )()
 }
 
 // [79]
 func s_l_comments () -> YamlParser<()> {
-   // todo: what about 'start of line'?
-  return ( s_b_comment >>> many(attempt(l_comment)) >>> create(()) )()
+  return (
+    ( s_b_comment <|> start_of_line ) >>> many(attempt(l_comment)) >>> create(())
+  )()
 }
 
 // [80]

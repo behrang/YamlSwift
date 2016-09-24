@@ -43,8 +43,8 @@ class Chapter6: XCTestCase {
   }
 
   func test_066_s_separate_in_line () {
-    left(s_separate_in_line, "z")
-    left(s_separate_in_line, "\nz")
+    right(s_separate_in_line, "z")
+    right(s_separate_in_line, "\nz")
     right(s_separate_in_line, " z")
     right(s_separate_in_line, " \tz")
     right(s_separate_in_line, "\tz")
@@ -122,8 +122,8 @@ class Chapter6: XCTestCase {
 
   func test_077_s_b_comment () {
     left(s_b_comment, "z")
-    left(s_b_comment, "#z")
-    left(s_b_comment, "# z")
+    right(s_b_comment, "#z")
+    right(s_b_comment, "# z")
     right(s_b_comment, " # z")
     right(s_b_comment, " # \nz")
     right(s_b_comment, " \t\nz")
@@ -133,9 +133,9 @@ class Chapter6: XCTestCase {
   func test_078_l_comment () {
     left(l_comment, "z")
     left(l_comment, "")
-    left(l_comment, "\n")
-    left(l_comment, "# z")
-    left(l_comment, "# z\n")
+    right(l_comment, "\n")
+    right(l_comment, "# z")
+    right(l_comment, "# z\n")
     right(l_comment, " # z\n")
     right(l_comment, "\t# z\n")
     right(l_comment, " # z")
@@ -151,8 +151,8 @@ class Chapter6: XCTestCase {
   }
 
   func test_081_s_separate_lines () {
-    left(s_separate_lines(2), "z")
-    left(s_separate_lines(2), "\n z")
+    right(s_separate_lines(2), "z")
+    right(s_separate_lines(2), "\n z")
     right(s_separate_lines(2), " z")
     right(s_separate_lines(2), "\n  z")
   }

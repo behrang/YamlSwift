@@ -102,6 +102,7 @@ func nb_ns_double_in_line () -> YamlParser<String> {
 func s_double_next_line (_ n: Int) -> YamlParserClosure<String> {
   return {(
     s_double_break(n) >>- { b in
+      (notFollowedBy(c_forbidden) <?> "no document markers") >>>
       optionMaybe(attempt(ns_double_char >>- { x in
         nb_ns_double_in_line >>- { s in
           ( attempt(s_double_next_line(n)) <|>
@@ -197,6 +198,7 @@ func nb_ns_single_in_line () -> YamlParser<String> {
 func s_single_next_line (_ n: Int) -> YamlParserClosure<String> {
   return {(
     s_flow_folded(n) >>- { f in
+      (notFollowedBy(c_forbidden) <?> "no document markers") >>>
       optionMaybe(attempt(ns_single_char >>- { x in
         nb_ns_single_in_line >>- { s in
           ( attempt(s_single_next_line(n)) <|>
@@ -314,6 +316,7 @@ func nb_ns_plain_in_line (_ c: Context) -> YamlParserClosure<String> {
 // [133]
 func ns_plain_one_line (_ c: Context) -> YamlParserClosure<String> {
   return {(
+    (notFollowedBy(c_forbidden) <?> "no document markers") >>>
     ns_plain_first(c) >>- { x in
       nb_ns_plain_in_line(c) >>- { s in
         create(String(x) + s)
@@ -326,6 +329,7 @@ func ns_plain_one_line (_ c: Context) -> YamlParserClosure<String> {
 func s_ns_plain_next_line (_ n: Int, _ c: Context) -> YamlParserClosure<String> {
   return {(
     s_flow_folded(n) >>- { s in
+      (notFollowedBy(c_forbidden) <?> "no document markers") >>>
       ns_plain_char(c) >>- { x in
         nb_ns_plain_in_line(c) >>- { l in
           create(s + x + l)

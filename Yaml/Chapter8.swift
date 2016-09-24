@@ -122,6 +122,7 @@ func c_l_literal (_ n: Int) -> YamlParserClosure<String> {
 func l_nb_literal_text (_ n: Int) -> YamlParserClosure<String> {
   return {(
     many(attempt(l_empty(n, .block_in))) <<< s_indent(n) >>- { bs in
+      (notFollowedBy(c_forbidden) <?> "no document markers") >>>
       many1(nb_char) >>- { xs in
         create(String(bs) + String(xs))
       }
@@ -169,6 +170,7 @@ func c_l_folded (_ n: Int) -> YamlParserClosure<String> {
 // [175]
 func s_nb_folded_text (_ n: Int) -> YamlParserClosure<String> {
   return {(
+    (notFollowedBy(c_forbidden) <?> "no document markers") >>>
     s_indent(n) >>> ns_char >>- { x in
       many(nb_char) >>- { xs in
         create(String(x) + String(xs))
@@ -439,7 +441,7 @@ func s_l_block_scalar (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
 func s_l_block_collection (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
   return {(
     option((nil, nil), attempt(s_separate(n + 1, c) >>> c_ns_properties(n + 1, c))) >>- { properties in
-      s_l_comments // todo: should it be => optional(attempt(s_l_comments))
+      s_l_comments
       >>> ( attempt(l_block_sequence(seq_spaces(n, c))) <|> l_block_mapping(n) ) >>- { node in
         var tag = node.tag
         if let newTag = properties.tag {
