@@ -1,4 +1,4 @@
-import Yaml
+@testable import Yaml
 import XCTest
 
 class ExampleTests: XCTestCase {
@@ -15,17 +15,17 @@ class ExampleTests: XCTestCase {
     XCTAssert(value[1]["yaml"][0][1] == "and")
     XCTAssert(value[1]["yaml"][1]["in"] == "real-time")
     
-    value[0]["just"] = .String("replaced string")
+    value[0]["just"] = .string("replaced string")
     XCTAssert(value[0]["just"] == "replaced string")
-    value[0]["another"] = .Int(2)
+    value[0]["another"] = .int(2)
     XCTAssert(value[0]["another"] == 2)
-    value[0]["new"]["key"][10]["key"] = .String("Ten")
+    value[0]["new"]["key"][10]["key"] = .string("Ten")
     XCTAssert(value[0]["new"]["key"][10]["key"] == "Ten")
-    value[0]["new"]["key"][5]["key"] = .String("Five")
+    value[0]["new"]["key"][5]["key"] = .string("Five")
     XCTAssert(value[0]["new"]["key"][5]["key"] == "Five")
-    value[0]["new"]["key"][15]["key"] = .String("Fifteen")
+    value[0]["new"]["key"][15]["key"] = .string("Fifteen")
     XCTAssert(value[0]["new"]["key"][15]["key"] == "Fifteen")
-    value[2] = .Double(2)
+    value[2] = .double(2)
     XCTAssert(value[2] == 2)
     value = nil
     XCTAssert(value == nil)
@@ -248,7 +248,7 @@ class ExampleTests: XCTestCase {
       " What a year!\n"
       ).value!
     XCTAssert(value ==
-      .String("Sammy Sosa completed another fine season with great stats.\n\n" +
+      .string("Sammy Sosa completed another fine season with great stats.\n\n" +
         "  63 Home Runs\n  0.288 Batting Average\n\nWhat a year!\n"))
   }
   
@@ -330,7 +330,7 @@ class ExampleTests: XCTestCase {
     XCTAssert(value["exponential"] == 1.23015e+3)
     XCTAssert(value["fixed"] == 1.23015e+3)
 #endif
-    XCTAssert(value["negative infinity"] == .Double(-Double.infinity))
+    XCTAssert(value["negative infinity"] == .double(-Double.infinity))
     XCTAssert(value["not a number"].double?.isNaN == true)
   }
   
@@ -438,7 +438,7 @@ class ExampleTests: XCTestCase {
     let value = Yaml.load(exampleYaml).value!
     XCTAssert(value.count == 6)
     XCTAssert(value["YAML"] == "YAML Ain't Markup Language")
-    XCTAssert(value["What It Is"] == .String("YAML is a human friendly data" +
+    XCTAssert(value["What It Is"] == .string("YAML is a human friendly data" +
       " serialization standard for all programming languages."))
     XCTAssert(value["YAML Resources"].count == 8)
     XCTAssert(value["YAML Resources"]["YAML 1.2 (3rd Edition)"] ==

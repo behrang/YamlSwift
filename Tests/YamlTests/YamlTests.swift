@@ -4,9 +4,9 @@ import XCTest
 class YamlTests: XCTestCase {
   
   func testNull() {
-    XCTAssert(Yaml.load("# comment line").value! == .Null)
-    XCTAssert(Yaml.load("").value! == .Null)
-    XCTAssert(Yaml.load("null").value! == .Null)
+    XCTAssert(Yaml.load("# comment line").value! == .null)
+    XCTAssert(Yaml.load("").value! == .null)
+    XCTAssert(Yaml.load("null").value! == .null)
     XCTAssert(Yaml.load("Null").value! == nil)
     XCTAssert(Yaml.load("NULL").value! == nil)
     XCTAssert(Yaml.load("~").value! == nil)
@@ -20,7 +20,7 @@ class YamlTests: XCTestCase {
   }
   
   func testBool() {
-    XCTAssert(Yaml.load("true").value! == .Bool(true))
+    XCTAssert(Yaml.load("true").value! == .bool(true))
     XCTAssert(Yaml.load("True").value!.bool == true)
     XCTAssert(Yaml.load("TRUE").value! == true)
     XCTAssert(Yaml.load("trUE").value! == "trUE")
@@ -33,7 +33,7 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load("true \n").value! == true)
     XCTAssert(true == Yaml.load("\ntrue \n").value!)
     
-    XCTAssert(Yaml.load("false").value! == .Bool(false))
+    XCTAssert(Yaml.load("false").value! == .bool(false))
     XCTAssert(Yaml.load("False").value!.bool == false)
     XCTAssert(Yaml.load("FALSE").value! == false)
     XCTAssert(Yaml.load("faLSE").value! == "faLSE")
@@ -52,7 +52,7 @@ class YamlTests: XCTestCase {
   }
   
   func testInt() {
-    XCTAssert(Yaml.load("0").value! == .Int(0))
+    XCTAssert(Yaml.load("0").value! == .int(0))
     XCTAssert(Yaml.load("+0").value!.int == 0)
     XCTAssert(Yaml.load("-0").value! == 0)
     XCTAssert(Yaml.load("2").value! == 2)
@@ -86,7 +86,7 @@ class YamlTests: XCTestCase {
   }
   
   func testDouble() {
-    XCTAssert(Yaml.load(".inf").value! == .Double(Double.infinity))
+    XCTAssert(Yaml.load(".inf").value! == .double(Double.infinity))
     XCTAssert(Yaml.load(".Inf").value!.double == Double.infinity)
     XCTAssert(Yaml.load(".INF").value!.double == Double.infinity)
     XCTAssert(Yaml.load(".iNf").value! == ".iNf")
@@ -96,7 +96,7 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load(".inf .inf").value! == ".inf .inf")
     XCTAssert(Yaml.load("+.inf # comment").value!.double == Double.infinity)
     
-    XCTAssert(Yaml.load("-.inf").value! == .Double(-Double.infinity))
+    XCTAssert(Yaml.load("-.inf").value! == .double(-Double.infinity))
     XCTAssert(Yaml.load("-.Inf").value!.double == -Double.infinity)
     XCTAssert(Yaml.load("-.INF").value!.double == -Double.infinity)
     XCTAssert(Yaml.load("-.iNf").value! == "-.iNf")
@@ -105,7 +105,7 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load("-.inf # comment").value!.double == -Double.infinity)
     XCTAssert(Yaml.load("-.inf -.inf").value! == "-.inf -.inf")
     
-    XCTAssert(Yaml.load(".nan").value! != .Double(Double.nan))
+    XCTAssert(Yaml.load(".nan").value! != .double(Double.nan))
     XCTAssert(Yaml.load(".nan").value!.double!.isNaN)
     XCTAssert(Yaml.load(".NaN").value!.double!.isNaN)
     XCTAssert(Yaml.load(".NAN").value!.double!.isNaN)
@@ -115,7 +115,7 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load(".nan # comment").value!.double!.isNaN)
     XCTAssert(Yaml.load(".nan .nan").value! == ".nan .nan")
     
-    XCTAssert(Yaml.load("0.").value! == .Double(0))
+    XCTAssert(Yaml.load("0.").value! == .double(0))
     XCTAssert(Yaml.load(".0").value!.double == 0)
     XCTAssert(Yaml.load("+0.").value! == 0)
     XCTAssert(Yaml.load("+.0").value! == 0)
@@ -159,9 +159,9 @@ class YamlTests: XCTestCase {
   }
   
   func testString () {
-    XCTAssert(Yaml.load("Behrang").value! == .String("Behrang"))
-    XCTAssert(Yaml.load("\"Behrang\"").value! == .String("Behrang"))
-    XCTAssert(Yaml.load("\"B\\\"ehran\\\"g\"").value! == .String("B\"ehran\"g"))
+    XCTAssert(Yaml.load("Behrang").value! == .string("Behrang"))
+    XCTAssert(Yaml.load("\"Behrang\"").value! == .string("Behrang"))
+    XCTAssert(Yaml.load("\"B\\\"ehran\\\"g\"").value! == .string("B\"ehran\"g"))
     XCTAssert(Yaml.load("Behrang Noruzi Niya").value!.string ==
       "Behrang Noruzi Niya")
     XCTAssert(Yaml.load("Radin Noruzi Niya").value! == "Radin Noruzi Niya")
@@ -213,7 +213,7 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load(">\n  \n  Behrang").value! == "\nBehrang")
     XCTAssert(Yaml.load(">\n\n folded\n line\n\n next\n line\n   * bullet\n\n" +
       "   * list\n   * lines\n\n last\n line\n\n# Comment").value! ==
-      .String("\nfolded line\nnext line\n  * bullet\n\n  * list\n  * lines" +
+      .string("\nfolded line\nnext line\n  * bullet\n\n  * list\n  * lines" +
         "\n\nlast line\n"))
     
     XCTAssert(Yaml.load("\"\n  foo \n \n  \t bar\n\n  baz\n\"").value! ==
@@ -265,10 +265,10 @@ class YamlTests: XCTestCase {
   }
   
   func testFlowSeq () {
-    XCTAssert(Yaml.load("[]").value! == .Array([]))
+    XCTAssert(Yaml.load("[]").value! == .array([]))
     XCTAssert(Yaml.load("[]").value!.count == 0)
-    XCTAssert(Yaml.load("[ true ]").value! == [Yaml.Bool(true)])
-    XCTAssert(Yaml.load("[ true ]").value! == .Array([true]))
+    XCTAssert(Yaml.load("[ true ]").value! == [Yaml.bool(true)])
+    XCTAssert(Yaml.load("[ true ]").value! == .array([true]))
     XCTAssert(Yaml.load("[ true ]").value! == [true])
     XCTAssert(Yaml.load("[ true ]").value![0] == true)
     XCTAssert(Yaml.load("[true, false, true]").value! == [true, false, true])
@@ -276,11 +276,11 @@ class YamlTests: XCTestCase {
     XCTAssert(Yaml.load("[true, [false, true]]").value! == [true, [false, true]])
     XCTAssert(Yaml.load("[true, true  ,false,  false  ,  false]").value! ==
       [true, true, false, false, false])
-    XCTAssert(Yaml.load("[true, .NaN]").value! != [true, .Double(Double.nan)])
+    XCTAssert(Yaml.load("[true, .NaN]").value! != [true, .double(Double.nan)])
     XCTAssert(Yaml.load("[~, null, TRUE, False, .INF, -.inf, 0, 123, -456" +
       ", 0o74, 0xFf, 1.23, -4.5]").value! ==
       [nil, nil, true, false,
-        .Double(Double.infinity), .Double(-Double.infinity),
+        .double(Double.infinity), .double(-Double.infinity),
         0, 123, -456, 60, 255, 1.23, -4.5])
     XCTAssert(Yaml.load("x:\n y:\n  z: [\n1]").error != nil)
     XCTAssert(Yaml.load("x:\n y:\n  z: [\n  1]").error != nil)
@@ -316,7 +316,7 @@ class YamlTests: XCTestCase {
   
   func testBlockMap () {
     XCTAssert(Yaml.load("x: 1\ny: 2").value! ==
-      .Dictionary([.String("x"): .Int(1), .String("y"): .Int(2)]))
+      .dictionary([.string("x"): .int(1), .string("y"): .int(2)]))
     XCTAssert(Yaml.load("x: 1\nx: 2").error != nil)
     XCTAssert(Yaml.load("x: 1\n? y\n: 2").value! == ["x": 1, "y": 2])
     XCTAssert(Yaml.load("x: 1\n? x\n: 2").error != nil)
