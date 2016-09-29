@@ -1,49 +1,49 @@
 import Foundation
 
 enum TokenType: Swift.String {
-  case YamlDirective = "%YAML"
-  case DocStart = "doc-start"
-  case DocEnd = "doc-end"
-  case Comment = "comment"
-  case Space = "space"
-  case NewLine = "newline"
-  case Indent = "indent"
-  case Dedent = "dedent"
-  case Null = "null"
-  case True = "true"
-  case False = "false"
-  case InfinityP = "+infinity"
-  case InfinityN = "-infinity"
-  case NaN = "nan"
-  case Double = "double"
-  case Int = "int"
-  case IntOct = "int-oct"
-  case IntHex = "int-hex"
-  case IntSex = "int-sex"
-  case Anchor = "&"
-  case Alias = "*"
-  case Comma = ","
-  case OpenSB = "["
-  case CloseSB = "]"
-  case Dash = "-"
-  case OpenCB = "{"
-  case CloseCB = "}"
-  case Key = "key"
-  case KeyDQ = "key-dq"
-  case KeySQ = "key-sq"
-  case QuestionMark = "?"
-  case ColonFO = ":-flow-out"
-  case ColonFI = ":-flow-in"
-  case Colon = ":"
-  case Literal = "|"
-  case Folded = ">"
-  case Reserved = "reserved"
-  case StringDQ = "string-dq"
-  case StringSQ = "string-sq"
-  case StringFI = "string-flow-in"
-  case StringFO = "string-flow-out"
-  case String = "string"
-  case End = "end"
+  case yamlDirective = "%YAML"
+  case docStart = "doc-start"
+  case docend = "doc-end"
+  case comment = "comment"
+  case space = "space"
+  case newLine = "newline"
+  case indent = "indent"
+  case dedent = "dedent"
+  case null = "null"
+  case _true = "true"
+  case _false = "false"
+  case infinityP = "+infinity"
+  case infinityN = "-infinity"
+  case nan = "nan"
+  case double = "double"
+  case int = "int"
+  case intOct = "int-oct"
+  case intHex = "int-hex"
+  case intSex = "int-sex"
+  case anchor = "&"
+  case alias = "*"
+  case comma = ","
+  case openSB = "["
+  case closeSB = "]"
+  case dash = "-"
+  case openCB = "{"
+  case closeCB = "}"
+  case key = "key"
+  case keyDQ = "key-dq"
+  case keySQ = "key-sq"
+  case questionMark = "?"
+  case colonFO = ":-flow-out"
+  case colonFI = ":-flow-in"
+  case colon = ":"
+  case literal = "|"
+  case folded = ">"
+  case reserved = "reserved"
+  case stringDQ = "string-dq"
+  case stringSQ = "string-sq"
+  case stringFI = "string-flow-in"
+  case stringFO = "string-flow-out"
+  case string = "string"
+  case end = "end"
 }
 
 typealias TokenPattern = (type: TokenType, pattern: NSRegularExpression)
@@ -65,41 +65,41 @@ let plainInPattern =
 let dashPattern = regex("^-([ \\t]+(?!#|\(bBreak))|(?=[ \\t\\n]))")
 let finish = "(?= *(,|\\]|\\}|( #.*)?(\(bBreak)|$)))"
 let tokenPatterns: [TokenPattern] = [
-  (.YamlDirective, regex("^%YAML(?= )")),
-  (.DocStart, regex("^---")),
-  (.DocEnd, regex("^\\.\\.\\.")),
-  (.Comment, regex("^#.*|^\(bBreak) *(#.*)?(?=\(bBreak)|$)")),
-  (.Space, regex("^ +")),
-  (.NewLine, regex("^\(bBreak) *")),
-  (.Dash, dashPattern!),
-  (.Null, regex("^(null|Null|NULL|~)\(finish)")),
-  (.True, regex("^(true|True|TRUE)\(finish)")),
-  (.False, regex("^(false|False|FALSE)\(finish)")),
-  (.InfinityP, regex("^\\+?\\.(inf|Inf|INF)\(finish)")),
-  (.InfinityN, regex("^-\\.(inf|Inf|INF)\(finish)")),
-  (.NaN, regex("^\\.(nan|NaN|NAN)\(finish)")),
-  (.Int, regex("^[-+]?[0-9]+\(finish)")),
-  (.IntOct, regex("^0o[0-7]+\(finish)")),
-  (.IntHex, regex("^0x[0-9a-fA-F]+\(finish)")),
-  (.IntSex, regex("^[0-9]{2}(:[0-9]{2})+\(finish)")),
-  (.Double, regex("^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)")),
-  (.Anchor, regex("^&\\w+")),
-  (.Alias, regex("^\\*\\w+")),
-  (.Comma, regex("^,")),
-  (.OpenSB, regex("^\\[")),
-  (.CloseSB, regex("^\\]")),
-  (.OpenCB, regex("^\\{")),
-  (.CloseCB, regex("^\\}")),
-  (.QuestionMark, regex("^\\?( +|(?=\(bBreak)))")),
-  (.ColonFO, regex("^:(?!:)")),
-  (.ColonFI, regex("^:(?!:)")),
-  (.Literal, regex("^\\|.*")),
-  (.Folded, regex("^>.*")),
-  (.Reserved, regex("^[@`]")),
-  (.StringDQ, regex("^\"([^\\\\\"]|\\\\(.|\(bBreak)))*\"")),
-  (.StringSQ, regex("^'([^']|'')*'")),
-  (.StringFO, regex("^\(plainOutPattern)(?=:([ \\t]|\(bBreak))|\(bBreak)|$)")),
-  (.StringFI, regex("^\(plainInPattern)")),
+  (.yamlDirective, regex("^%YAML(?= )")),
+  (.docStart, regex("^---")),
+  (.docend, regex("^\\.\\.\\.")),
+  (.comment, regex("^#.*|^\(bBreak) *(#.*)?(?=\(bBreak)|$)")),
+  (.space, regex("^ +")),
+  (.newLine, regex("^\(bBreak) *")),
+  (.dash, dashPattern!),
+  (.null, regex("^(null|Null|NULL|~)\(finish)")),
+  (._true, regex("^(true|True|TRUE)\(finish)")),
+  (._false, regex("^(false|False|FALSE)\(finish)")),
+  (.infinityP, regex("^\\+?\\.(inf|Inf|INF)\(finish)")),
+  (.infinityN, regex("^-\\.(inf|Inf|INF)\(finish)")),
+  (.nan, regex("^\\.(nan|NaN|NAN)\(finish)")),
+  (.int, regex("^[-+]?[0-9]+\(finish)")),
+  (.intOct, regex("^0o[0-7]+\(finish)")),
+  (.intHex, regex("^0x[0-9a-fA-F]+\(finish)")),
+  (.intSex, regex("^[0-9]{2}(:[0-9]{2})+\(finish)")),
+  (.double, regex("^[-+]?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?)([eE][-+]?[0-9]+)?\(finish)")),
+  (.anchor, regex("^&\\w+")),
+  (.alias, regex("^\\*\\w+")),
+  (.comma, regex("^,")),
+  (.openSB, regex("^\\[")),
+  (.closeSB, regex("^\\]")),
+  (.openCB, regex("^\\{")),
+  (.closeCB, regex("^\\}")),
+  (.questionMark, regex("^\\?( +|(?=\(bBreak)))")),
+  (.colonFO, regex("^:(?!:)")),
+  (.colonFI, regex("^:(?!:)")),
+  (.literal, regex("^\\|.*")),
+  (.folded, regex("^>.*")),
+  (.reserved, regex("^[@`]")),
+  (.stringDQ, regex("^\"([^\\\\\"]|\\\\(.|\(bBreak)))*\"")),
+  (.stringSQ, regex("^'([^']|'')*'")),
+  (.stringFO, regex("^\(plainOutPattern)(?=:([ \\t]|\(bBreak))|\(bBreak)|$)")),
+  (.stringFI, regex("^\(plainInPattern)")),
 ]
 
 func escapeErrorContext (_ text: String) -> String {
@@ -124,7 +124,7 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
         let rangeEnd = range.location + range.length
         switch tokenPattern.type {
 
-        case .NewLine:
+        case .newLine:
           let match = text |> substringWithRange(range)
           let lastIndent = indents.last ?? 0
           let rest = match.substring(from: match.index(after: match.startIndex))
@@ -132,61 +132,61 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
           let nestedBlockSequence =
                 matches(text |> substringFromIndex(rangeEnd), regex: dashPattern!)
           if spaces == lastIndent {
-            matchList.append(TokenMatch(.NewLine, match))
+            matchList.append(TokenMatch(.newLine, match))
           } else if spaces > lastIndent {
             if insideFlow == 0 {
               if matchList.last != nil &&
-                  matchList[matchList.endIndex - 1].type == .Indent {
+                  matchList[matchList.endIndex - 1].type == .indent {
                 indents[indents.endIndex - 1] = spaces
-                matchList[matchList.endIndex - 1] = TokenMatch(.Indent, match)
+                matchList[matchList.endIndex - 1] = TokenMatch(.indent, match)
               } else {
                 indents.append(spaces)
-                matchList.append(TokenMatch(.Indent, match))
+                matchList.append(TokenMatch(.indent, match))
               }
             }
           } else if nestedBlockSequence && spaces == lastIndent - 1 {
-            matchList.append(TokenMatch(.NewLine, match))
+            matchList.append(TokenMatch(.newLine, match))
           } else {
             while nestedBlockSequence && spaces < (indents.last ?? 0) - 1
                 || !nestedBlockSequence && spaces < indents.last ?? 0 {
               indents.removeLast()
-              matchList.append(TokenMatch(.Dedent, ""))
+              matchList.append(TokenMatch(.dedent, ""))
             }
-            matchList.append(TokenMatch(.NewLine, match))
+            matchList.append(TokenMatch(.newLine, match))
           }
 
-        case .Dash, .QuestionMark:
+        case .dash, .questionMark:
           let match = text |> substringWithRange(range)
           let index = match.index(after: match.startIndex)
           let indent = match.characters.count
           indents.append((indents.last ?? 0) + indent)
           matchList.append(
             TokenMatch(tokenPattern.type, match.substring(to: index)))
-          matchList.append(TokenMatch(.Indent, match.substring(from: index)))
+          matchList.append(TokenMatch(.indent, match.substring(from: index)))
 
-        case .ColonFO:
+        case .colonFO:
           if insideFlow > 0 {
             continue
           }
           fallthrough
 
-        case .ColonFI:
+        case .colonFI:
           let match = text |> substringWithRange(range)
-          matchList.append(TokenMatch(.Colon, match))
+          matchList.append(TokenMatch(.colon, match))
           if insideFlow == 0 {
             indents.append((indents.last ?? 0) + 1)
-            matchList.append(TokenMatch(.Indent, ""))
+            matchList.append(TokenMatch(.indent, ""))
           }
 
-        case .OpenSB, .OpenCB:
+        case .openSB, .openCB:
           insideFlow += 1
           matchList.append(TokenMatch(tokenPattern.type, text |> substringWithRange(range)))
 
-        case .CloseSB, .CloseCB:
+        case .closeSB, .closeCB:
           insideFlow -= 1
           matchList.append(TokenMatch(tokenPattern.type, text |> substringWithRange(range)))
 
-        case .Literal, .Folded:
+        case .literal, .folded:
           matchList.append(TokenMatch(tokenPattern.type, text |> substringWithRange(range)))
           text = text |> substringFromIndex(rangeEnd)
           let lastIndent = indents.last ?? 0
@@ -201,10 +201,10 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
               |> replace(regex("\(bBreak) {0,\(lastIndent)}"), template: "\n")
             ) + (matches(text, regex: regex("^\(bBreak)")) && lead.endIndex > lead.startIndex
               ? "\n" : "")
-          matchList.append(TokenMatch(.String, block))
+          matchList.append(TokenMatch(.string, block))
           continue next
 
-        case .StringFO:
+        case .stringFO:
           if insideFlow > 0 {
             continue
           }
@@ -225,16 +225,16 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
                 replace(regex("^\(bBreak)[ \\t]*|[ \\t]+$"), template: "")(s)
             text = text |> substringFromIndex(range.location + range.length)
           }
-          matchList.append(TokenMatch(.String, block))
+          matchList.append(TokenMatch(.string, block))
           continue next
 
-        case .StringFI:
+        case .stringFI:
           let match = text
                 |> substringWithRange(range)
                 |> replace(regex("^[ \\t]|[ \\t]$"), template: "")
-          matchList.append(TokenMatch(.String, match))
+          matchList.append(TokenMatch(.string, match))
 
-        case .Reserved:
+        case .reserved:
           return fail(escapeErrorContext(text))
 
         default:
@@ -248,8 +248,8 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
   }
   while indents.count > 1 {
     indents.removeLast()
-    matchList.append((.Dedent, ""))
+    matchList.append((.dedent, ""))
   }
-  matchList.append((.End, ""))
+  matchList.append((.end, ""))
   return lift(matchList)
 }
