@@ -27,7 +27,7 @@ func parseDoc (_ tokens: [TokenMatch]) -> Result<Yaml> {
   let v = cv >>- getValue
   return cv
       >>- getContext
-      >>- ignoredocend
+      >>- ignoreDocEnd
       >>=- expect(TokenType.end, message: "expected end")
       >>| v
 }
@@ -48,7 +48,7 @@ func parseDocs (_ acc: [Yaml]) -> (Context) -> Result<[Yaml]> {
         >>- getValue
     let c = cv
         >>- getContext
-        >>- ignoredocend
+        >>- ignoreDocEnd
     let a = appendToArray(acc) <^> v
     return parseDocs <^> a <*> c |> join
   }
@@ -68,18 +68,18 @@ func advance (_ context: Context) -> Context {
   return Context(tokens, context.aliases)
 }
 
-func ignorespace (_ context: Context) -> Context {
+func ignoreSpace (_ context: Context) -> Context {
   if ![.comment, .space, .newLine].contains(peekType(context)) {
     return context
   }
-  return ignorespace(advance(context))
+  return ignoreSpace(advance(context))
 }
 
-func ignoredocend (_ context: Context) -> Context {
+func ignoreDocEnd (_ context: Context) -> Context {
   if ![.comment, .space, .newLine, .docend].contains(peekType(context)) {
     return context
   }
-  return ignoredocend(advance(context))
+  return ignoreDocEnd(advance(context))
 }
 
 func expect (_ type: TokenType, message: String) -> (Context) -> Result<Context> {
@@ -147,7 +147,7 @@ func parse (_ context: Context) -> Result<ContextValue> {
   switch peekType(context) {
 
   case .comment, .space, .newLine:
-    return parse(ignorespace(context))
+    return parse(ignoreSpace(context))
 
   case .null:
     return lift((advance(context), nil))
@@ -161,24 +161,24 @@ func parse (_ context: Context) -> Result<ContextValue> {
   case .int:
     let m = peekMatch(context)
     // will throw runtime error if overflows
-    let v = Yaml.int(parseint(m, radix: 10))
+    let v = Yaml.int(parseInt(m, radix: 10))
     return lift((advance(context), v))
 
   case .intOct:
     let m = peekMatch(context) |> replace(regex("0o"), template: "")
     // will throw runtime error if overflows
-    let v = Yaml.int(parseint(m, radix: 8))
+    let v = Yaml.int(parseInt(m, radix: 8))
     return lift((advance(context), v))
 
   case .intHex:
     let m = peekMatch(context) |> replace(regex("0x"), template: "")
     // will throw runtime error if overflows
-    let v = Yaml.int(parseint(m, radix: 16))
+    let v = Yaml.int(parseInt(m, radix: 16))
     return lift((advance(context), v))
 
   case .intSex:
     let m = peekMatch(context)
-    let v = Yaml.int(parseint(m, radix: 60))
+    let v = Yaml.int(parseInt(m, radix: 60))
     return lift((advance(context), v))
 
   case .infinityP:
@@ -225,7 +225,7 @@ func parse (_ context: Context) -> Result<ContextValue> {
     let v = cv >>- getValue
     let c = cv
         >>- getContext
-        >>- ignorespace
+        >>- ignoreSpace
         >>=- expect(TokenType.dedent, message: "expected dedent")
     return createContextValue <^> c <*> v
 
@@ -301,14 +301,14 @@ func parseFlowSeq (_ acc: [Yaml]) -> (Context) -> Result<ContextValue> {
       return lift((advance(context), .array(acc)))
     }
     let cv = lift(context)
-        >>- ignorespace
+        >>- ignoreSpace
         >>=- (acc.count == 0 ? lift : expect(TokenType.comma, message: "expected comma"))
-        >>- ignorespace
+        >>- ignoreSpace
         >>=- parse
     let v = cv >>- getValue
     let c = cv
         >>- getContext
-        >>- ignorespace
+        >>- ignoreSpace
     let a = appendToArray(acc) <^> v
     return parseFlowSeq <^> a <*> c |> join
   }
@@ -326,9 +326,9 @@ func parseFlowMap (_ acc: [Yaml: Yaml]) -> (Context) -> Result<ContextValue> {
       return lift((advance(context), .dictionary(acc)))
     }
     let ck = lift(context)
-        >>- ignorespace
+        >>- ignoreSpace
         >>=- (acc.count == 0 ? lift : expect(TokenType.comma, message: "expected comma"))
-        >>- ignorespace
+        >>- ignoreSpace
         >>=- parseString
         >>=- checkkeyUniqueness(acc)
     let k = ck >>- getValue
@@ -339,7 +339,7 @@ func parseFlowMap (_ acc: [Yaml: Yaml]) -> (Context) -> Result<ContextValue> {
     let v = cv >>- getValue
     let c = cv
         >>- getContext
-        >>- ignorespace
+        >>- ignoreSpace
     let a = putToMap(acc) <^> k <*> v
     return parseFlowMap <^> a <*> c |> join
   }
@@ -357,14 +357,14 @@ func parseBlockSeq (_ acc: [Yaml]) -> (Context) -> Result<ContextValue> {
     let cv = lift(context)
         >>- advance
         >>=- expect(TokenType.indent, message: "expected indent after dash")
-        >>- ignorespace
+        >>- ignoreSpace
         >>=- parse
     let v = cv >>- getValue
     let c = cv
         >>- getContext
-        >>- ignorespace
+        >>- ignoreSpace
         >>=- expect(TokenType.dedent, message: "expected dedent after dash indent")
-        >>- ignorespace
+        >>- ignoreSpace
     let a = appendToArray(acc) <^> v
     return parseBlockSeq <^> a <*> c |> join
   }
@@ -399,28 +399,28 @@ func parsequestionMarkkeyValue (_ acc: [Yaml: Yaml]) -> (Context) -> Result<Cont
     let k = ck >>- getValue
     let cv = ck
         >>- getContext
-        >>- ignorespace
-        >>=- parsecolonValueOrNil
+        >>- ignoreSpace
+        >>=- parseColonValueOrNil
     let v = cv >>- getValue
     let c = cv
         >>- getContext
-        >>- ignorespace
+        >>- ignoreSpace
     let a = putToMap(acc) <^> k <*> v
     return parseBlockMap <^> a <*> c |> join
   }
 }
 
-func parsecolonValueOrNil (_ context: Context) -> Result<ContextValue> {
+func parseColonValueOrNil (_ context: Context) -> Result<ContextValue> {
   if peekType(context) != .colon {
     return lift((context, nil))
   }
-  return parsecolonValue(context)
+  return parseColonValue(context)
 }
 
-func parsecolonValue (_ context: Context) -> Result<ContextValue> {
+func parseColonValue (_ context: Context) -> Result<ContextValue> {
   return lift(context)
       >>=- expect(TokenType.colon, message: "expected colon")
-      >>- ignorespace
+      >>- ignoreSpace
       >>=- parse
 }
 
@@ -432,12 +432,12 @@ func parseStringkeyValue (_ acc: [Yaml: Yaml]) -> (Context) -> Result<ContextVal
     let k = ck >>- getValue
     let cv = ck
         >>- getContext
-        >>- ignorespace
-        >>=- parsecolonValue
+        >>- ignoreSpace
+        >>=- parseColonValue
     let v = cv >>- getValue
     let c = cv
         >>- getContext
-        >>- ignorespace
+        >>- ignoreSpace
     let a = putToMap(acc) <^> k <*> v
     return parseBlockMap <^> a <*> c |> join
   }
@@ -453,7 +453,7 @@ func parseString (_ context: Context) -> Result<ContextValue> {
 
   case .stringDQ:
     let m = unwrapQuotedString(normalizeBreaks(peekMatch(context)))
-    return lift((advance(context), .string(unescapedoubleQuotes(foldFlow(m)))))
+    return lift((advance(context), .string(unescapeDoubleQuotes(foldFlow(m)))))
 
   case .stringSQ:
     let m = unwrapQuotedString(normalizeBreaks(peekMatch(context)))
@@ -496,7 +496,7 @@ func parseliteral (_ context: Context) -> Result<ContextValue> {
   let blockContext = advance(context)
   let chomps = ["-": -1, "+": 1]
   let chomp = chomps[literal |> replace(regex("[^-+]"), template: "")] ?? 0
-  let indent = parseint(literal |> replace(regex("[^1-9]"), template: ""), radix: 10)
+  let indent = parseInt(literal |> replace(regex("[^1-9]"), template: ""), radix: 10)
   let headerPattern = regex("^(\\||>)([1-9][-+]|[-+]?[1-9]?)( |$)")
   let error0 = "invalid chomp or indent header"
   let c = `guard`(error(error0)(context),
@@ -533,7 +533,7 @@ func parseliteral (_ context: Context) -> Result<ContextValue> {
       >>- { context in (context, .string(trimmed))}
 }
 
-func parseint (_ string: String, radix: Int) -> Int {
+func parseInt (_ string: String, radix: Int) -> Int {
   let (sign, str) = splitLead(regex("^[-+]"))(string)
   let multiplier = (sign == "-" ? -1 : 1)
   let ints = radix == 60
@@ -572,16 +572,16 @@ func unescapeSingleQuotes (_ s: String) -> String {
   return replace(regex("''"), template: "'")(s)
 }
 
-func unescapedoubleQuotes (_ input: String) -> String {
+func unescapeDoubleQuotes (_ input: String) -> String {
   return input
     |> replace(regex("\\\\([0abtnvfre \"\\/N_LP])"))
         { escapeCharacters[$0[1]] ?? "" }
     |> replace(regex("\\\\x([0-9A-Fa-f]{2})"))
-        { String(describing: UnicodeScalar(parseint($0[1], radix: 16))) }
+        { String(describing: UnicodeScalar(parseInt($0[1], radix: 16))) }
     |> replace(regex("\\\\u([0-9A-Fa-f]{4})"))
-        { String(describing: UnicodeScalar(parseint($0[1], radix: 16))) }
+        { String(describing: UnicodeScalar(parseInt($0[1], radix: 16))) }
     |> replace(regex("\\\\U([0-9A-Fa-f]{8})"))
-        { String(describing: UnicodeScalar(parseint($0[1], radix: 16))) }
+        { String(describing: UnicodeScalar(parseInt($0[1], radix: 16))) }
 }
 
 let escapeCharacters = [
