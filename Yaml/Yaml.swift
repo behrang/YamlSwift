@@ -105,13 +105,13 @@ extension Yaml: CustomStringConvertible {
   public var description: Swift.String {
     switch self {
     case .null:
-      return "null"
+      return "Null"
     case .bool(let b):
       return "Bool(\(b))"
     case .int(let i):
-      return "int(\(i))"
+      return "Int(\(i))"
     case .double(let f):
-      return "double(\(f))"
+      return "Double(\(f))"
     case .string(let s):
       return "String(\(s))"
     case .array(let s):

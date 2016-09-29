@@ -72,12 +72,12 @@ let tokenPatterns: [TokenPattern] = [
   (.space, regex("^ +")),
   (.newLine, regex("^\(bBreak) *")),
   (.dash, dashPattern!),
-  (.null, regex("^(null|null|NULL|~)\(finish)")),
+  (.null, regex("^(null|Null|NULL|~)\(finish)")),
   (._true, regex("^(true|True|TRUE)\(finish)")),
   (._false, regex("^(false|False|FALSE)\(finish)")),
   (.infinityP, regex("^\\+?\\.(inf|Inf|INF)\(finish)")),
   (.infinityN, regex("^-\\.(inf|Inf|INF)\(finish)")),
-  (.nan, regex("^\\.(nan|nan|NAN)\(finish)")),
+  (.nan, regex("^\\.(nan|NaN|NAN)\(finish)")),
   (.int, regex("^[-+]?[0-9]+\(finish)")),
   (.intOct, regex("^0o[0-7]+\(finish)")),
   (.intHex, regex("^0x[0-9a-fA-F]+\(finish)")),
@@ -121,19 +121,19 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
     for tokenPattern in tokenPatterns {
       let range = matchRange(text, regex: tokenPattern.pattern)
       if range.location != NSNotFound {
-        let rangeend = range.location + range.length
+        let rangeEnd = range.location + range.length
         switch tokenPattern.type {
 
         case .newLine:
           let match = text |> substringWithRange(range)
-          let lastindent = indents.last ?? 0
+          let lastIndent = indents.last ?? 0
           let rest = match.substring(from: match.index(after: match.startIndex))
           let spaces = rest.characters.count
           let nestedBlockSequence =
-                matches(text |> substringFromIndex(rangeend), regex: dashPattern!)
-          if spaces == lastindent {
+                matches(text |> substringFromIndex(rangeEnd), regex: dashPattern!)
+          if spaces == lastIndent {
             matchList.append(TokenMatch(.newLine, match))
-          } else if spaces > lastindent {
+          } else if spaces > lastIndent {
             if insideFlow == 0 {
               if matchList.last != nil &&
                   matchList[matchList.endIndex - 1].type == .indent {
@@ -144,7 +144,7 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
                 matchList.append(TokenMatch(.indent, match))
               }
             }
-          } else if nestedBlockSequence && spaces == lastindent - 1 {
+          } else if nestedBlockSequence && spaces == lastIndent - 1 {
             matchList.append(TokenMatch(.newLine, match))
           } else {
             while nestedBlockSequence && spaces < (indents.last ?? 0) - 1
@@ -188,17 +188,17 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
 
         case .literal, .folded:
           matchList.append(TokenMatch(tokenPattern.type, text |> substringWithRange(range)))
-          text = text |> substringFromIndex(rangeend)
-          let lastindent = indents.last ?? 0
-          let minindent = 1 + lastindent
+          text = text |> substringFromIndex(rangeEnd)
+          let lastIndent = indents.last ?? 0
+          let minIndent = 1 + lastIndent
           let blockPattern = regex(("^(\(bBreak) *)*(\(bBreak)" +
-              "( {\(minindent),})[^ ].*(\(bBreak)( *|\\3.*))*)(?=\(bBreak)|$)"))
+              "( {\(minIndent),})[^ ].*(\(bBreak)( *|\\3.*))*)(?=\(bBreak)|$)"))
           let (lead, rest) = text |> splitLead(blockPattern!)
           text = rest
           let block = (lead
               |> replace(regex("^\(bBreak)"), template: "")
-              |> replace(regex("^ {0,\(lastindent)}"), template: "")
-              |> replace(regex("\(bBreak) {0,\(lastindent)}"), template: "\n")
+              |> replace(regex("^ {0,\(lastIndent)}"), template: "")
+              |> replace(regex("\(bBreak) {0,\(lastIndent)}"), template: "\n")
             ) + (matches(text, regex: regex("^\(bBreak)")) && lead.endIndex > lead.startIndex
               ? "\n" : "")
           matchList.append(TokenMatch(.string, block))
@@ -214,7 +214,7 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
           var block = text
                 |> substringWithRange(range)
                 |> replace(regex("^[ \\t]+|[ \\t]+$"), template: "")
-          text = text |> substringFromIndex(rangeend)
+          text = text |> substringFromIndex(rangeEnd)
           while true {
             let range = matchRange(text, regex: blockPattern!)
             if range.location == NSNotFound {
@@ -240,7 +240,7 @@ func tokenize (_ text: String) -> Result<[TokenMatch]> {
         default:
           matchList.append(TokenMatch(tokenPattern.type, text |> substringWithRange(range)))
         }
-        text = text |> substringFromIndex(rangeend)
+        text = text |> substringFromIndex(rangeEnd)
         continue next
       }
     }

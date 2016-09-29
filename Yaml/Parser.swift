@@ -185,7 +185,7 @@ func parse (_ context: Context) -> Result<ContextValue> {
     return lift((advance(context), .double(Double.infinity)))
 
   case .infinityN:
-    return lift((advance(context), .double(Double.infinity)))
+    return lift((advance(context), .double(-Double.infinity)))
 
   case .nan:
     return lift((advance(context), .double(Double.nan)))
