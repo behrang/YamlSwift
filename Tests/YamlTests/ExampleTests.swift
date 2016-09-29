@@ -1,15 +1,15 @@
-@testable import Yaml
+import Yaml
 import XCTest
 
 class ExampleTests: XCTestCase {
   
   func testExample0 () {
-    var value = Yaml.load(
+    var value = try! Yaml.load(
       "- just: write some\n" +
         "- yaml: \n" +
         "  - [here, and]\n" +
       "  - {it: updates, in: real-time}\n"
-      ).value!
+      )
     XCTAssert(value.count == 2)
     XCTAssert(value[0]["just"] == "write some")
     XCTAssert(value[1]["yaml"][0][1] == "and")
@@ -32,27 +32,27 @@ class ExampleTests: XCTestCase {
   }
   
   func testExample1 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "- Mark McGwire\n" +
         "- Sammy Sosa\n" +
       "- Ken Griffey\n"
-      ).value!
+      )
     XCTAssert(value.count == 3)
     XCTAssert(value[1] == "Sammy Sosa")
   }
   
   func testExample2 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "hr:  65    # Home runs\n" +
         "avg: 0.278 # Batting average\n" +
       "rbi: 147   # Runs Batted In\n"
-      ).value!
+      )
     XCTAssert(value.count == 3)
     XCTAssert(value["avg"] == 0.278)
   }
   
   func testExample3 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "american:\n" +
         "  - Boston Red Sox\n" +
         "  - Detroit Tigers\n" +
@@ -61,14 +61,14 @@ class ExampleTests: XCTestCase {
         "  - New York Mets\n" +
         "  - Chicago Cubs\n" +
       "  - Atlanta Braves\n"
-      ).value!
+      )
     XCTAssert(value.count == 2)
     XCTAssert(value["national"].count == 3)
     XCTAssert(value["national"][2] == "Atlanta Braves")
   }
   
   func testExample4 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "-\n" +
         "  name: Mark McGwire\n" +
         "  hr:   65\n" +
@@ -77,36 +77,36 @@ class ExampleTests: XCTestCase {
         "  name: Sammy Sosa\n" +
         "  hr:   63\n" +
       "  avg:  0.288\n"
-      ).value!
+      )
     XCTAssert(value.count == 2)
     XCTAssertEqualWithAccuracy(value[1]["avg"].double!, 0.288, accuracy: 0.00001)
   }
   
   func testExample5 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "- [name        , hr, avg  ]\n" +
         "- [Mark McGwire, 65, 0.278]\n" +
       "- [Sammy Sosa  , 63, 0.288]\n"
-      ).value!
+      )
     XCTAssert(value.count == 3)
     XCTAssert(value[2].count == 3)
     XCTAssertEqualWithAccuracy(value[2][2].double!, 0.288, accuracy: 0.00001)
   }
   
   func testExample6 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "Mark McGwire: {hr: 65, avg: 0.278}\n" +
         "Sammy Sosa: {\n" +
         "    hr: 63,\n" +
         "    avg: 0.288\n" +
       "  }\n"
-      ).value!
+      )
     XCTAssert(value["Mark McGwire"]["hr"] == 65)
     XCTAssert(value["Sammy Sosa"]["hr"] == 63)
   }
   
   func testExample7 () {
-    let value = Yaml.loadMultiple(
+    let value = try! Yaml.loadMultiple(
       "# Ranking of 1998 home runs\n" +
         "---\n" +
         "- Mark McGwire\n" +
@@ -117,7 +117,7 @@ class ExampleTests: XCTestCase {
         "---\n" +
         "- Chicago Cubs\n" +
       "- St Louis Cardinals\n"
-      ).value!
+      )
     XCTAssert(value.count == 2)
     XCTAssert(value[0].count == 3)
     XCTAssert(value[0][1] == "Sammy Sosa")
@@ -126,7 +126,7 @@ class ExampleTests: XCTestCase {
   }
   
   func testExample8 () {
-    let value = Yaml.loadMultiple(
+    let value = try! Yaml.loadMultiple(
       "---\n" +
         "time: 20:03:20\n" +
         "player: Sammy Sosa\n" +
@@ -137,7 +137,7 @@ class ExampleTests: XCTestCase {
         "player: Sammy Sosa\n" +
         "action: grand slam\n" +
       "...\n"
-      ).value!
+      )
     XCTAssert(value.count == 2)
     XCTAssert(value[0]["player"] == "Sammy Sosa")
     XCTAssert(value[0]["time"] == 72200)
@@ -146,7 +146,7 @@ class ExampleTests: XCTestCase {
   }
   
   func testExample9 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "---\n" +
         "hr: # 1998 hr ranking\n" +
         "  - Mark McGwire\n" +
@@ -155,13 +155,13 @@ class ExampleTests: XCTestCase {
         "  # 1998 rbi ranking\n" +
         "  - Sammy Sosa\n" +
       "  - Ken Griffey\n"
-      ).value!
+      )
     XCTAssert(value["hr"][1] == "Sammy Sosa")
     XCTAssert(value["rbi"][1] == "Ken Griffey")
   }
   
   func testExample10 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "---\n" +
         "hr:\n" +
         "  - Mark McGwire\n" +
@@ -170,7 +170,7 @@ class ExampleTests: XCTestCase {
         "rbi:\n" +
         "  - *SS # Subsequent occurrence\n" +
       "  - Ken Griffey\n"
-      ).value!
+      )
     XCTAssert(value["hr"].count == 2)
     XCTAssert(value["hr"][1] == "Sammy Sosa")
     XCTAssert(value["rbi"].count == 2)
@@ -178,7 +178,7 @@ class ExampleTests: XCTestCase {
   }
   
   func testExample11 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "? - Detroit Tigers\n" +
         "  - Chicago cubs\n" +
         ":\n" +
@@ -188,9 +188,9 @@ class ExampleTests: XCTestCase {
         "    Atlanta Braves ]\n" +
         ": [ 2001-07-02, 2001-08-12,\n" +
       "    2001-08-14 ]\n"
-      ).value!
-    let key1 = Yaml.load("- Detroit Tigers\n- Chicago cubs\n").value!
-    let key2 = Yaml.load("- New York Yankees\n- Atlanta Braves").value!
+      )
+    let key1 = try! Yaml.load("- Detroit Tigers\n- Chicago cubs\n")
+    let key2 = try! Yaml.load("- New York Yankees\n- Atlanta Braves")
     XCTAssert(value.count == 2)
     XCTAssert(value[key1].count == 1)
     XCTAssert(value[key2].count == 3)
@@ -198,7 +198,7 @@ class ExampleTests: XCTestCase {
   }
   
   func testExample12 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "---\n" +
         "# Products purchased\n" +
         "- item    : Super Hoop\n" +
@@ -207,37 +207,37 @@ class ExampleTests: XCTestCase {
         "  quantity: 4\n" +
         "- item    : Big Shoes\n" +
       "  quantity: 1\n"
-      ).value!
+      )
     XCTAssert(value.count == 3)
     XCTAssert(value[1].count == 2)
     XCTAssert(value[1]["item"] == "Basketball")
     XCTAssert(value[1]["quantity"] == 4)
-    let key = Yaml.load("quantity").value!
+    let key = try! Yaml.load("quantity")
     XCTAssert(value[2][key] == 1)
   }
   
   func testExample13 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "# ASCII Art\n" +
         "--- |\n" +
         "  \\//||\\/||\n" +
       "  // ||  ||__\n"
-      ).value!
+      )
     XCTAssert(value == "\\//||\\/||\n// ||  ||__\n")
   }
   
   func testExample14 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "--- >\n" +
         "  Mark McGwire's\n" +
         "  year was crippled\n" +
       "  by a knee injury.\n"
-      ).value!
+      )
     XCTAssert(value == "Mark McGwire's year was crippled by a knee injury.\n")
   }
   
   func testExample15 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       ">\n" +
         " Sammy Sosa completed another\n" +
         " fine season with great stats.\n" +
@@ -246,14 +246,14 @@ class ExampleTests: XCTestCase {
         "   0.288 Batting Average\n" +
         "\n" +
       " What a year!\n"
-      ).value!
+      )
     XCTAssert(value ==
       .string("Sammy Sosa completed another fine season with great stats.\n\n" +
         "  63 Home Runs\n  0.288 Batting Average\n\nWhat a year!\n"))
   }
   
   func testExample16 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "name: Mark McGwire\n" +
         "accomplishment: >\n" +
         "  Mark set a major league\n" +
@@ -261,14 +261,14 @@ class ExampleTests: XCTestCase {
         "stats: |\n" +
         "  65 Home Runs\n" +
       "  0.278 Batting Average\n"
-      ).value!
+      )
     XCTAssert(value["accomplishment"] ==
       "Mark set a major league home run record in 1998.\n")
     XCTAssert(value["stats"] == "65 Home Runs\n0.278 Batting Average\n")
   }
   
   func testExample17 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "unicode: \"Sosa did fine.\\u263A\"\n" +
         "control: \"\\b1998\\t1999\\t2000\\n\"\n" +
         "hex esc: \"\\x0d\\x0a is \\r\\n\"\n" +
@@ -276,7 +276,7 @@ class ExampleTests: XCTestCase {
         "single: '\"Howdy!\" he cried.'\n" +
         "quoted: ' # Not a ''comment''.'\n" +
       "tie-fighter: '|\\-*-/|'\n"
-      ).value!
+      )
     // FIXME: Failing with Xcode8b6
     // XCTAssert(value["unicode"] == "Sosa did fine.\u{263A}")
     XCTAssert(value["control"] == "\u{8}1998\t1999\t2000\n")
@@ -288,26 +288,26 @@ class ExampleTests: XCTestCase {
   }
   
   func testExample18 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "plain:\n" +
         "  This unquoted scalar\n" +
         "  spans many lines.\n" +
         "\n" +
         "quoted: \"So does this\n" +
       "  quoted scalar.\\n\"\n"
-      ).value!
+      )
     XCTAssert(value.count == 2)
     XCTAssert(value["plain"] == "This unquoted scalar spans many lines.")
     XCTAssert(value["quoted"] == "So does this quoted scalar.\n")
   }
   
   func testExample19 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "canonical: 12345\n" +
         "decimal: +12345\n" +
         "octal: 0o14\n" +
       "hexadecimal: 0xC\n"
-      ).value!
+      )
     XCTAssert(value.count == 4)
     XCTAssert(value["canonical"] == 12345)
     XCTAssert(value["decimal"] == 12345)
@@ -316,13 +316,13 @@ class ExampleTests: XCTestCase {
   }
   
   func testExample20 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "canonical: 1.23015e+3\n" +
         "exponential: 12.3015e+02\n" +
         "fixed: 1230.15\n" +
         "negative infinity: -.inf\n" +
       "not a number: .NaN\n"
-      ).value!
+      )
     XCTAssert(value.count == 5)
     /* Disabled for Linux */
 #if !os(Linux)
@@ -335,11 +335,11 @@ class ExampleTests: XCTestCase {
   }
   
   func testExample21 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "null:\n" +
         "booleans: [ true, false ]\n" +
       "string: '012345'\n"
-      ).value!
+      )
     XCTAssert(value.count == 3)
     XCTAssert(value["null"] == nil)
     XCTAssert(value["booleans"] == [true, false])
@@ -347,12 +347,12 @@ class ExampleTests: XCTestCase {
   }
   
   func testExample22 () {
-    let value = Yaml.load(
+    let value = try! Yaml.load(
       "canonical: 2001-12-15T02:59:43.1Z\n" +
         "iso8601: 2001-12-14t21:59:43.10-05:00\n" +
         "spaced: 2001-12-14 21:59:43.10 -5\n" +
       "date: 2002-12-14\n"
-      ).value!
+      )
     XCTAssert(value.count == 4)
     XCTAssert(value["canonical"] == "2001-12-15T02:59:43.1Z")
     XCTAssert(value["iso8601"] == "2001-12-14t21:59:43.10-05:00")
@@ -435,7 +435,7 @@ class ExampleTests: XCTestCase {
         "...\n"
   
   func testYamlHomepage () {
-    let value = Yaml.load(exampleYaml).value!
+    let value = try! Yaml.load(exampleYaml)
     XCTAssert(value.count == 6)
     XCTAssert(value["YAML"] == "YAML Ain't Markup Language")
     XCTAssert(value["What It Is"] == .string("YAML is a human friendly data" +
@@ -456,7 +456,7 @@ class ExampleTests: XCTestCase {
   
   func testPerformanceExample() {
     self.measure() {
-      _ = Yaml.load(self.exampleYaml)
+      _ = try! Yaml.load(self.exampleYaml)
     }
   }
   

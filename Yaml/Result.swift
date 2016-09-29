@@ -1,4 +1,4 @@
-public enum Result<T> {
+internal enum Result<T> {
   case error(String)
   case value(T)
   

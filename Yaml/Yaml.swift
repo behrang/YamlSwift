@@ -47,6 +47,12 @@ public enum Yaml {
     }
 }
 
+extension Yaml {
+  public enum ResultError: Error {
+    case message(String?)
+  }
+}
+
 extension Yaml: ExpressibleByNilLiteral {
   public init(nilLiteral: ()) {
     self = .null
@@ -132,15 +138,18 @@ extension Yaml: Hashable {
 
 extension Yaml {
   
-  public static func load (_ text: Swift.String) -> Result<Yaml> {
-    return tokenize(text) >>=- Context.parseDoc
+  public static func load (_ text: Swift.String) throws -> Yaml {
+    let result = tokenize(text) >>=- Context.parseDoc
+    if let value = result.value { return value } else { throw ResultError.message(result.error) }
   }
 
-  public static func loadMultiple (_ text: Swift.String) -> Result<[Yaml]> {
-    return tokenize(text) >>=- Context.parseDocs
+  public static func loadMultiple (_ text: Swift.String) throws -> [Yaml] {
+    let result = tokenize(text) >>=- Context.parseDocs
+    if let value = result.value { return value } else { throw ResultError.message(result.error) }
+
   }
 
-  public static func debug (_ text: Swift.String) -> Result<Yaml> {
+  public static func debug (_ text: Swift.String) -> Yaml? {
     let result = tokenize(text)
         >>- { tokens in print("\n====== Tokens:\n\(tokens)"); return tokens }
         >>=- Context.parseDoc
@@ -148,10 +157,10 @@ extension Yaml {
     if let error = result.error {
       print("~~~~~~\n\(error)")
     }
-    return result
+    return result.value
   }
 
-  public static func debugMultiple (_ text: Swift.String) -> Result<[Yaml]> {
+  public static func debugMultiple (_ text: Swift.String) -> [Yaml]? {
     let result = tokenize(text)
         >>- { tokens in print("\n====== Tokens:\n\(tokens)"); return tokens }
         >>=- Context.parseDocs
@@ -161,7 +170,7 @@ extension Yaml {
     if let error = result.error {
       print("~~~~~~\n\(error)")
     }
-    return result
+    return result.value
   }
 }
 
