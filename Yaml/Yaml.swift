@@ -128,19 +128,22 @@ extension Yaml: Hashable {
   }
 }
 
+
+
 extension Yaml {
+  
   public static func load (_ text: Swift.String) -> Result<Yaml> {
-    return tokenize(text) >>=- parseDoc
+    return tokenize(text) >>=- Context.parseDoc
   }
 
   public static func loadMultiple (_ text: Swift.String) -> Result<[Yaml]> {
-    return tokenize(text) >>=- parseDocs
+    return tokenize(text) >>=- Context.parseDocs
   }
 
   public static func debug (_ text: Swift.String) -> Result<Yaml> {
     let result = tokenize(text)
         >>- { tokens in print("\n====== Tokens:\n\(tokens)"); return tokens }
-        >>=- parseDoc
+        >>=- Context.parseDoc
         >>- { value -> Yaml in print("------ Doc:\n\(value)"); return value }
     if let error = result.error {
       print("~~~~~~\n\(error)")
@@ -151,7 +154,7 @@ extension Yaml {
   public static func debugMultiple (_ text: Swift.String) -> Result<[Yaml]> {
     let result = tokenize(text)
         >>- { tokens in print("\n====== Tokens:\n\(tokens)"); return tokens }
-        >>=- parseDocs
+        >>=- Context.parseDocs
         >>- { values -> [Yaml] in values.forEach {
               v in print("------ Doc:\n\(v)")
             }; return values }

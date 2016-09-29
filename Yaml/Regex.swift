@@ -1,19 +1,31 @@
 import Foundation
 
+private let invalidOptionsPattern =
+  try! NSRegularExpression(pattern: "[^ixsm]", options: [])
+
+private let regexOptions: [Character: NSRegularExpression.Options] = [
+  "i": .caseInsensitive,
+  "x": .allowCommentsAndWhitespace,
+  "s": .dotMatchesLineSeparators,
+  "m": .anchorsMatchLines
+]
+
+extension Yaml {
+  struct Regex {
 #if os(Linux)
 typealias NSRegularExpression = RegularExpression
 #endif
 
-func matchRange (_ string: String, regex: NSRegularExpression) -> NSRange {
+static func matchRange (_ string: String, regex: NSRegularExpression) -> NSRange {
   let sr = NSMakeRange(0, string.utf16.count)
   return regex.rangeOfFirstMatch(in: string, options: [], range: sr)
 }
 
-func matches (_ string: String, regex: NSRegularExpression) -> Bool {
+static func matches (_ string: String, regex: NSRegularExpression) -> Bool {
   return matchRange(string, regex: regex).location != NSNotFound
 }
 
-func regex (_ pattern: String, options: String = "") -> NSRegularExpression! {
+static func regex (_ pattern: String, options: String = "") -> NSRegularExpression! {
   if matches(options, regex: invalidOptionsPattern) {
     return nil
   }
@@ -24,17 +36,11 @@ func regex (_ pattern: String, options: String = "") -> NSRegularExpression! {
   return try? NSRegularExpression(pattern: pattern, options: opts)
 }
 
-let invalidOptionsPattern =
-        try! NSRegularExpression(pattern: "[^ixsm]", options: [])
 
-let regexOptions: [Character: NSRegularExpression.Options] = [
-  "i": .caseInsensitive,
-  "x": .allowCommentsAndWhitespace,
-  "s": .dotMatchesLineSeparators,
-  "m": .anchorsMatchLines
-]
 
-func replace (_ regex: NSRegularExpression, template: String) -> (String)
+
+
+static func replace (_ regex: NSRegularExpression, template: String) -> (String)
     -> String {
       return { string in
         let s = NSMutableString(string: string)
@@ -49,7 +55,7 @@ func replace (_ regex: NSRegularExpression, template: String) -> (String)
       }
 }
 
-func replace (_ regex: NSRegularExpression, block: @escaping ([String]) -> String)
+static func replace (_ regex: NSRegularExpression, block: @escaping ([String]) -> String)
     -> (String) -> String {
       return { string in
         let s = NSMutableString(string: string)
@@ -83,7 +89,7 @@ func replace (_ regex: NSRegularExpression, block: @escaping ([String]) -> Strin
       }
 }
 
-func splitLead (_ regex: NSRegularExpression) -> (String)
+static func splitLead (_ regex: NSRegularExpression) -> (String)
     -> (String, String) {
       return { string in
         let r = matchRange(string, regex: regex)
@@ -97,7 +103,7 @@ func splitLead (_ regex: NSRegularExpression) -> (String)
       }
 }
 
-func splitTrail (_ regex: NSRegularExpression) -> (String)
+static func splitTrail (_ regex: NSRegularExpression) -> (String)
     -> (String, String) {
       return { string in
         let r = matchRange(string, regex: regex)
@@ -111,14 +117,17 @@ func splitTrail (_ regex: NSRegularExpression) -> (String)
       }
 }
 
-func substringWithRange (_ range: NSRange) -> (String) -> String {
+static func substringWithRange (_ range: NSRange) -> (String) -> String {
   return { string in
     return NSString(string: string).substring(with: range)
   }
 }
 
-func substringFromIndex (_ index: Int) -> (String) -> String {
+static func substringFromIndex (_ index: Int) -> (String) -> String {
   return { string in
     return NSString(string: string).substring(from: index)
   }
+}
+  }
+
 }
