@@ -280,7 +280,7 @@ func putToMap (_ map: [Yaml: Yaml]) -> (Yaml) -> (Yaml) -> [Yaml: Yaml] {
   }
 }
 
-func checkkeyUniqueness (_ acc: [Yaml: Yaml]) -> (_ context: Context, _ key: Yaml)
+func checkKeyUniqueness (_ acc: [Yaml: Yaml]) -> (_ context: Context, _ key: Yaml)
     -> Result<ContextValue> {
       return { (context, key) in
         let err = "duplicate key \(key)"
@@ -330,7 +330,7 @@ func parseFlowMap (_ acc: [Yaml: Yaml]) -> (Context) -> Result<ContextValue> {
         >>=- (acc.count == 0 ? lift : expect(TokenType.comma, message: "expected comma"))
         >>- ignoreSpace
         >>=- parseString
-        >>=- checkkeyUniqueness(acc)
+        >>=- checkKeyUniqueness(acc)
     let k = ck >>- getValue
     let cv = ck
         >>- getContext
@@ -379,10 +379,10 @@ func parseBlockMap (_ acc: [Yaml: Yaml]) -> (Context) -> Result<ContextValue> {
     switch peekType(context) {
 
     case .questionMark:
-      return parsequestionMarkkeyValue(acc)(context)
+      return parseQuestionMarkkeyValue(acc)(context)
 
     case .string, .stringDQ, .stringSQ:
-      return parseStringkeyValue(acc)(context)
+      return parseStringKeyValue(acc)(context)
 
     default:
       return lift((context, .dictionary(acc)))
@@ -390,12 +390,12 @@ func parseBlockMap (_ acc: [Yaml: Yaml]) -> (Context) -> Result<ContextValue> {
   }
 }
 
-func parsequestionMarkkeyValue (_ acc: [Yaml: Yaml]) -> (Context) -> Result<ContextValue> {
+func parseQuestionMarkkeyValue (_ acc: [Yaml: Yaml]) -> (Context) -> Result<ContextValue> {
   return { context in
     let ck = lift(context)
         >>=- expect(TokenType.questionMark, message: "expected ?")
         >>=- parse
-        >>=- checkkeyUniqueness(acc)
+        >>=- checkKeyUniqueness(acc)
     let k = ck >>- getValue
     let cv = ck
         >>- getContext
@@ -424,11 +424,11 @@ func parseColonValue (_ context: Context) -> Result<ContextValue> {
       >>=- parse
 }
 
-func parseStringkeyValue (_ acc: [Yaml: Yaml]) -> (Context) -> Result<ContextValue> {
+func parseStringKeyValue (_ acc: [Yaml: Yaml]) -> (Context) -> Result<ContextValue> {
   return { context in
     let ck = lift(context)
         >>=- parseString
-        >>=- checkkeyUniqueness(acc)
+        >>=- checkKeyUniqueness(acc)
     let k = ck >>- getValue
     let cv = ck
         >>- getContext
