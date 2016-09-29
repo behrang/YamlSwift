@@ -1,0 +1,5 @@
+language: objective-c
+osx_image: xcode8
+xcode_workspace: Yaml.xcodeproj
+xcode_scheme: "Yaml iOS"
+xcode_sdk: iphonesimulator9.3
