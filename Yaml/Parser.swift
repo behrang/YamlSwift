@@ -234,7 +234,7 @@ func parse (_ context: Context) -> Result<ContextValue> {
     let name = m.substring(from: m.index(after: m.startIndex))
     let cv = parse(advance(context))
     let v = cv >>- getValue
-    let c = addalias(name) <^> v <*> (cv >>- getContext)
+    let c = addAlias(name) <^> v <*> (cv >>- getContext)
     return createContextValue <^> c <*> v
 
   case .alias:
@@ -254,7 +254,7 @@ func parse (_ context: Context) -> Result<ContextValue> {
   }
 }
 
-func addalias (_ name: String) -> (Yaml) -> (Context) -> Context {
+func addAlias (_ name: String) -> (Yaml) -> (Context) -> Context {
   return { value in
     return { context in
       var aliases = context.aliases
