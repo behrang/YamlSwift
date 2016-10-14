@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		228450BD1DB0E51C00EACD31 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 228450B41DB0E51C00EACD31 /* Info.plist */; };
-		228450BE1DB0E51C00EACD31 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 228450B41DB0E51C00EACD31 /* Info.plist */; };
-		228450BF1DB0E51C00EACD31 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 228450B41DB0E51C00EACD31 /* Info.plist */; };
 		228450C01DB0E51C00EACD31 /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B61DB0E51C00EACD31 /* Yaml.swift */; };
 		228450C11DB0E51C00EACD31 /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B61DB0E51C00EACD31 /* Yaml.swift */; };
 		228450C21DB0E51C00EACD31 /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B61DB0E51C00EACD31 /* Yaml.swift */; };
@@ -401,7 +398,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				228450BF1DB0E51C00EACD31 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,7 +412,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				228450BD1DB0E51C00EACD31 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,7 +426,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				228450BE1DB0E51C00EACD31 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
