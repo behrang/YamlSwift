@@ -7,34 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		228450BD1DB0E51C00EACD31 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 228450B41DB0E51C00EACD31 /* Info.plist */; };
+		228450BE1DB0E51C00EACD31 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 228450B41DB0E51C00EACD31 /* Info.plist */; };
+		228450BF1DB0E51C00EACD31 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 228450B41DB0E51C00EACD31 /* Info.plist */; };
+		228450C01DB0E51C00EACD31 /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B61DB0E51C00EACD31 /* Yaml.swift */; };
+		228450C11DB0E51C00EACD31 /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B61DB0E51C00EACD31 /* Yaml.swift */; };
+		228450C21DB0E51C00EACD31 /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B61DB0E51C00EACD31 /* Yaml.swift */; };
+		228450C31DB0E51C00EACD31 /* YAMLOperators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B71DB0E51C00EACD31 /* YAMLOperators.swift */; };
+		228450C41DB0E51C00EACD31 /* YAMLOperators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B71DB0E51C00EACD31 /* YAMLOperators.swift */; };
+		228450C51DB0E51C00EACD31 /* YAMLOperators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B71DB0E51C00EACD31 /* YAMLOperators.swift */; };
+		228450C61DB0E51C00EACD31 /* YAMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B81DB0E51C00EACD31 /* YAMLParser.swift */; };
+		228450C71DB0E51C00EACD31 /* YAMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B81DB0E51C00EACD31 /* YAMLParser.swift */; };
+		228450C81DB0E51C00EACD31 /* YAMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B81DB0E51C00EACD31 /* YAMLParser.swift */; };
+		228450C91DB0E51C00EACD31 /* YAMLRegex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B91DB0E51C00EACD31 /* YAMLRegex.swift */; };
+		228450CA1DB0E51C00EACD31 /* YAMLRegex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B91DB0E51C00EACD31 /* YAMLRegex.swift */; };
+		228450CB1DB0E51C00EACD31 /* YAMLRegex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B91DB0E51C00EACD31 /* YAMLRegex.swift */; };
+		228450CC1DB0E51C00EACD31 /* YAMLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450BA1DB0E51C00EACD31 /* YAMLResult.swift */; };
+		228450CD1DB0E51C00EACD31 /* YAMLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450BA1DB0E51C00EACD31 /* YAMLResult.swift */; };
+		228450CE1DB0E51C00EACD31 /* YAMLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450BA1DB0E51C00EACD31 /* YAMLResult.swift */; };
+		228450CF1DB0E51C00EACD31 /* YAMLTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450BB1DB0E51C00EACD31 /* YAMLTokenizer.swift */; };
+		228450D01DB0E51C00EACD31 /* YAMLTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450BB1DB0E51C00EACD31 /* YAMLTokenizer.swift */; };
+		228450D11DB0E51C00EACD31 /* YAMLTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450BB1DB0E51C00EACD31 /* YAMLTokenizer.swift */; };
+		228450D21DB0E51C00EACD31 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 228450BC1DB0E51C00EACD31 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		228450D31DB0E51C00EACD31 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 228450BC1DB0E51C00EACD31 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		228450D41DB0E51C00EACD31 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 228450BC1DB0E51C00EACD31 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8313C4331C8DC2CB00DEF215 /* Yaml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8313C4291C8DC2CB00DEF215 /* Yaml.framework */; };
 		8313C4401C8DC4AD00DEF215 /* YamlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3894BCB1B7312E000286880 /* YamlTests.swift */; };
 		8313C4411C8DC4B000DEF215 /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
-		8313C4421C8DC4BE00DEF215 /* YAMLOperators.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23B1B7304620011046A /* YAMLOperators.swift */; };
-		8313C4431C8DC4BE00DEF215 /* YAMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23C1B7304620011046A /* YAMLParser.swift */; };
-		8313C4441C8DC4BE00DEF215 /* YAMLRegex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23D1B7304620011046A /* YAMLRegex.swift */; };
-		8313C4451C8DC4BE00DEF215 /* YAMLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23E1B7304620011046A /* YAMLResult.swift */; };
-		8313C4461C8DC4BE00DEF215 /* YAMLTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23F1B7304620011046A /* YAMLTokenizer.swift */; };
-		8313C4471C8DC4BE00DEF215 /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
-		8313C4481C8DC4E600DEF215 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E1D76261B258FEE0022C013 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8E1D76271B258FEE0022C013 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E1D76261B258FEE0022C013 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8E1D762D1B258FEE0022C013 /* Yaml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E1D76211B258FEE0022C013 /* Yaml.framework */; };
-		F32DF2411B7304620011046A /* YAMLOperators.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23B1B7304620011046A /* YAMLOperators.swift */; };
-		F32DF2431B7304620011046A /* YAMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23C1B7304620011046A /* YAMLParser.swift */; };
-		F32DF2451B7304620011046A /* YAMLRegex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23D1B7304620011046A /* YAMLRegex.swift */; };
-		F32DF2471B7304620011046A /* YAMLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23E1B7304620011046A /* YAMLResult.swift */; };
-		F32DF2491B7304620011046A /* YAMLTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23F1B7304620011046A /* YAMLTokenizer.swift */; };
-		F32DF24B1B7304620011046A /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
 		F32DF2501B7304750011046A /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
 		F32DF2621B73054D0011046A /* Yaml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F32DF2581B73054C0011046A /* Yaml.framework */; };
-		F32DF26F1B7305630011046A /* YAMLOperators.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23B1B7304620011046A /* YAMLOperators.swift */; };
-		F32DF2701B7305630011046A /* YAMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23C1B7304620011046A /* YAMLParser.swift */; };
-		F32DF2711B7305630011046A /* YAMLRegex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23D1B7304620011046A /* YAMLRegex.swift */; };
-		F32DF2721B7305630011046A /* YAMLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23E1B7304620011046A /* YAMLResult.swift */; };
-		F32DF2731B7305630011046A /* YAMLTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF23F1B7304620011046A /* YAMLTokenizer.swift */; };
-		F32DF2741B7305630011046A /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF2401B7304620011046A /* Yaml.swift */; };
 		F32DF27B1B7305700011046A /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
-		F36137A91B730CD0009B4BE6 /* Yaml.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E1D76261B258FEE0022C013 /* Yaml.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F3894BCC1B7312E000286880 /* YamlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3894BCB1B7312E000286880 /* YamlTests.swift */; };
 		F3894BCD1B7312E000286880 /* YamlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3894BCB1B7312E000286880 /* YamlTests.swift */; };
 /* End PBXBuildFile section */
@@ -64,20 +67,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		228450B41DB0E51C00EACD31 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		228450B61DB0E51C00EACD31 /* Yaml.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Yaml.swift; sourceTree = "<group>"; };
+		228450B71DB0E51C00EACD31 /* YAMLOperators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAMLOperators.swift; sourceTree = "<group>"; };
+		228450B81DB0E51C00EACD31 /* YAMLParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAMLParser.swift; sourceTree = "<group>"; };
+		228450B91DB0E51C00EACD31 /* YAMLRegex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAMLRegex.swift; sourceTree = "<group>"; };
+		228450BA1DB0E51C00EACD31 /* YAMLResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAMLResult.swift; sourceTree = "<group>"; };
+		228450BB1DB0E51C00EACD31 /* YAMLTokenizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAMLTokenizer.swift; sourceTree = "<group>"; };
+		228450BC1DB0E51C00EACD31 /* Yaml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Yaml.h; sourceTree = "<group>"; };
 		8313C4291C8DC2CB00DEF215 /* Yaml.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Yaml.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8313C4321C8DC2CB00DEF215 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E1D76211B258FEE0022C013 /* Yaml.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Yaml.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8E1D76251B258FEE0022C013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8E1D76261B258FEE0022C013 /* Yaml.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Yaml.h; sourceTree = "<group>"; };
 		8E1D762C1B258FEE0022C013 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E1D76321B258FEE0022C013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../Info.plist; sourceTree = "<group>"; };
 		8E1D763B1B2591330022C013 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
-		F32DF23B1B7304620011046A /* YAMLOperators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAMLOperators.swift; sourceTree = "<group>"; };
-		F32DF23C1B7304620011046A /* YAMLParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAMLParser.swift; sourceTree = "<group>"; };
-		F32DF23D1B7304620011046A /* YAMLRegex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAMLRegex.swift; sourceTree = "<group>"; };
-		F32DF23E1B7304620011046A /* YAMLResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAMLResult.swift; sourceTree = "<group>"; };
-		F32DF23F1B7304620011046A /* YAMLTokenizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAMLTokenizer.swift; sourceTree = "<group>"; };
-		F32DF2401B7304620011046A /* Yaml.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Yaml.swift; sourceTree = "<group>"; };
 		F32DF24D1B7304750011046A /* ExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleTests.swift; sourceTree = "<group>"; };
 		F32DF2581B73054C0011046A /* Yaml.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Yaml.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F32DF2611B73054C0011046A /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -133,6 +136,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		228450B31DB0E51C00EACD31 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				228450B41DB0E51C00EACD31 /* Info.plist */,
+				228450B51DB0E51C00EACD31 /* YAML */,
+				228450BC1DB0E51C00EACD31 /* Yaml.h */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		228450B51DB0E51C00EACD31 /* YAML */ = {
+			isa = PBXGroup;
+			children = (
+				228450B61DB0E51C00EACD31 /* Yaml.swift */,
+				228450B71DB0E51C00EACD31 /* YAMLOperators.swift */,
+				228450B81DB0E51C00EACD31 /* YAMLParser.swift */,
+				228450B91DB0E51C00EACD31 /* YAMLRegex.swift */,
+				228450BA1DB0E51C00EACD31 /* YAMLResult.swift */,
+				228450BB1DB0E51C00EACD31 /* YAMLTokenizer.swift */,
+			);
+			path = YAML;
+			sourceTree = "<group>";
+		};
 		8E1D76221B258FEE0022C013 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -144,29 +170,6 @@
 				8313C4321C8DC2CB00DEF215 /* Tests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		8E1D76231B258FEE0022C013 /* Yaml */ = {
-			isa = PBXGroup;
-			children = (
-				8E1D76261B258FEE0022C013 /* Yaml.h */,
-				F32DF23B1B7304620011046A /* YAMLOperators.swift */,
-				F32DF23C1B7304620011046A /* YAMLParser.swift */,
-				F32DF23D1B7304620011046A /* YAMLRegex.swift */,
-				F32DF23E1B7304620011046A /* YAMLResult.swift */,
-				F32DF23F1B7304620011046A /* YAMLTokenizer.swift */,
-				F32DF2401B7304620011046A /* Yaml.swift */,
-				8E1D76241B258FEE0022C013 /* Supporting Files */,
-			);
-			path = Yaml;
-			sourceTree = "<group>";
-		};
-		8E1D76241B258FEE0022C013 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				8E1D76251B258FEE0022C013 /* Info.plist */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		8E1D76301B258FEE0022C013 /* Tests */ = {
@@ -191,8 +194,8 @@
 		8EF254191B258FB4001BCEBE = {
 			isa = PBXGroup;
 			children = (
+				228450B31DB0E51C00EACD31 /* Sources */,
 				8E1D763B1B2591330022C013 /* Readme.md */,
-				8E1D76231B258FEE0022C013 /* Yaml */,
 				8E1D76301B258FEE0022C013 /* Tests */,
 				8E1D76221B258FEE0022C013 /* Products */,
 			);
@@ -205,7 +208,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8313C4481C8DC4E600DEF215 /* Yaml.h in Headers */,
+				228450D41DB0E51C00EACD31 /* Yaml.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,7 +216,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8E1D76271B258FEE0022C013 /* Yaml.h in Headers */,
+				228450D21DB0E51C00EACD31 /* Yaml.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,7 +224,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F36137A91B730CD0009B4BE6 /* Yaml.h in Headers */,
+				228450D31DB0E51C00EACD31 /* Yaml.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -398,6 +401,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				228450BF1DB0E51C00EACD31 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,6 +416,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				228450BD1DB0E51C00EACD31 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,6 +431,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				228450BE1DB0E51C00EACD31 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -443,12 +449,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8313C4431C8DC4BE00DEF215 /* YAMLParser.swift in Sources */,
-				8313C4461C8DC4BE00DEF215 /* YAMLTokenizer.swift in Sources */,
-				8313C4471C8DC4BE00DEF215 /* Yaml.swift in Sources */,
-				8313C4421C8DC4BE00DEF215 /* YAMLOperators.swift in Sources */,
-				8313C4451C8DC4BE00DEF215 /* YAMLResult.swift in Sources */,
-				8313C4441C8DC4BE00DEF215 /* YAMLRegex.swift in Sources */,
+				228450D11DB0E51C00EACD31 /* YAMLTokenizer.swift in Sources */,
+				228450CE1DB0E51C00EACD31 /* YAMLResult.swift in Sources */,
+				228450CB1DB0E51C00EACD31 /* YAMLRegex.swift in Sources */,
+				228450C51DB0E51C00EACD31 /* YAMLOperators.swift in Sources */,
+				228450C21DB0E51C00EACD31 /* Yaml.swift in Sources */,
+				228450C81DB0E51C00EACD31 /* YAMLParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -465,12 +471,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F32DF2431B7304620011046A /* YAMLParser.swift in Sources */,
-				F32DF2491B7304620011046A /* YAMLTokenizer.swift in Sources */,
-				F32DF24B1B7304620011046A /* Yaml.swift in Sources */,
-				F32DF2411B7304620011046A /* YAMLOperators.swift in Sources */,
-				F32DF2471B7304620011046A /* YAMLResult.swift in Sources */,
-				F32DF2451B7304620011046A /* YAMLRegex.swift in Sources */,
+				228450CF1DB0E51C00EACD31 /* YAMLTokenizer.swift in Sources */,
+				228450CC1DB0E51C00EACD31 /* YAMLResult.swift in Sources */,
+				228450C91DB0E51C00EACD31 /* YAMLRegex.swift in Sources */,
+				228450C31DB0E51C00EACD31 /* YAMLOperators.swift in Sources */,
+				228450C01DB0E51C00EACD31 /* Yaml.swift in Sources */,
+				228450C61DB0E51C00EACD31 /* YAMLParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -487,12 +493,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F32DF2701B7305630011046A /* YAMLParser.swift in Sources */,
-				F32DF2731B7305630011046A /* YAMLTokenizer.swift in Sources */,
-				F32DF2741B7305630011046A /* Yaml.swift in Sources */,
-				F32DF26F1B7305630011046A /* YAMLOperators.swift in Sources */,
-				F32DF2721B7305630011046A /* YAMLResult.swift in Sources */,
-				F32DF2711B7305630011046A /* YAMLRegex.swift in Sources */,
+				228450D01DB0E51C00EACD31 /* YAMLTokenizer.swift in Sources */,
+				228450CD1DB0E51C00EACD31 /* YAMLResult.swift in Sources */,
+				228450CA1DB0E51C00EACD31 /* YAMLRegex.swift in Sources */,
+				228450C41DB0E51C00EACD31 /* YAMLOperators.swift in Sources */,
+				228450C11DB0E51C00EACD31 /* Yaml.swift in Sources */,
+				228450C71DB0E51C00EACD31 /* YAMLParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -565,7 +571,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Yaml/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -614,7 +620,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Yaml/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -633,6 +639,7 @@
 		8313C43C1C8DC2CB00DEF215 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -678,6 +685,7 @@
 		8313C43D1C8DC2CB00DEF215 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -758,7 +766,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Yaml/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
@@ -809,7 +817,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Yaml/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
@@ -826,6 +834,7 @@
 		8E1D76371B258FEE0022C013 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -878,6 +887,7 @@
 		8E1D76381B258FEE0022C013 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -1009,7 +1019,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Yaml/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -1060,7 +1070,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Yaml/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -1079,6 +1089,7 @@
 		F32DF26D1B73054D0011046A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -1127,6 +1138,7 @@
 		F32DF26E1B73054D0011046A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
