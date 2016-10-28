@@ -1,5 +1,9 @@
 import Foundation
 
+#if os(Linux)
+typealias NSRegularExpression = RegularExpression
+#endif
+
 private let invalidOptionsPattern =
   try! NSRegularExpression(pattern: "[^ixsm]", options: [])
 
@@ -12,10 +16,6 @@ private let regexOptions: [Character: NSRegularExpression.Options] = [
 
 extension Yaml {
   struct Regex {
-#if os(Linux)
-typealias NSRegularExpression = RegularExpression
-#endif
-
 static func matchRange (_ string: String, regex: NSRegularExpression) -> NSRange {
   let sr = NSMakeRange(0, string.utf16.count)
   return regex.rangeOfFirstMatch(in: string, options: [], range: sr)
