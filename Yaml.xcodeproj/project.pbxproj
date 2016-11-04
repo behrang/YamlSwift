@@ -942,6 +942,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = behrang.Yaml;
 				PRODUCT_NAME = Yaml;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -965,6 +966,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = behrang.Yaml;
 				PRODUCT_NAME = Yaml;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
