@@ -20,7 +20,7 @@ class Chapter5: XCTestCase {
 
   func test_003_c_byte_order_mark () {
     left(c_byte_order_mark, "\u{fefe}z")
-    right(c_byte_order_mark, "\u{feff}z", "\u{feff}")
+    right(c_byte_order_mark, "\u{feff}z")
   }
 
   func test_004_c_sequence_entry () {

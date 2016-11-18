@@ -3,7 +3,7 @@ import Parsec
 // [202]
 func l_document_prefix () -> YamlParser<()> {
   return (
-    c_byte_order_mark >>> create(()) <<< many(l_comment)
+    c_byte_order_mark <<< many(l_comment)
     <|> optional(c_byte_order_mark) <<< many1(l_comment)
   )()
 }
@@ -11,14 +11,14 @@ func l_document_prefix () -> YamlParser<()> {
 // [203]
 func c_directives_end () -> YamlParser<()> {
   return (
-    string("---") >>> create(())
+    attempt(string("---")) >>> create(())
   )()
 }
 
 // [204]
 func c_document_end () -> YamlParser<()> {
   return (
-    string("...") >>> create(())
+    attempt(string("...")) >>> create(())
   )()
 }
 
@@ -55,8 +55,29 @@ func l_explicit_document () -> YamlParser<Node> {
 // [209]
 func l_directive_document () -> YamlParser<Node> {
   return (
-    many1(l_directive) >>> l_explicit_document
+    many1(l_directive) >>- process_directives >>> l_explicit_document
   )()
+}
+
+func process_directives (_ directives: [(String, [String])]) -> YamlParserClosure<()> {
+  if directives.filter({ $0.0 == "YAML" }).count > 1 {
+    return unexpected("found more than one YAML directive")
+  }
+  var handles: [String: String] = [:]
+  let tags = directives.filter({ $0.0 == "TAG" }).map({ $0.1 })
+  tags.forEach{ tag in
+    handles[tag[0]] = tag[1]
+  }
+  if handles.count < tags.count {
+    return unexpected("found more than one TAG directive for the same handle")
+  }
+  return modifyState({ state in
+    var modified = state
+    handles.forEach{ (handle, pre) in
+      modified.handles[handle] = pre
+    }
+    return modified
+  })
 }
 
 // [210]

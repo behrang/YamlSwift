@@ -6,12 +6,15 @@ enum Chomp {
   case keep
 }
 
-func to_dictionary (_ entries: [(Node, Node)]) -> [Node: Node] {
+func to_dictionary (_ entries: [(Node, Node)]) -> YamlParserClosure<Node> {
   var r: [Node: Node] = [:]
   for (key, value) in entries {
+    if r[key] != nil {
+      return unexpected("found duplicate block mapping key: \(key)")
+    }
     r[key] = value
   }
-  return r
+  return create(.mapping(r, tag_mapping))
 }
 
 // [162]
@@ -34,22 +37,24 @@ func c_b_block_header (_ n: Int) -> YamlParserClosure<(indent: Int, chomp: Chomp
 // [163]
 func c_indentation_indicator (_ n: Int) -> YamlParserClosure<Int> {
   return {(
-    ns_dec_digit >>- { c in
+    oneOf("123456789") >>- { c in
       create(Int(String(c), radix: 10)!)
-    } <|> lookAhead(many(nb_char) >>> b_comment >>> auto_detect(n))
+    } <|> lookAhead(s_b_comment >>> auto_detect(n))
   )()}
 }
 
 func auto_detect (_ n: Int) -> YamlParserClosure<Int> {
-  return { lookAhead(
-    many(attempt(l_empty(n, .flow_out)))
-    >>> many(s_space) >>- { ss in
-      let m = ss.count - n
-      if m >= 0 {
-        return create(m)
-      } else {
-        return fail("auto detection of indentation failed")
+  return { (
+    lookAhead(
+      many(attempt(l_empty(n, .flow_out)))
+      >>> many(s_space) >>- { ss in
+        create(max(1, ss.count - n))
       }
+    ) >>- { m in
+      lookAhead(
+        many(attempt(l_empty(n + m, .block_out)))
+        >>> notFollowedBy(s_indent(n + m + 1))
+      ) >>> create(m)
     }
   )()}
 }
@@ -69,7 +74,7 @@ func b_chomped_last (_ t: Chomp) -> YamlParserClosure<String> {
     switch t {
     case .strip: return ( (b_non_content <|> eof) >>> create("") )()
     case .clip, .keep:
-      return ( (b_as_line_feed >>> create(()) <|> eof) >>> create("\n") )()
+      return ( b_as_line_feed >>> create("\n") <|> eof >>> create("") )()
     }
   }
 }
@@ -105,7 +110,7 @@ func l_keep_empty (_ n: Int) -> YamlParserClosure<String> {
 func l_trail_comments (_ n: Int) -> YamlParserClosure<()> {
   return {(
     s_indent_less_than(n) >>> c_nb_comment_text >>> b_comment
-    <<< many(attempt(l_comment))
+    <<< many(l_comment)
   )()}
 }
 
@@ -275,10 +280,9 @@ func l_folded_content (_ n: Int, _ t: Chomp) -> YamlParserClosure<String> {
 // [183]
 func l_block_sequence (_ n: Int) -> YamlParserClosure<Node> {
   return {(
-    auto_detect(n) >>- { mm in
-      let m = max(mm, 1)
-      return many1(attempt(s_indent(n + m) >>> c_l_block_seq_entry(n + m)))
-        >>- { entries in create(.sequence(entries, tag_sequence, "")) }
+    auto_detect(n) >>- { m in
+      many1(attempt(s_indent(n + m) >>> c_l_block_seq_entry(n + m)))
+      >>- { entries in create(.sequence(entries, tag_sequence)) }
     }
   )()}
 }
@@ -314,7 +318,7 @@ func ns_l_compact_sequence (_ n: Int) -> YamlParserClosure<Node> {
   return {(
     c_l_block_seq_entry(n) >>- { entry in
       many(attempt(s_indent(n) >>> c_l_block_seq_entry(n))) >>- { entries in
-        create(.sequence(prepend(entry, entries), tag_sequence, ""))
+        create(.sequence(prepend(entry, entries), tag_sequence))
       }
     }
   )()}
@@ -323,10 +327,9 @@ func ns_l_compact_sequence (_ n: Int) -> YamlParserClosure<Node> {
 // [187]
 func l_block_mapping (_ n: Int) -> YamlParserClosure<Node> {
   return {(
-    auto_detect(n) >>- { mm in
-      let m = max(mm, 1)
-      return many1(attempt(s_indent(n + m) >>> ns_l_block_map_entry(n + m)))
-        >>- { entries in create(.mapping(to_dictionary(entries), tag_mapping, "")) }
+    auto_detect(n) >>- { m in
+      many1(attempt(s_indent(n + m) >>> ns_l_block_map_entry(n + m)))
+      >>- { entries in to_dictionary(entries) }
    }
   )()}
 }
@@ -394,7 +397,7 @@ func ns_l_compact_mapping (_ n: Int) -> YamlParserClosure<Node> {
   return {(
     ns_l_block_map_entry(n) >>- { entry in
       many(attempt(s_indent(n) >>> ns_l_block_map_entry(n))) >>- { entries in
-        create(.mapping(to_dictionary(prepend(entry, entries)), tag_mapping, ""))
+        to_dictionary(prepend(entry, entries))
       }
     }
   )()}
@@ -427,11 +430,13 @@ func s_l_block_in_block (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
 func s_l_block_scalar (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
   return {(
     s_separate(n + 1, c)
-    >>> option((nil, nil), attempt(c_ns_properties(n + 1, c) <<< s_separate(n + 1, c))) >>- { properties in
-      ( attempt(c_l_literal(n)) <|> c_l_folded(n) ) >>- { node in
-        let tag = Tag.lookup(properties.tag ?? "tag:yaml.org,2002:str")
-        let anchor = properties.anchor ?? ""
-        return create(.scalar(node, tag, anchor))
+    >>> option((tag_string, ""), attempt(c_ns_properties(n + 1, c) <<< s_separate(n + 1, c))) >>- { properties in
+      let box = Box(properties.anchor)
+      return save_anchor(box)
+      >>> ( c_l_literal(n) <|> c_l_folded(n) )
+      >>- { content in
+        create(Node.scalar(content, tag_string))
+        >>- apply_properties(properties, box)
       }
     }
   )()}
@@ -440,20 +445,12 @@ func s_l_block_scalar (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
 // [200]
 func s_l_block_collection (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
   return {(
-    option((nil, nil), attempt(s_separate(n + 1, c) >>> c_ns_properties(n + 1, c))) >>- { properties in
-      s_l_comments
-      >>> ( attempt(l_block_sequence(seq_spaces(n, c))) <|> l_block_mapping(n) ) >>- { node in
-        var tag = node.tag
-        if let newTag = properties.tag {
-          tag = Tag.lookup(newTag)
-        }
-        let anchor = properties.anchor ?? ""
-        switch node {
-        case .sequence(let c, _, _): return create(.sequence(c, tag, anchor))
-        case .mapping(let c, _, _): return create(.mapping(c, tag, anchor))
-        default: fatalError("other node types are not supported")
-        }
-      }
+    option((tag_non_specific, ""), attempt(s_separate(n + 1, c) >>> c_ns_properties(n + 1, c))) >>- { properties in
+      let box = Box(properties.anchor)
+      return save_anchor(box)
+      >>> s_l_comments
+      >>> ( attempt(l_block_sequence(seq_spaces(n, c))) <|> l_block_mapping(n) )
+      >>- apply_properties(properties, box)
     }
   )()}
 }

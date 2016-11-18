@@ -163,13 +163,13 @@ class Chapter6: XCTestCase {
     left(l_directive, "%YAML 1.2 3.4")
     left(l_directive, "%YAML ")
     left(l_directive, "%TAG ")
+    left(l_directive, "%YAML 2.3")
     right(l_directive, "%YAM ", ("YAM", []))
     right(l_directive, "%YAM #", ("YAM", ["#"]))
     right(l_directive, "%YAM #z", ("YAM", ["#z"]))
     right(l_directive, "%YAMLZ #z", ("YAMLZ", ["#z"]))
     right(l_directive, "%YAML", ("YAML", []))
     right(l_directive, "%YAML 1.2", ("YAML", ["1.2"]))
-    right(l_directive, "%YAML 2.3", ("YAML", ["2.3"]))
     right(l_directive,
       "%TAG ! tag:example.com,2000:app/",
       ("TAG", ["!", "tag:example.com,2000:app/"]))
@@ -188,24 +188,32 @@ class Chapter6: XCTestCase {
   }
 
   func test_096_c_ns_properties () {
-    // these 2 are invalid tags but parser accepts them at first
-    right(c_ns_properties(2, .block_key), "!!!foo", ("!", nil))
-    right(c_ns_properties(2, .block_key), "!e!", ("!", nil))
+    let tag_ex = Tag("tag:example.com,2000:app/x")
+    let tag_et = Tag("tag:example.com,2000:app/tag!")
+    let tag_foo = Tag("!foo")
+    var tags = core_tags
+    tags[tag_ex.uri] = tag_ex
+    tags[tag_et.uri] = tag_et
+    tags[tag_foo.uri] = tag_foo
+    var schema = Schema(tags: tags, resolve: core_resolve)
+    schema.handles["!e!"] = "tag:example.com,2000:app/"
 
     left(c_ns_properties(2, .block_key), "& ")
-    right(c_ns_properties(2, .block_key), "! ", ("!", nil))
-    right(c_ns_properties(2, .block_key), "!e!x ", ("!e!x", nil))
-    right(c_ns_properties(2, .block_key), "!foo", ("!foo", nil))
-    right(c_ns_properties(2, .block_key), "!<!foo>", ("!<!foo>", nil))
-    right(c_ns_properties(2, .block_key), "!!str", ("!!str", nil))
-    right(c_ns_properties(2, .block_key), "!e!tag%21", ("!e!tag!", nil))
-    right(c_ns_properties(2, .block_key), "!!str &a1", ("!!str", "a1"))
-    right(c_ns_properties(2, .block_key), "&a1", (nil, "a1"))
-    right(c_ns_properties(2, .block_key), "&1", (nil, "1"))
-    right(c_ns_properties(2, .block_key), "&a1 !!str", ("!!str", "a1"))
+    right(c_ns_properties(2, .block_key), "!!!foo", (tag_non_specific, ""))
+    right(c_ns_properties(2, .block_key), "!e!", (tag_non_specific, ""))
+    right(c_ns_properties(2, .block_key), "! ", (tag_non_specific, ""))
+    right(c_ns_properties(2, .block_key), "!e!x ", (tag_ex, ""), schema: schema)
+    right(c_ns_properties(2, .block_key), "!foo", (tag_foo, ""), schema: schema)
+    right(c_ns_properties(2, .block_key), "!<!foo>", (tag_foo, ""), schema: schema)
+    right(c_ns_properties(2, .block_key), "!!str", (tag_string, ""))
+    right(c_ns_properties(2, .block_key), "!e!tag%21", (tag_et, ""), schema: schema)
+    right(c_ns_properties(2, .block_key), "!!str &a1", (tag_string, "a1"))
+    right(c_ns_properties(2, .block_key), "&a1", (tag_unknown, "a1"))
+    right(c_ns_properties(2, .block_key), "&1", (tag_unknown, "1"))
+    right(c_ns_properties(2, .block_key), "&a1 !!str", (tag_string, "a1"))
     right(c_ns_properties(2, .block_key),
       "!<tag:yaml.org,2002:str>",
-      ("!<tag:yaml.org,2002:str>", nil))
+      (tag_string, ""))
   }
 
 }

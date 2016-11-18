@@ -1,6 +1,8 @@
 import Parsec
 import Foundation
 
+typealias Properties = (tag: Tag, anchor: String)
+
 func start_of_line () -> YamlParser<()> {
   return (
     getPosition >>- { pos in
@@ -114,7 +116,11 @@ func b_comment () -> YamlParser<()> {
 
 // [77]
 func s_b_comment () -> YamlParser<()> {
-  return ( optional(attempt(s_separate_in_line >>> optional(attempt(c_nb_comment_text))))
+  return (
+    optional(attempt(
+      s_separate_in_line
+      >>> optional(attempt(c_nb_comment_text))
+    ))
     >>> b_comment
   )()
 }
@@ -126,7 +132,7 @@ func l_comment () -> YamlParser<()> {
       if end != nil {
         return fail("no more comment lines")
       } else {
-        return s_separate_in_line >>> optional(attempt(c_nb_comment_text)) >>> b_comment
+        return attempt(s_separate_in_line >>> optional(attempt(c_nb_comment_text)) >>> b_comment)
       }
     }
   )()
@@ -135,7 +141,7 @@ func l_comment () -> YamlParser<()> {
 // [79]
 func s_l_comments () -> YamlParser<()> {
   return (
-    ( s_b_comment <|> start_of_line ) >>> many(attempt(l_comment)) >>> create(())
+    ( attempt(s_b_comment) <|> start_of_line ) >>> many(l_comment) >>> create(())
   )()
 }
 
@@ -192,7 +198,14 @@ func ns_yaml_directive () -> YamlParser<(String, [String])> {
 func ns_yaml_version () -> YamlParser<String> {
   return ( many1(ns_dec_digit) >>- { major in
     char(".") >>> many1(ns_dec_digit) >>- { minor in
-      create(String(major) + "." + String(minor))
+      let version = String(major) + "." + String(minor)
+      let mj = Int(String(major), radix: 10)!
+      let mn = Int(String(minor), radix: 10)!
+      if mj == 1 && mn > 0 {
+        return create(version)
+      } else {
+        return unexpected("invalid YAML version: \(version)")
+      }
     }
   })()
 }
@@ -254,26 +267,18 @@ func ns_global_tag_prefix () -> YamlParser<String> {
 }
 
 // [96]
-func c_ns_properties (_ n: Int, _ c: Context) -> YamlParserClosure<(tag: String?, anchor: String?)> {
+func c_ns_properties (_ n: Int, _ c: Context) -> YamlParserClosure<Properties> {
   return {(
     (
       c_ns_tag_property >>- { tag in
-        optionMaybe(attempt(s_separate(n, c) >>> c_ns_anchor_property)) >>- { anchor in
-          if let anchor = anchor {
-            return create((tag: tag, anchor: anchor))
-          } else {
-            return create((tag: tag, anchor: nil))
-          }
+        option("", attempt(s_separate(n, c) >>> c_ns_anchor_property)) >>- { anchor in
+          create((tag: tag, anchor: anchor))
         }
       }
     ) <|> (
       c_ns_anchor_property >>- { anchor in
-        optionMaybe(attempt(s_separate(n, c) >>> c_ns_tag_property)) >>- { tag in
-          if let tag = tag {
-            return create((tag: tag, anchor: anchor))
-          } else {
-            return create((tag: nil, anchor: anchor))
-          }
+        option(tag_unknown, attempt(s_separate(n, c) >>> c_ns_tag_property)) >>- { tag in
+          create((tag: tag, anchor: anchor))
         }
       }
     )
@@ -281,29 +286,47 @@ func c_ns_properties (_ n: Int, _ c: Context) -> YamlParserClosure<(tag: String?
 }
 
 // [97]
-func c_ns_tag_property () -> YamlParser<String> {
+func c_ns_tag_property () -> YamlParser<Tag> {
   return ( attempt(c_verbatim_tag) <|> attempt(c_ns_shorthand_tag) <|> c_non_specific_tag )()
 }
 
 // [98]
-func c_verbatim_tag () -> YamlParser<String> {
+func c_verbatim_tag () -> YamlParser<Tag> {
   return ( string("!<") >>> many1(ns_uri_char) >>- { xs in
-    create("!<" + String(xs) + ">")
+    getState >>- { state in
+      let uri = String(xs)
+      if let tag = state.tags[uri] {
+        return create(tag)
+      } else {
+        return unexpected("unknown verbatim tag: \(uri)")
+      }
+    }
   } <<< char(">") )()
 }
 
 // [99]
-func c_ns_shorthand_tag () -> YamlParser<String> {
-  return ( c_tag_handle >>- { tag in
+func c_ns_shorthand_tag () -> YamlParser<Tag> {
+  return ( c_tag_handle >>- { handle in
     many1(ns_tag_char) >>- { xs in
-      create(tag + String(xs))
+      getState >>- { state in
+        if let pre = state.handles[handle] {
+          let uri = pre + String(xs)
+          if let tag = state.tags[uri] {
+            return create(tag)
+          } else {
+            return unexpected("unknown tag: \(uri)")
+          }
+        } else {
+          return unexpected("unknown shorthand handle: \(handle)")
+        }
+      }
     }
   } )()
 }
 
 // [100]
-func c_non_specific_tag () -> YamlParser<String> {
-  return string("!")()
+func c_non_specific_tag () -> YamlParser<Tag> {
+  return (char("!") >>> create(tag_non_specific))()
 }
 
 // [101]

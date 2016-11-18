@@ -16,6 +16,9 @@ func member (_ allowed: CharacterSet) -> (Character) -> Bool {
   }
 }
 
+typealias YamlParser<a> = StringUserParser<a, Schema>
+typealias YamlParserClosure<a> = StringUserParserClosure<a, Schema>
+
 // [1]
 func c_printable () -> YamlParser<Character> {
   return ( satisfy(member(c_printable_set)) <?> "allowed yaml character" )()
@@ -48,8 +51,8 @@ let nb_json_set: CharacterSet = {
 }()
 
 // [3]
-func c_byte_order_mark () -> YamlParser<Character> {
-  return ( char("\u{feff}") <?> "BOM" )()
+func c_byte_order_mark () -> YamlParser<()> {
+  return ( char("\u{feff}") >>> create(()) <?> "BOM" )()
 }
 
 // [4]

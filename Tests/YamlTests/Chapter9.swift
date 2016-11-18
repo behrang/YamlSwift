@@ -24,46 +24,46 @@ class Chapter9: XCTestCase {
       "\"\n...\n\"")
     right(l_bare_document,
       "|\nx\n...",
-      .scalar("x\n", tag_string, ""))
+      .scalar("x\n", tag_string))
     right(l_bare_document,
       ">\nx\n--- ",
-      .scalar("x\n", tag_string, ""))
+      .scalar("x\n", tag_string))
     right(l_bare_document,
       "Bare\ndocument\n...\n",
-      .scalar("Bare document", tag_non_specific, ""))
+      .scalar("Bare document", tag_unknown))
   }
 
   func test_211_l_yaml_stream () {
     right(l_yaml_stream,
       "# Comment\n# lines\nDocument",
-      [ Node.scalar("Document", tag_non_specific, "") ])
+      [ Node.scalar("Document", tag_unknown) ])
     right(l_yaml_stream,
       "%YAML 1.2\n---\nDocument\n... # Suffix",
-      [ Node.scalar("Document", tag_non_specific, "") ])
+      [ Node.scalar("Document", tag_unknown) ])
     right(l_yaml_stream,
       "Bare\ndocument\n...\n# No document\n...\n|\n%!PS-Adobe-2.0 # Not the first line",
-      [ Node.scalar("Bare document", tag_non_specific, ""),
-        Node.scalar("%!PS-Adobe-2.0 # Not the first line\n", tag_string, "")
+      [ Node.scalar("Bare document", tag_unknown),
+        Node.scalar("%!PS-Adobe-2.0 # Not the first line", tag_string)
       ])
     right(l_yaml_stream,
       "---\n{ matches\n% : 20 }\n...\n---\n# Empty\n...",
       [ Node.mapping([
-          .scalar("matches %", tag_non_specific, ""): .scalar("20", tag_non_specific, "")
-        ], tag_mapping, ""),
-        Node.scalar("", tag_null, "")
+          .scalar("matches %", tag_unknown): .scalar("20", tag_unknown)
+        ], tag_mapping),
+        Node.scalar("", tag_null)
       ])
     right(l_yaml_stream,
       "%YAML 1.2\n--- |\n%!PS-Adobe-2.0\n...\n%YAML1.2\n---\n# Empty\n...\n",
-      [ Node.scalar("%!PS-Adobe-2.0\n", tag_string, ""),
-        Node.scalar("", tag_null, "")
+      [ Node.scalar("%!PS-Adobe-2.0\n", tag_string),
+        Node.scalar("", tag_null)
       ])
     right(l_yaml_stream,
       "Document\n---\n# Empty\n...\n%YAML 1.2\n---\nmatches %: 20",
-      [ Node.scalar("Document", tag_non_specific, ""),
-        Node.scalar("", tag_null, ""),
+      [ Node.scalar("Document", tag_unknown),
+        Node.scalar("", tag_null),
         Node.mapping([
-          .scalar("matches %", tag_non_specific, ""): .scalar("20", tag_non_specific, "")
-        ], tag_mapping, ""),
+          .scalar("matches %", tag_unknown): .scalar("20", tag_unknown)
+        ], tag_non_specific),
       ])
   }
 

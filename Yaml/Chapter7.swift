@@ -7,15 +7,30 @@ func prepend<a> (_ x: a, _ xs: [a]) -> [a] {
   return r
 }
 
-func put<a> (_ x: (a, a), _ xs: [a: a]) -> [a: a] {
+func put<a> (_ x: (a, a), _ xs: [a: a]) -> YamlParserClosure<[a: a]> {
   var r = xs
+  if r[x.0] != nil {
+    return unexpected("found duplicate flow mapping key: \(x.0)")
+  }
   r[x.0] = x.1
-  return r
+  return create(r)
 }
 
 // [104]
 func c_ns_alias_node () -> YamlParser<Node> {
-  return ( char("*") >>> ns_anchor_name >>- { anchor in create(.alias(anchor)) } )()
+  return (
+    char("*")
+    >>> ns_anchor_name
+    >>- { anchor in
+      getState >>- { state in
+        if let box = state.anchors[anchor] {
+          return create(.alias(box))
+        } else {
+          return unexpected("unidentified alias: \(anchor)")
+        }
+      }
+    }
+  )()
 }
 
 // [105]
@@ -25,7 +40,7 @@ func e_scalar () -> YamlParser<()> {
 
 // [106]
 func e_node () -> YamlParser<Node> {
-  return ( e_scalar >>> create(.scalar("", tag_null, "")) )()
+  return ( e_scalar >>> create(.scalar("", tag_null)) )()
 }
 
 // [107]
@@ -41,20 +56,14 @@ let nb_double_char_set: CharacterSet = {
 
 // [108]
 func ns_double_char () -> YamlParser<Character> {
-  return ( nb_double_char >>- { x in
-    if x == " " || x == "\t" {
-      return fail("expected non-white-space")
-    } else {
-      return create(x)
-    }
-  } )()
+  return ( notFollowedBy(s_white) >>> nb_double_char )()
 }
 
 // [109]
 func c_double_quoted (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
   return {(
     between(char("\""), char("\""), nb_double_text(n, c)) >>- { c in
-      create(.scalar(c, tag_string, ""))
+      create(.scalar(c, tag_string))
     }
   )()}
 }
@@ -166,7 +175,7 @@ func ns_single_char () -> YamlParser<Character> {
 func c_single_quoted (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
   return {(
     between(char("'"), char("'"), nb_single_text(n, c)) >>- { c in
-      create(.scalar(c, tag_string, ""))
+      create(.scalar(c, tag_string))
     }
   )()}
 }
@@ -277,19 +286,10 @@ let ns_plain_safe_in_set: CharacterSet = {
 }()
 
 // [130]
-func ns_plain_char (_ c: Context) -> YamlParserClosure<String> {
+func ns_plain_char (_ c: Context) -> YamlParserClosure<Character> {
   return {(
-    char(":") >>> ns_plain_safe(c) >>- { x in
-      create(":" + String(x))
-    } <|> attempt(satisfy(member(ns_char_set)) >>- { x in
-      char("#") >>> create(String(x) + "#")
-    }) <|> ns_plain_safe(c) >>- { x in
-      if x == ":" || x == "#" {
-        return fail("expected none of ':#'")
-      } else {
-        return create(String(x))
-      }
-    }
+    lookAhead(noneOf(":#")) >>> ns_plain_safe(c)
+    <|> attempt(char(":") <<< lookAhead(ns_plain_safe(c)))
   )()}
 }
 
@@ -309,6 +309,13 @@ func nb_ns_plain_in_line (_ c: Context) -> YamlParserClosure<String> {
   return {(
     many(attempt(many(s_white) >>- { ws in
       ns_plain_char(c) >>- { x in create(String(ws) + String(x)) }
+      <|> char("#") >>- { _ in
+        if ws.count == 0 {
+          return create("#")
+        } else {
+          return fail("comment character")
+        }
+      }
     })) >>- { ss in create(ss.joined(separator: "")) }
   )()}
 }
@@ -332,7 +339,7 @@ func s_ns_plain_next_line (_ n: Int, _ c: Context) -> YamlParserClosure<String> 
       (notFollowedBy(c_forbidden) <?> "no document markers") >>>
       ns_plain_char(c) >>- { x in
         nb_ns_plain_in_line(c) >>- { l in
-          create(s + x + l)
+          create(s + String(x) + l)
         }
       }
     }
@@ -366,7 +373,7 @@ func c_flow_sequence (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
     >>> optional(attempt(s_separate(n, c)))
     >>> option([], attempt(ns_s_flow_seq_entries(n, in_flow(c))))
     <<< char("]")
-    >>- { entries in create(.sequence(entries, tag_sequence, "")) }
+    >>- { entries in create(.sequence(entries, tag_sequence)) }
   )()}
 }
 
@@ -395,7 +402,7 @@ func c_flow_mapping (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
     >>> optional(attempt(s_separate(n, c)))
     >>> option([:], attempt(ns_s_flow_map_entries(n, in_flow(c))))
     <<< char("}")
-    >>- { entries in create(.mapping(entries, tag_mapping, "")) }
+    >>- { entries in create(.mapping(entries, tag_mapping)) }
   )()}
 }
 
@@ -407,7 +414,7 @@ func ns_s_flow_map_entries (_ n: Int, _ c: Context) -> YamlParserClosure<[Node: 
       >>> option([:], attempt(char(",")
         >>> optional(attempt(s_separate(n, c)))
         >>> option([:], attempt(ns_s_flow_map_entries(n, c)))
-      )) >>- { entries in create(put(entry, entries)) }
+      )) >>- { entries in put(entry, entries) }
     }
   )()}
 }
@@ -514,7 +521,7 @@ func ns_flow_pair (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
         >>> s_separate(n, c)
         >>> ns_flow_map_explicit_entry(n, c)
       ) <|> ns_flow_pair_entry(n, c)
-    ) >>- { pair in create(.mapping([pair.0: pair.1], tag_mapping, "")) }
+    ) >>- { pair in create(.mapping([pair.0: pair.1], tag_mapping)) }
   )()}
 }
 
@@ -551,17 +558,59 @@ func c_ns_flow_pair_json_key_entry (_ n: Int, _ c: Context) -> YamlParserClosure
 
 // [154]
 func ns_s_implicit_yaml_key (_ c: Context) -> YamlParserClosure<Node> {
-  return {( ns_flow_yaml_node(-1, c) <<< optional(attempt(s_separate_in_line)) )()}
+  return {(
+    same_line_implicit_key(1024, c)
+    >>> ns_flow_yaml_node(-1, c)
+    <<< optional(attempt(s_separate_in_line))
+  )()}
+}
+
+func same_line_implicit_key (_ n: Int, _ c: Context) -> YamlParserClosure<()> {
+  let msg = "key indicator not found on the same line in 1024 characters"
+  return {(
+    getInput >>- { input in
+      let s = String(input)
+      if let range = s.range(of: "^.{0,1025}", options: .regularExpression) {
+        let sub = s[range]
+        switch c {
+        case .flow_out, .block_key:
+          let regex = ":([^\u{21}-\u{7e}\u{85}\u{a0}-\u{d7ff}" +
+            "\u{e000}-\u{fefe}\u{ff00}-\u{fffd}\u{10000}-\u{10ffff}]|$)"
+          if match(sub, regex) {
+            return create(())
+          } else {
+            return fail(msg)
+          }
+        case .flow_in, .flow_key:
+          let regex = ":([^\u{21}-\u{2b}\u{2d}-\u{5a}\u{5c}" +
+            "\u{5e}-\u{7a}\u{7c}\u{7e}\u{85}\u{a0}-\u{d7ff}" +
+            "\u{e000}-\u{fefe}\u{ff00}-\u{fffd}\u{10000}-\u{10ffff}]|$)"
+          if match(sub, regex) {
+            return create(())
+          } else {
+            return fail(msg)
+          }
+        default: return fail("invalid use of ns_plain_safe for context \(c)")
+        }
+      } else {
+        return fail(msg)
+      }
+    }
+  )()}
 }
 
 // [155]
 func c_s_implicit_json_key (_ c: Context) -> YamlParserClosure<Node> {
-  return {( c_flow_json_node(-1, c) <<< optional(attempt(s_separate_in_line)) )()}
+  return {(
+    same_line_implicit_key(1024, c)
+    >>> c_flow_json_node(-1, c)
+    <<< optional(attempt(s_separate_in_line))
+  )()}
 }
 
 // [156]
 func ns_flow_yaml_content (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
-  return {( ns_plain(n, c) >>- { s in create(.scalar(s, tag_non_specific, "")) } )()}
+  return {( ns_plain(n, c) >>- { s in create(.scalar(s, tag_unknown)) } )()}
 }
 
 // [157]
@@ -586,47 +635,25 @@ func ns_flow_content (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
 func ns_flow_yaml_node (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
   return {(
     attempt(c_ns_alias_node)
-    <|> attempt(ns_flow_yaml_content(n, c) >>- at_most_1024(n))
+    <|> attempt(ns_flow_yaml_content(n, c))
     <|> c_ns_properties(n, c) >>- { properties in
-      ( s_separate(n, c) >>> ns_flow_yaml_content(n, c)
-        <|> e_node
-      ) >>- { node in
-        let tag = Tag.lookup(properties.tag ?? "")
-        let anchor = properties.anchor ?? ""
-        return create(.scalar(node.content, tag, anchor))
-      }
-    } >>- at_most_1024(n)
-  )()}
-}
-
-func at_most_1024 (_ n: Int) -> (Node) -> YamlParserClosure<Node> {
-  return { node in
-    if n == -1 && node.content.characters.count > 1024 {
-      return fail("key is too long: \(node.content)")
-    } else {
-      return create(node)
+      let box = Box(properties.anchor)
+      return save_anchor(box)
+      >>> ( s_separate(n, c) >>> ns_flow_yaml_content(n, c) <|> e_node )
+      >>- apply_properties(properties, box)
     }
-  }
+  )()}
 }
 
 // [160]
 func c_flow_json_node (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
   return {(
-    option((nil, nil), attempt(c_ns_properties(n, c) <<< s_separate(n, c))) >>- { properties in
-      c_flow_json_content(n, c) >>- { node in
-        var tag = node.tag
-        if let newTag = properties.tag {
-          tag = Tag.lookup(newTag)
-        }
-        let anchor = properties.anchor ?? ""
-        switch node {
-        case .scalar(let c, _, _): return create(.scalar(c, tag, anchor))
-        case .sequence(let c, _, _): return create(.sequence(c, tag, anchor))
-        case .mapping(let c, _, _): return create(.mapping(c, tag, anchor))
-        default: fatalError("other node types are not supported")
-        }
-      }
-    } >>- at_most_1024(n)
+    option((tag_unknown, ""), attempt(c_ns_properties(n, c) <<< s_separate(n, c))) >>- { properties in
+      let box = Box(properties.anchor)
+      return save_anchor(box)
+      >>> c_flow_json_content(n, c)
+      >>- apply_properties(properties, box)
+    }
   )()}
 }
 
@@ -636,18 +663,35 @@ func ns_flow_node (_ n: Int, _ c: Context) -> YamlParserClosure<Node> {
     attempt(c_ns_alias_node)
     <|> attempt(ns_flow_content(n, c))
     <|> c_ns_properties(n, c) >>- { properties in
-      ( attempt(s_separate(n, c) >>> ns_flow_content(n, c))
-        <|> e_node
-      ) >>- { node in
-        let tag = Tag.lookup(properties.tag ?? "")
-        let anchor = properties.anchor ?? ""
-        switch node {
-        case .scalar(let c, _, _): return create(.scalar(c, tag, anchor))
-        case .sequence(let c, _, _): return create(.sequence(c, tag, anchor))
-        case .mapping(let c, _, _): return create(.mapping(c, tag, anchor))
-        default: fatalError("other node types are not supported")
-        }
-      }
+      let box = Box(properties.anchor)
+      return save_anchor(box)
+      >>> ( attempt(s_separate(n, c) >>> ns_flow_content(n, c)) <|> e_node )
+      >>- apply_properties(properties, box)
     }
   )()}
+}
+
+func apply_properties (_ properties: Properties, _ box: Box) -> (Node) -> YamlParserClosure<Node> {
+  return { node in
+    getState >>- { state in
+      switch node {
+      case .scalar(let c, _):
+        box.node = .scalar(c, properties.tag)
+      case .sequence(let c, _):
+        box.node = .sequence(c, properties.tag)
+      case .mapping(let c, _):
+        box.node = .mapping(c, properties.tag)
+      default: fatalError("alias nodes don't have properties")
+      }
+      return create(box.node!)
+    }
+  }
+}
+
+func save_anchor (_ box: Box) -> YamlParserClosure<()> {
+  return modifyState({ state in
+    var modified = state
+    modified.anchors[box.anchor] = box
+    return modified
+  })
 }
