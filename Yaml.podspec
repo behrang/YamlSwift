@@ -28,6 +28,9 @@ Pod::Spec.new do |s|
   s.source_files = "Yaml/*.swift"
 
   # --- Target xcconfig ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '2.3' }
+  s.pod_target_xcconfig = {
+    'SWIFT_VERSION' => '2.3',
+    'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+  }
 
 end
