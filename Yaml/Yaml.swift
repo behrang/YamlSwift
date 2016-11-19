@@ -10,17 +10,23 @@ public enum Yaml {
   case dictionary([Yaml: Yaml])
 }
 
-public enum YamlError: Error {
+public enum YamlError: Error, CustomStringConvertible {
   case message(String)
+
+  public var description: String {
+    switch self {
+    case .message(let error): return error
+    }
+  }
 }
 
 extension Yaml {
-  public static func load (_ text: String, schema: Schema = core_schema) throws -> Yaml {
+  public static func load (_ text: String, schema: Schema = core_schema) throws -> [Yaml] {
     switch parse(l_yaml_stream <<< eof, schema, "", text.characters) {
       case let .left(err): throw YamlError.message(err.description)
       case let .right(value):
         let node = Node.sequence(value, tag_sequence)
-        return try node.construct(schema.resolve)
+        return try node.construct(schema.resolve).array!
     }
   }
 }
