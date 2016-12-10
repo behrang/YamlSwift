@@ -120,7 +120,7 @@ extension Yaml {
   }
   
   
-  static func tokenize (_ text: String) -> Result<[TokenMatch]> {
+  static func tokenize (_ text: String) -> YAMLResult<[TokenMatch]> {
     var text = text
     var matchList: [TokenMatch] = []
     var indents = [0]
