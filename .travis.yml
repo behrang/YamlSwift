@@ -1,5 +1,10 @@
-language: objective-c
+os:
+  - linux
+  - osx
+language: generic
+sudo: required
+dist: trusty
 osx_image: xcode8
-xcode_workspace: Yaml.xcodeproj
-xcode_scheme: "Yaml iOS"
-xcode_sdk: iphonesimulator9.3
+script:
+  - eval "$(curl -sL https://swift.vapor.sh/ci-3.1)"
+  - eval "$(curl -sL https://swift.vapor.sh/codecov)"
