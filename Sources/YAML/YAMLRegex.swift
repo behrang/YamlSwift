@@ -1,9 +1,5 @@
 import Foundation
 
-#if os(Linux)
-typealias NSRegularExpression = RegularExpression
-#endif
-
 private let invalidOptionsPattern =
   try! NSRegularExpression(pattern: "[^ixsm]", options: [])
 
