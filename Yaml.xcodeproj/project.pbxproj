@@ -153,7 +153,8 @@
 				228450BA1DB0E51C00EACD31 /* YAMLResult.swift */,
 				228450BB1DB0E51C00EACD31 /* YAMLTokenizer.swift */,
 			);
-			path = YAML;
+			name = YAML;
+			path = Yaml;
 			sourceTree = "<group>";
 		};
 		8E1D76221B258FEE0022C013 /* Products */ = {
