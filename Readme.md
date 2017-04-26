@@ -15,6 +15,10 @@ Use [Carthage](https://github.com/Carthage/Carthage) to build and install.
 Or use [CocoaPods](https://cocoapods.org/) :
 Add `pod 'Yaml'` to your `Podfile` and run `pod install`.
 
+## Looking for a maintainer
+
+I don't have time and interest to maintain this project. If you want to help with maintenance, please send me a message.
+
 
 ## API
 
