@@ -26,7 +26,7 @@ Add `pod 'Yaml'` to your `Podfile` and run `pod install`.
 To use it, you should import it using the following statement:
 
 ```swift
-import Yaml
+import YamlSwift
 ```
 
 
