@@ -1,5 +1,6 @@
 import Foundation
 
+
 private let invalidOptionsPattern =
   try! NSRegularExpression(pattern: "[^ixsm]", options: [])
 
@@ -12,6 +13,7 @@ private let regexOptions: [Character: NSRegularExpression.Options] = [
 
 extension Yaml {
   struct Regex {
+
 static func matchRange (_ string: String, regex: NSRegularExpression) -> NSRange {
   let sr = NSMakeRange(0, string.utf16.count)
   return regex.rangeOfFirstMatch(in: string, options: [], range: sr)
@@ -65,9 +67,9 @@ static func replace (_ regex: NSRegularExpression, block: @escaping ([String]) -
                 #if os(Linux)
                 let rangeAt = result.range(at: i)
                 #else
-                let rangeAt = result.rangeAt(i)
+                let rangeAt = result.range(at: i)
                 #endif
-                if let r = rangeAt.toRange() {
+                if let r = Range(rangeAt) {
                   captures[i] = NSString(string: string).substring(with: NSRange(r))
                 }
               }

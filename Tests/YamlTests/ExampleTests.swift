@@ -79,7 +79,7 @@ class ExampleTests: XCTestCase {
       "  avg:  0.288\n"
       )
     XCTAssert(value.count == 2)
-    XCTAssertEqualWithAccuracy(value[1]["avg"].double!, 0.288, accuracy: 0.00001)
+    XCTAssertEqual(value[1]["avg"].double!, 0.288, accuracy: 0.00001)
   }
   
   func testExample5 () {
@@ -90,7 +90,7 @@ class ExampleTests: XCTestCase {
       )
     XCTAssert(value.count == 3)
     XCTAssert(value[2].count == 3)
-    XCTAssertEqualWithAccuracy(value[2][2].double!, 0.288, accuracy: 0.00001)
+    XCTAssertEqual(value[2][2].double!, 0.288, accuracy: 0.00001)
   }
   
   func testExample6 () {

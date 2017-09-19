@@ -7,9 +7,9 @@ extension Yaml {
 
 struct Context {
   let tokens: [Yaml.TokenMatch]
-  let aliases: [String: Yaml]
+  let aliases: [String.SubSequence: Yaml]
 
-  init (_ tokens: [Yaml.TokenMatch], _ aliases: [String: Yaml] = [:]) {
+  init (_ tokens: [Yaml.TokenMatch], _ aliases: [String.SubSequence: Yaml] = [:]) {
     self.tokens = tokens
     self.aliases = aliases
   }
@@ -251,7 +251,7 @@ private func parse (_ context: Context) -> YAMLResult<ContextValue> {
 
   case .anchor:
     let m = peekMatch(context)
-    let name = m.substring(from: m.index(after: m.startIndex))
+    let name = m[m.index(after: m.startIndex)...]
     let cv = parse(advance(context))
     let v = cv >>- getValue
     let c = addAlias(name) <^> v <*> (cv >>- getContext)
@@ -259,7 +259,7 @@ private func parse (_ context: Context) -> YAMLResult<ContextValue> {
 
   case .alias:
     let m = peekMatch(context)
-    let name = m.substring(from: m.index(after: m.startIndex))
+    let name = m[m.index(after: m.startIndex)...]
     let value = context.aliases[name]
     let err = "unknown alias \(name)"
     return Resulter.`guard`(error(err)(context), check: value != nil)
@@ -274,7 +274,7 @@ private func parse (_ context: Context) -> YAMLResult<ContextValue> {
   }
 }
 
-private func addAlias (_ name: String) -> (Yaml) -> (Context) -> Context {
+private func addAlias (_ name: String.SubSequence) -> (Yaml) -> (Context) -> Context {
   return { value in
     return { context in
       var aliases = context.aliases
@@ -592,7 +592,7 @@ private func normalizeBreaks (_ s: String) -> String {
 }
 
 private func unwrapQuotedString (_ s: String) -> String {
-  return s[s.index(after: s.startIndex)..<s.index(before: s.endIndex)]
+  return String(s[s.index(after: s.startIndex)..<s.index(before: s.endIndex)])
 }
 
 private func unescapeSingleQuotes (_ s: String) -> String {
