@@ -130,16 +130,16 @@ extension Yaml {
         for tokenPattern in tokenPatterns {
           let range = Yaml.Regex.matchRange(text, regex: tokenPattern.pattern)
           if range.location != NSNotFound {
-            let rangeend = range.location + range.length
+            let rangeEnd = range.location + range.length
             switch tokenPattern.type {
               
             case .newLine:
-              let match = text |> Yaml.Regex.substringWithRange(range)
+              let match = (range, text) |> Yaml.Regex.substring
               let lastindent = indents.last ?? 0
               let rest = match[match.index(after: match.startIndex)...]
               let spaces = rest.characters.count
               let nestedBlockSequence =
-                Yaml.Regex.matches(text |> Yaml.Regex.substringFromIndex(rangeend), regex: dashPattern!)
+                Yaml.Regex.matches((rangeEnd, text) |> Yaml.Regex.substring, regex: dashPattern!)
               if spaces == lastindent {
                 matchList.append(TokenMatch(.newLine, match))
               } else if spaces > lastindent {
@@ -165,7 +165,7 @@ extension Yaml {
               }
               
             case .dash, .questionMark:
-              let match = text |> Yaml.Regex.substringWithRange(range)
+              let match = (range, text) |> Yaml.Regex.substring
               let index = match.index(after: match.startIndex)
               let indent = match.characters.count
               indents.append((indents.last ?? 0) + indent)
@@ -180,7 +180,7 @@ extension Yaml {
               fallthrough
               
             case .colonFI:
-              let match = text |> Yaml.Regex.substringWithRange(range)
+              let match = (range, text) |> Yaml.Regex.substring
               matchList.append(TokenMatch(.colon, match))
               if insideFlow == 0 {
                 indents.append((indents.last ?? 0) + 1)
@@ -189,15 +189,15 @@ extension Yaml {
               
             case .openSB, .openCB:
               insideFlow += 1
-              matchList.append(TokenMatch(tokenPattern.type, text |> Yaml.Regex.substringWithRange(range)))
+              matchList.append(TokenMatch(tokenPattern.type, (range, text) |> Yaml.Regex.substring))
               
             case .closeSB, .closeCB:
               insideFlow -= 1
-              matchList.append(TokenMatch(tokenPattern.type, text |> Yaml.Regex.substringWithRange(range)))
+              matchList.append(TokenMatch(tokenPattern.type, (range, text) |> Yaml.Regex.substring))
               
             case .literal, .folded:
-              matchList.append(TokenMatch(tokenPattern.type, text |> Yaml.Regex.substringWithRange(range)))
-              text = text |> Yaml.Regex.substringFromIndex(rangeend)
+              matchList.append(TokenMatch(tokenPattern.type, (range, text) |> Yaml.Regex.substring))
+              text = (rangeEnd, text) |> Yaml.Regex.substring
               let lastindent = indents.last ?? 0
               let minindent = 1 + lastindent
               let blockPattern = Yaml.Regex.regex(("^(\(bBreak) *)*(\(bBreak)" +
@@ -220,26 +220,26 @@ extension Yaml {
               let indent = (indents.last ?? 0)
               let blockPattern = Yaml.Regex.regex(("^\(bBreak)( *| {\(indent),}" +
                 "\(plainOutPattern))(?=\(bBreak)|$)"))
-              var block = text
-                |> Yaml.Regex.substringWithRange(range)
+              var block = (range, text)
+                |> Yaml.Regex.substring
                 |> Yaml.Regex.replace(Yaml.Regex.regex("^[ \\t]+|[ \\t]+$"), template: "")
-              text = text |> Yaml.Regex.substringFromIndex(rangeend)
+              text = (rangeEnd, text) |> Yaml.Regex.substring
               while true {
                 let range = Yaml.Regex.matchRange(text, regex: blockPattern!)
                 if range.location == NSNotFound {
                   break
                 }
-                let s = text |> Yaml.Regex.substringWithRange(range)
+                let s = (range, text) |> Yaml.Regex.substring
                 block += "\n" +
                   Yaml.Regex.replace(Yaml.Regex.regex("^\(bBreak)[ \\t]*|[ \\t]+$"), template: "")(s)
-                text = text |> Yaml.Regex.substringFromIndex(range.location + range.length)
+                text = (range.location + range.length, text) |> Yaml.Regex.substring
               }
               matchList.append(TokenMatch(.string, block))
               continue next
               
             case .stringFI:
-              let match = text
-                |> Yaml.Regex.substringWithRange(range)
+              let match = (range, text)
+                |> Yaml.Regex.substring
                 |> Yaml.Regex.replace(Yaml.Regex.regex("^[ \\t]|[ \\t]$"), template: "")
               matchList.append(TokenMatch(.string, match))
               
@@ -247,9 +247,9 @@ extension Yaml {
               return fail(escapeErrorContext(text))
               
             default:
-              matchList.append(TokenMatch(tokenPattern.type, text |> Yaml.Regex.substringWithRange(range)))
+              matchList.append(TokenMatch(tokenPattern.type, (range, text) |> Yaml.Regex.substring))
             }
-            text = text |> Yaml.Regex.substringFromIndex(rangeend)
+            text = (rangeEnd, text) |> Yaml.Regex.substring
             continue next
           }
         }

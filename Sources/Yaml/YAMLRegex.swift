@@ -111,16 +111,12 @@ static func splitTrail (_ regex: NSRegularExpression) -> (String)
       }
 }
 
-static func substringWithRange (_ range: NSRange) -> (String) -> String {
-  return { string in
+static func substring (_ range: NSRange, _ string : String ) -> String {
     return NSString(string: string).substring(with: range)
-  }
 }
 
-static func substringFromIndex (_ index: Int) -> (String) -> String {
-  return { string in
+static func substring (_ index: Int, _ string: String ) -> String {
     return NSString(string: string).substring(from: index)
-  }
 }
   }
 
