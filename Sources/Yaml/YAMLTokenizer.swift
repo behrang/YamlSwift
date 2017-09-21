@@ -2,7 +2,7 @@ import Foundation
 
 
 extension Yaml {
-  enum TokenType: Swift.String {
+  enum TokenType: String {
     case yamlDirective = "%YAML"
     case docStart = "doc-start"
     case docend = "doc-end"
