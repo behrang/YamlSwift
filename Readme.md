@@ -29,7 +29,7 @@ And:
 ```
         .target(
             name: "YourProject",
-            dependencies: ["YamlSwift"]),
+            dependencies: ["Yaml"]),
 ```
 
 ## API
