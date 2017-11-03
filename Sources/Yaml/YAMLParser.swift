@@ -125,7 +125,7 @@ private func expectVersion (_ context: Context) -> YAMLResult<Context> {
 
 
 private func recreateText (_ string: String, context: Context) -> String {
-  if string.characters.count >= 50 || peekType(context) == .end {
+  if string.count >= 50 || peekType(context) == .end {
     return string
   }
   return recreateText(string + peekMatch(context), context: advance(context))
@@ -514,7 +514,7 @@ private func foldFlow (_ flow: String) -> String {
 }
 
 private func count(string: String) -> String.IndexDistance {
-  return string.characters.count
+  return string.count
 }
 
 private func parseliteral (_ context: Context) -> YAMLResult<ContextValue> {
