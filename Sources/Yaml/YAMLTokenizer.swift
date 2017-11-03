@@ -137,7 +137,7 @@ extension Yaml {
               let match = (range, text) |> Yaml.Regex.substring
               let lastindent = indents.last ?? 0
               let rest = match[match.index(after: match.startIndex)...]
-              let spaces = rest.characters.count
+              let spaces = rest.count
               let nestedBlockSequence =
                 Yaml.Regex.matches((rangeEnd, text) |> Yaml.Regex.substring, regex: dashPattern!)
               if spaces == lastindent {
@@ -167,7 +167,7 @@ extension Yaml {
             case .dash, .questionMark:
               let match = (range, text) |> Yaml.Regex.substring
               let index = match.index(after: match.startIndex)
-              let indent = match.characters.count
+              let indent = match.count
               indents.append((indents.last ?? 0) + indent)
               matchList.append(
                 TokenMatch(tokenPattern.type, String(match[..<index])))

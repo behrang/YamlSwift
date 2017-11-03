@@ -28,7 +28,7 @@ static func regex (_ pattern: String, options: String = "") -> NSRegularExpressi
     return nil
   }
 
-  let opts = options.characters.reduce(NSRegularExpression.Options()) { (acc, opt) -> NSRegularExpression.Options in
+  let opts = options.reduce(NSRegularExpression.Options()) { (acc, opt) -> NSRegularExpression.Options in
     return NSRegularExpression.Options(rawValue:acc.rawValue | (regexOptions[opt] ?? NSRegularExpression.Options()).rawValue)
   }
   return try? NSRegularExpression(pattern: pattern, options: opts)
@@ -71,7 +71,7 @@ static func replace (_ regex: NSRegularExpression, block: @escaping ([String]) -
               }
               let replacement = block(captures)
               let offR = NSMakeRange(result.range.location + offset, result.range.length)
-              offset += replacement.characters.count - result.range.length
+              offset += replacement.count - result.range.length
               s.replaceCharacters(in: offR, with: replacement)
           }
         }
