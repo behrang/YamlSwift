@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/behrang/YamlSwift.git", :tag => s.version }
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.source_files = "Yaml/*.swift"
+  s.source_files = "Sources/Yaml/*.swift"
 
   # --- Target xcconfig ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.pod_target_xcconfig = {
