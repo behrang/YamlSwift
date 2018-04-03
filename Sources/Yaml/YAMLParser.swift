@@ -513,7 +513,7 @@ private func foldFlow (_ flow: String) -> String {
   return lead + folded + trail
 }
 
-private func count(string: String) -> String.IndexDistance {
+private func count(string: String) -> Int {
   return string.count
 }
 
