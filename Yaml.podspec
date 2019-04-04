@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
                  and returns a Yaml enum value representing that string.
                    DESC
   s.homepage      = "https://github.com/behrang/YamlSwift"
-  s.swift_version = "4.1"
+  s.swift_version = "5.0"
 
   # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.license      = "MIT"
@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
   # --- Target xcconfig ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.pod_target_xcconfig = {
-    'SWIFT_VERSION' => '4.1',
+    'SWIFT_VERSION' => '5.0',
     'APPLICATION_EXTENSION_API_ONLY' => 'YES',
   }
 
