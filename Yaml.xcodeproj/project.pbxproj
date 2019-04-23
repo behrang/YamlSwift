@@ -32,6 +32,12 @@
 		8313C4401C8DC4AD00DEF215 /* YamlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3894BCB1B7312E000286880 /* YamlTests.swift */; };
 		8313C4411C8DC4B000DEF215 /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
 		8E1D762D1B258FEE0022C013 /* Yaml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E1D76211B258FEE0022C013 /* Yaml.framework */; };
+		DB234628226F73A70000DF87 /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B61DB0E51C00EACD31 /* Yaml.swift */; };
+		DB234629226F73A70000DF87 /* YAMLOperators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B71DB0E51C00EACD31 /* YAMLOperators.swift */; };
+		DB23462A226F73A70000DF87 /* YAMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B81DB0E51C00EACD31 /* YAMLParser.swift */; };
+		DB23462B226F73A70000DF87 /* YAMLRegex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450B91DB0E51C00EACD31 /* YAMLRegex.swift */; };
+		DB23462C226F73A70000DF87 /* YAMLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450BA1DB0E51C00EACD31 /* YAMLResult.swift */; };
+		DB23462D226F73A70000DF87 /* YAMLTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228450BB1DB0E51C00EACD31 /* YAMLTokenizer.swift */; };
 		F32DF2501B7304750011046A /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
 		F32DF2621B73054D0011046A /* Yaml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F32DF2581B73054C0011046A /* Yaml.framework */; };
 		F32DF27B1B7305700011046A /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32DF24D1B7304750011046A /* ExampleTests.swift */; };
@@ -78,6 +84,7 @@
 		8E1D762C1B258FEE0022C013 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E1D76321B258FEE0022C013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../Info.plist; sourceTree = "<group>"; };
 		8E1D763B1B2591330022C013 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
+		DB23461D226F71B70000DF87 /* libYaml.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libYaml.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F32DF24D1B7304750011046A /* ExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleTests.swift; sourceTree = "<group>"; };
 		F32DF2581B73054C0011046A /* Yaml.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Yaml.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F32DF2611B73054C0011046A /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -112,6 +119,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				8E1D762D1B258FEE0022C013 /* Yaml.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB23461B226F71B70000DF87 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -166,6 +180,7 @@
 				F32DF2611B73054C0011046A /* Tests.xctest */,
 				8313C4291C8DC2CB00DEF215 /* Yaml.framework */,
 				8313C4321C8DC2CB00DEF215 /* Tests.xctest */,
+				DB23461D226F71B70000DF87 /* libYaml.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -215,6 +230,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				228450D21DB0E51C00EACD31 /* Yaml.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB234619226F71B70000DF87 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,6 +323,23 @@
 			productReference = 8E1D762C1B258FEE0022C013 /* Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		DB23461C226F71B70000DF87 /* Yaml OSX Static */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB234625226F71B70000DF87 /* Build configuration list for PBXNativeTarget "Yaml OSX Static" */;
+			buildPhases = (
+				DB234619226F71B70000DF87 /* Headers */,
+				DB23461A226F71B70000DF87 /* Sources */,
+				DB23461B226F71B70000DF87 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Yaml OSX Static";
+			productName = "Yaml OSX Static";
+			productReference = DB23461D226F71B70000DF87 /* libYaml.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		F32DF2571B73054C0011046A /* Yaml iOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F32DF2691B73054D0011046A /* Build configuration list for PBXNativeTarget "Yaml iOS" */;
@@ -362,6 +401,10 @@
 						CreatedOnToolsVersion = 6.3.2;
 						LastSwiftMigration = 0800;
 					};
+					DB23461C226F71B70000DF87 = {
+						CreatedOnToolsVersion = 10.2.1;
+						ProvisioningStyle = Automatic;
+					};
 					F32DF2571B73054C0011046A = {
 						CreatedOnToolsVersion = 7.0;
 						LastSwiftMigration = 1020;
@@ -391,6 +434,7 @@
 				F32DF2601B73054C0011046A /* Tests iOS */,
 				8313C4281C8DC2CB00DEF215 /* Yaml tvOS */,
 				8313C4311C8DC2CB00DEF215 /* Tests tvOS */,
+				DB23461C226F71B70000DF87 /* Yaml OSX Static */,
 			);
 		};
 /* End PBXProject section */
@@ -482,6 +526,19 @@
 			files = (
 				F3894BCC1B7312E000286880 /* YamlTests.swift in Sources */,
 				F32DF2501B7304750011046A /* ExampleTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB23461A226F71B70000DF87 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB23462D226F73A70000DF87 /* YAMLTokenizer.swift in Sources */,
+				DB23462C226F73A70000DF87 /* YAMLResult.swift in Sources */,
+				DB23462B226F73A70000DF87 /* YAMLRegex.swift in Sources */,
+				DB234629226F73A70000DF87 /* YAMLOperators.swift in Sources */,
+				DB234628226F73A70000DF87 /* Yaml.swift in Sources */,
+				DB23462A226F73A70000DF87 /* YAMLParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1006,6 +1063,85 @@
 			};
 			name = Release;
 		};
+		DB234623226F71B70000DF87 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 3.4.3;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 3.4.3;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		DB234624226F71B70000DF87 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 3.4.3;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 3.4.3;
+				ENABLE_NS_ASSERTIONS = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
 		F32DF26A1B73054D0011046A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1252,6 +1388,15 @@
 			buildConfigurations = (
 				8EF2541E1B258FB4001BCEBE /* Debug */,
 				8EF2541F1B258FB4001BCEBE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DB234625226F71B70000DF87 /* Build configuration list for PBXNativeTarget "Yaml OSX Static" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB234623226F71B70000DF87 /* Debug */,
+				DB234624226F71B70000DF87 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
