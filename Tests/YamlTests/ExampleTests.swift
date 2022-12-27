@@ -50,6 +50,32 @@ class ExampleTests: XCTestCase {
     XCTAssert(value.count == 3)
     XCTAssert(value["avg"] == 0.278)
   }
+
+  func testComment() {
+    let value = try! Yaml.load(
+        """
+        foo:
+            bar:  # quux
+                - baz
+                - qux
+        """,
+        preserveComments: true
+      )
+
+    // print(value == Yaml.dictionary([.string("foo"): .string("bar")]))
+
+    XCTAssertEqual(value["foo"]["__comment__bar"], "quux")
+
+    // XCTAssert(
+    //     NSDictionary(
+    //         dictionary: value
+    //     ).isEqual(
+    //         to: ["foo": ["bar": ["baz": ["qux", "quux"]]]]
+    //     ), "Expected and loaded dictionaries are not the same"
+    // )
+    // XCTAssert(value.count == 3)
+    // XCTAssert(value["avg"] == 0.278)
+  }
   
   func testExample3 () {
     let value = try! Yaml.load(
@@ -490,6 +516,7 @@ extension ExampleTests {
       ("testExample20", testExample20),
       ("testExample21", testExample21),
       ("testExample22", testExample22),
+      ("testComment", testComment),
       ("testYamlHomepage", testYamlHomepage),
       ("testPerformanceExample", testPerformanceExample),
     ]
