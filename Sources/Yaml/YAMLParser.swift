@@ -13,15 +13,111 @@ struct Context {
     self.tokens = tokens
     self.aliases = aliases
   }
-  static func parseDoc (_ tokens: [Yaml.TokenMatch]) -> YAMLResult<Yaml> {
-    let c = Resulter.lift(Context(tokens))
-    let cv = c >>=- parseHeader >>=- parse
-    let v = cv >>- getValue
-    return cv
-      >>- getContext
-      >>- ignoreDocEnd
-      >>=- expect(Yaml.TokenType.end, message: "expected end")
-      >>| v
+
+  static private let commentRegex = try! NSRegularExpression(pattern: "#\\s*(?<text>.+)\\s*$")
+
+  static private func getCommentText(_ comment: String) -> String? {
+      if let match = Context.commentRegex.firstMatch(in: comment, range: NSRange(location: 0, length: comment.count)) {
+          if let textRange = Range(match.range(withName: "text"), in: comment) {
+              return String(comment[textRange])
+          }
+      }
+
+      return nil
+  }
+
+  static func makeDocParser(preserveComments: Bool = false) -> (([Yaml.TokenMatch]) -> YAMLResult<Yaml>) {
+      func parseDoc (_ tokens: [Yaml.TokenMatch]) -> YAMLResult<Yaml> {
+        let c = Resulter.lift(Context(tokens))
+        let header = c >>=- parseHeader
+
+        if preserveComments {
+            var updatedTokens = [Yaml.TokenMatch]()
+            var updatedAliases = [String.SubSequence: Yaml]()
+
+            if case let .value(context) = header {
+                updatedTokens = context.tokens
+                updatedAliases = context.aliases
+
+                var foundComment = true
+
+                while (foundComment) {
+                    var lastString: String = ""
+                    var newEntries = [Yaml.TokenMatch]()
+                    var i = 0
+                    var lastStringIndex = 0
+                    var commentIndex = 0
+
+                    foundComment = false
+
+                    for token in updatedTokens {
+                        if case let (type: type, match: comment) = token, type == Yaml.TokenType.comment {
+                            // print(Context.getCommentText(comment)!, lastString)
+                            newEntries.append(
+                                contentsOf: [
+                                    (type: Yaml.TokenType.string, match: "__comment__\(lastString)"),
+                                    (type: Yaml.TokenType.colon, match: ":"),
+                                    (type: Yaml.TokenType.indent, match: ""),
+                                    (type: Yaml.TokenType.space, match: " "),
+                                    (type: Yaml.TokenType.string, match: Context.getCommentText(comment)!),
+                                    (type: Yaml.TokenType.dedent, match: ""),
+                                    (type: Yaml.TokenType.newLine, match: "\n    ")
+                                ]
+                            )
+                            commentIndex = i
+                            foundComment = true
+                            break
+                        } else if case let (type: type, match: comment) = token, type == Yaml.TokenType.string {
+                            lastString = comment
+                            lastStringIndex = i
+                        }
+                        i += 1
+                    }
+
+                    // print(newEntries)
+                    // print(lastStringIndex)
+
+                    if (foundComment) {
+                        updatedTokens.remove(at: commentIndex)
+                        updatedTokens.insert(contentsOf: newEntries, at: lastStringIndex)
+                        // print(updatedTokens)
+                    }
+
+                    // break
+                }
+
+            }
+
+            let cv = .value(Context(updatedTokens, updatedAliases)) >>=- parse
+            // print(cv)
+            // print()
+            let v = cv >>- getValue
+            return cv
+              >>- getContext
+              >>- ignoreDocEnd
+              >>=- expect(Yaml.TokenType.end, message: "expected end")
+              >>| v
+        }
+
+        // print("upd")
+        // print(updatedTokens)
+
+        // print("------------------")
+        // print()
+        // print(header)
+        // print()
+        let cv = header >>=- parse
+        // print(cv)
+        // print()
+        let v = cv >>- getValue
+        return cv
+          >>- getContext
+          >>- ignoreDocEnd
+          >>=- expect(Yaml.TokenType.end, message: "expected end")
+          >>| v
+      }
+
+      return parseDoc
   }
   
   static func parseDocs (_ tokens: [Yaml.TokenMatch]) -> YAMLResult<[Yaml]> {
@@ -95,7 +191,9 @@ private func advance (_ context: Context) -> Context {
 }
 
 private func ignoreSpace (_ context: Context) -> Context {
+    // print("||||||||||||", context)
   if ![.comment, .space, .newLine].contains(peekType(context)) {
+  // if ![.space, .newLine].contains(peekType(context)) {
     return context
   }
   return ignoreSpace(advance(context))
@@ -164,9 +262,12 @@ private func parseHeader (_ yamlAllowed: Bool) -> (Context) -> YAMLResult<Contex
 }
 
 private func parse (_ context: Context) -> YAMLResult<ContextValue> {
+    // print(context)
+    // print(peekType(context), peekMatch(context))
   switch peekType(context) {
 
   case .comment, .space, .newLine:
+  // case .space, .newLine:
     return parse(ignoreSpace(context))
 
   case .null:
@@ -183,6 +284,14 @@ private func parse (_ context: Context) -> YAMLResult<ContextValue> {
     // will throw runtime error if overflows
     let v = Yaml.int(parseInt(m, radix: 10))
     return Resulter.lift((advance(context), v))
+
+  // case .comment:
+  //   print("------------------------------")
+  //   print(peekMatch(context))
+  //   // return parse(ignoreSpace(context))
+  //   let m = peekMatch(context)
+  //   // will throw runtime error if overflows
+  //   return Resulter.lift((advance(context), Yaml.string(m)))
 
   case .intOct:
     let m = peekMatch(context) |> Yaml.Regex.replace(Yaml.Regex.regex("0o"), template: "")
@@ -241,10 +350,17 @@ private func parse (_ context: Context) -> YAMLResult<ContextValue> {
     return createContextValue <^> c <*> v
 
   case .indent:
-    let cv = parse(advance(context))
+    let advancedContext = advance(context)
+    // print(">>", advancedContext)
+    let cv = parse(advancedContext)
+    // print("--", context)
+    // print(cv)
+    // print()
     let v = cv >>- getValue
-    let c = cv
+    let c_ = cv
         >>- getContext
+    // print(c_)
+    let c = c_
         >>- ignoreSpace
         >>=- expect(Yaml.TokenType.dedent, message: "expected dedent")
     return createContextValue <^> c <*> v
