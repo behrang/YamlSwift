@@ -51,8 +51,7 @@ struct Context {
                     foundComment = false
 
                     for token in updatedTokens {
-                        if case let (type: type, match: comment) = token, type == Yaml.TokenType.comment {
-                            print("comment token = ", token)
+                        if case let (type: type, match: comment) = token, type == Yaml.TokenType.comment, let unwrappedCommentText = Context.getCommentText(comment) {
                             // print(Context.getCommentText(comment)!, lastString)
                             newEntries.append(
                                 contentsOf: [
@@ -60,7 +59,7 @@ struct Context {
                                     (type: Yaml.TokenType.colon, match: ":"),
                                     (type: Yaml.TokenType.indent, match: ""),
                                     (type: Yaml.TokenType.space, match: " "),
-                                    (type: Yaml.TokenType.string, match: Context.getCommentText(comment)!),
+                                    (type: Yaml.TokenType.string, match: unwrappedCommentText),
                                     (type: Yaml.TokenType.dedent, match: ""),
                                     (type: Yaml.TokenType.newLine, match: "\n    ")
                                 ]
