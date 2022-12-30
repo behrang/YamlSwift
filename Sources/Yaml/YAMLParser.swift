@@ -52,10 +52,9 @@ struct Context {
 
                     for token in updatedTokens {
                         if case let (type: type, match: comment) = token, type == Yaml.TokenType.comment, let unwrappedCommentText = Context.getCommentText(comment) {
-                            // print(Context.getCommentText(comment)!, lastString)
                             newEntries.append(
                                 contentsOf: [
-                                    (type: Yaml.TokenType.string, match: "__comment__\(lastString)"),
+                                    (type: Yaml.TokenType.string, match: "\(Yaml.commentPrefix)\(lastString)"),
                                     (type: Yaml.TokenType.colon, match: ":"),
                                     (type: Yaml.TokenType.indent, match: ""),
                                     (type: Yaml.TokenType.space, match: " "),
@@ -74,23 +73,16 @@ struct Context {
                         i += 1
                     }
 
-                    // print(newEntries)
-                    // print(lastStringIndex)
-
                     if (foundComment) {
                         updatedTokens.remove(at: commentIndex)
                         updatedTokens.insert(contentsOf: newEntries, at: lastStringIndex)
-                        // print(updatedTokens)
                     }
 
-                    // break
                 }
 
             }
 
             let cv = .value(Context(updatedTokens, updatedAliases)) >>=- parse
-            // print(cv)
-            // print()
             let v = cv >>- getValue
             return cv
               >>- getContext
@@ -99,16 +91,7 @@ struct Context {
               >>| v
         }
 
-        // print("upd")
-        // print(updatedTokens)
-
-        // print("------------------")
-        // print()
-        // print(header)
-        // print()
         let cv = header >>=- parse
-        // print(cv)
-        // print()
         let v = cv >>- getValue
         return cv
           >>- getContext

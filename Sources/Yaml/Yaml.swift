@@ -45,6 +45,17 @@ public enum Yaml: Hashable {
             fatalError("`-` operator may only be used on .int or .double Yaml values")
         }
     }
+
+    public static let commentPrefix = "__comment__"
+
+    public func getComment(forKey key: String) -> String? {
+        switch self[.string("\(Yaml.commentPrefix)\(key)")] {
+            case let .string(value):
+                return value
+            default:
+                return nil
+        }
+    }
 }
 
 extension Yaml {
