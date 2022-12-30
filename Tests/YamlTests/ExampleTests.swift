@@ -62,8 +62,6 @@ class ExampleTests: XCTestCase {
         preserveComments: true
       )
 
-    // XCTAssertEqual(value["foo"]["__comment__bar"], "quux")
-    // print(value["foo"].getComment(forKey: "bar"))
     XCTAssertEqual(value["foo"].getComment(forKey: "bar"), "quux")
   }
 
