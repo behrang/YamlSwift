@@ -55,28 +55,18 @@ class ExampleTests: XCTestCase {
     let value = try! Yaml.load(
         """
         foo:
-            bar:  # quux
+            bar: # quux
                 - baz
                 - qux
         """,
         preserveComments: true
       )
 
-    // print(value == Yaml.dictionary([.string("foo"): .string("bar")]))
-
-    XCTAssertEqual(value["foo"]["__comment__bar"], "quux")
-
-    // XCTAssert(
-    //     NSDictionary(
-    //         dictionary: value
-    //     ).isEqual(
-    //         to: ["foo": ["bar": ["baz": ["qux", "quux"]]]]
-    //     ), "Expected and loaded dictionaries are not the same"
-    // )
-    // XCTAssert(value.count == 3)
-    // XCTAssert(value["avg"] == 0.278)
+    // XCTAssertEqual(value["foo"]["__comment__bar"], "quux")
+    // print(value["foo"].getComment(forKey: "bar"))
+    XCTAssertEqual(value["foo"].getComment(forKey: "bar"), "quux")
   }
-  
+
   func testExample3 () {
     let value = try! Yaml.load(
       "american:\n" +
