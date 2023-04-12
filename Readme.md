@@ -20,7 +20,7 @@ It supports Swift Package Manager.
 ```
         .package(
             url: "https://github.com/behrang/YamlSwift.git",
-            from: "
+            from: "3.4.4")
 
 ```
 
